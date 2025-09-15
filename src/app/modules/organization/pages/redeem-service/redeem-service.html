@@ -1,0 +1,102 @@
+<div class="redeem-service-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="flex items-center mb-6">
+      <button 
+        (click)="goBack()"
+        class="mr-4 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Redeem Service</h1>
+        <p class="text-sm text-gray-600 mt-1">
+          Coupon: <span class="font-semibold text-blue-600">{{ couponCode }}</span> | 
+          Customer: <span class="font-semibold">{{ customerName }}</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Services Grid -->
+  <div class="services-grid">
+    <div 
+      *ngFor="let service of services; let i = index" 
+      class="service-card"
+      [class]="getServiceCardClass(i)">
+      <div class="service-content">
+        <div class="service-number">{{ i + 1 }}</div>
+        <div class="service-details">
+          <h3 class="service-name">{{ service.name }}</h3>
+          <p class="service-description">{{ service.description }}</p>
+        </div>
+      </div>
+      <div class="service-action">
+        <button 
+          (click)="confirmRedeem(service, i)"
+          [disabled]="service.isRedeeming"
+          class="confirm-btn"
+          [class]="getConfirmButtonClass(i)">
+          <i *ngIf="service.isRedeeming" class="fas fa-spinner fa-spin"></i>
+          <i *ngIf="!service.isRedeeming" class="fas fa-check"></i>
+          <span>{{ service.isRedeeming ? 'Processing...' : 'Confirm Redeem' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Dialog -->
+  <div 
+    *ngIf="showConfirmationDialog" 
+    class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+    (click)="closeConfirmationDialog()">
+    <div 
+      class="relative top-20 mx-auto p-6 border w-96 shadow-lg rounded-md bg-white"
+      (click)="$event.stopPropagation()">
+      
+      <!-- Dialog Header -->
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Confirm Redemption</h3>
+        <button 
+          (click)="closeConfirmationDialog()"
+          class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Dialog Body -->
+      <div class="mb-6">
+        <p class="text-gray-700 mb-2">Are you sure you want to redeem this service?</p>
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <p class="font-medium text-gray-900">{{ selectedService?.name }}</p>
+          <p class="text-sm text-gray-600">{{ selectedService?.description }}</p>
+        </div>
+      </div>
+
+      <!-- Dialog Footer -->
+      <div class="flex justify-end space-x-3">
+        <button
+          (click)="closeConfirmationDialog()"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200">
+          Cancel
+        </button>
+        <button
+          (click)="processRedemption()"
+          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200">
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div 
+    *ngIf="showToast" 
+    class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300"
+    [class.translate-x-0]="showToast"
+    [class.translate-x-full]="!showToast">
+    <div class="flex items-center space-x-2">
+      <i class="fas fa-check-circle"></i>
+      <span>Redeem confirmed!</span>
+    </div>
+  </div>
+</div>

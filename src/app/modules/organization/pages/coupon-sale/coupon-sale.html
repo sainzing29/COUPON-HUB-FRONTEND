@@ -1,0 +1,112 @@
+<div class="coupon-sale-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="flex items-center mb-6">
+      <button 
+        (click)="goBack()"
+        class="mr-4 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1 class="text-2xl font-bold text-gray-900">Sell Coupon</h1>
+    </div>
+  </div>
+
+  <!-- Sale Form -->
+  <div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <form [formGroup]="saleForm" (ngSubmit)="submitSale()">
+        <div class="space-y-6">
+          <!-- Sell Coupon Field -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Sell Coupon
+            </label>
+            <div class="relative">
+              <div class="px-4 py-3 border border-gray-300 rounded-lg bg-gray-50">
+                <span class="text-lg font-bold text-blue-600">{{ couponCode }}</span>
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Coupon code to be sold</p>
+          </div>
+
+          <!-- Customer Name Field -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Customer Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="customerName"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter customer name"
+              [class.border-red-500]="saleForm.get('customerName')?.invalid && saleForm.get('customerName')?.touched">
+            <div *ngIf="saleForm.get('customerName')?.invalid && saleForm.get('customerName')?.touched" 
+                 class="text-red-500 text-xs mt-1">
+              Customer name is required
+            </div>
+          </div>
+
+          <!-- Mobile Field -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Mobile <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="tel"
+              formControlName="mobile"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter mobile number"
+              [class.border-red-500]="saleForm.get('mobile')?.invalid && saleForm.get('mobile')?.touched">
+            <div *ngIf="saleForm.get('mobile')?.invalid && saleForm.get('mobile')?.touched" 
+                 class="text-red-500 text-xs mt-1">
+              <span *ngIf="saleForm.get('mobile')?.errors?.['required']">Mobile number is required</span>
+              <span *ngIf="saleForm.get('mobile')?.errors?.['pattern']">Please enter a valid mobile number</span>
+            </div>
+          </div>
+
+          <!-- Amount Field -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Amount
+            </label>
+            <div class="relative">
+              <input
+                type="text"
+                formControlName="amount"
+                [disabled]="true"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed">
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                <span class="text-gray-500 text-sm font-medium">AED</span>
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Fixed amount for this coupon</p>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="mt-8 flex justify-end">
+          <button
+            type="submit"
+            [disabled]="saleForm.invalid || isSubmitting"
+            class="px-8 py-3 text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed rounded-lg transition-colors duration-200 flex items-center space-x-2 font-medium">
+            <i *ngIf="isSubmitting" class="fas fa-spinner fa-spin"></i>
+            <i *ngIf="!isSubmitting" class="fas fa-check"></i>
+            <span>{{ isSubmitting ? 'Processing...' : 'Submit' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div 
+    *ngIf="showToast" 
+    class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300"
+    [class.translate-x-0]="showToast"
+    [class.translate-x-full]="!showToast">
+    <div class="flex items-center space-x-2">
+      <i class="fas fa-check-circle"></i>
+      <span>Invoice generated successfully!</span>
+    </div>
+  </div>
+</div>

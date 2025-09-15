@@ -1,0 +1,194 @@
+// Coupon Sale Component Styles
+
+.coupon-sale-container {
+  @apply p-6;
+}
+
+// Header Section
+.header-section {
+  .back-button {
+    @apply mr-4 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200;
+  }
+  
+  .header-title {
+    @apply text-2xl font-bold text-gray-900;
+  }
+}
+
+// Sale Form
+.sale-form {
+  @apply max-w-2xl mx-auto;
+  
+  .form-container {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+  }
+  
+  .form-fields {
+    @apply space-y-6;
+    
+    .form-field {
+      @apply block;
+      
+      label {
+        @apply text-sm font-medium text-gray-700 mb-2;
+        
+        .required {
+          @apply text-red-500;
+        }
+      }
+      
+      input {
+        @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+        
+        &:disabled {
+          @apply bg-gray-100 text-gray-500 cursor-not-allowed;
+        }
+        
+        &.error {
+          @apply border-red-500 focus:ring-red-500;
+        }
+      }
+      
+      .coupon-display {
+        @apply px-4 py-3 border border-gray-300 rounded-lg bg-gray-50;
+        
+        .coupon-code {
+          @apply text-lg font-bold text-blue-600;
+        }
+      }
+      
+      .amount-input {
+        @apply relative;
+        
+        .currency-suffix {
+          @apply absolute inset-y-0 right-0 flex items-center pr-3;
+          
+          span {
+            @apply text-gray-500 text-sm font-medium;
+          }
+        }
+      }
+      
+      .field-description {
+        @apply text-xs text-gray-500 mt-1;
+      }
+      
+      .error-message {
+        @apply text-red-500 text-xs mt-1;
+      }
+    }
+  }
+  
+  .submit-section {
+    @apply mt-8 flex justify-end;
+    
+    .submit-button {
+      @apply px-8 py-3 text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed rounded-lg transition-colors duration-200 flex items-center space-x-2 font-medium;
+      
+      .spinner {
+        @apply animate-spin;
+      }
+    }
+  }
+}
+
+// Toast Notification
+.toast-notification {
+  @apply fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300;
+  
+  &.show {
+    @apply translate-x-0;
+  }
+  
+  &.hide {
+    @apply translate-x-full;
+  }
+  
+  .toast-content {
+    @apply flex items-center space-x-2;
+    
+    .toast-icon {
+      @apply text-lg;
+    }
+    
+    .toast-message {
+      @apply font-medium;
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .coupon-sale-container {
+    @apply p-4;
+  }
+  
+  .sale-form {
+    @apply max-w-full;
+    
+    .form-container {
+      @apply p-4;
+    }
+    
+    .form-fields {
+      @apply space-y-4;
+    }
+    
+    .submit-section {
+      @apply mt-6;
+      
+      .submit-button {
+        @apply w-full justify-center;
+      }
+    }
+  }
+  
+  .toast-notification {
+    @apply top-2 right-2 left-2 mx-auto;
+  }
+}
+
+// Animation for spinner
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+// Toast animation
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.toast-enter {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.toast-exit {
+  animation: slideOutRight 0.3s ease-in;
+}

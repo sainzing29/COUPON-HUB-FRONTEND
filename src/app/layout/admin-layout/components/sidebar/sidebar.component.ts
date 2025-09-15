@@ -34,7 +34,8 @@ export class SidebarComponent implements OnInit, OnChanges {
     { id: 'users', label: 'Users', icon: 'person', route: '/organization/users', active: false, hasSubmenu: false },
     { id: 'customers', label: 'Customers', icon: 'people', route: '/organization/customers', active: false, hasSubmenu: false },
     { id: 'service-centers', label: 'Service Centers', icon: 'business', route: '/organization/service-centers', active: false, hasSubmenu: false },
-    { id: 'coupons', label: 'Coupons', icon: 'local_offer', route: '/organization/coupons', active: false, hasSubmenu: false },
+    { id: 'service-redemption', label: 'Service Redemption', icon: 'local_offer', route: '/organization/service-redemption', active: false, hasSubmenu: false },
+    { id: 'new-coupons', label: 'New Coupons', icon: 'add_circle', route: '/organization/new-coupons', active: false, hasSubmenu: false },
     { id: 'invoices', label: 'Invoices & Payments', icon: 'receipt', route: '/organization/invoices', active: false, hasSubmenu: false },
     { 
       id: 'reports', 

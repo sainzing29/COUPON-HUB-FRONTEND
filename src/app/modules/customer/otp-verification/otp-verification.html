@@ -1,0 +1,118 @@
+<div class="otp-verification-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="logo-section">
+      <div class="logo">
+        <span class="logo-text">COUPON HUB</span>
+      </div>
+      <h1 class="page-title">Verify Your Phone</h1>
+      <p class="page-subtitle">We've sent a verification code to your phone number</p>
+      <div class="phone-info">
+        <p class="phone-text">
+          <i class="fas fa-mobile-alt"></i>
+          <span class="phone-number">{{ maskedPhoneNumber }}</span>
+        </p>
+        <button 
+          (click)="resendOTP()"
+          [disabled]="isResending"
+          class="resend-btn">
+          <i *ngIf="isResending" class="fas fa-spinner fa-spin"></i>
+          <i *ngIf="!isResending" class="fas fa-redo"></i>
+          <span>{{ isResending ? 'Sending...' : 'Resend Code' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OTP Verification Form -->
+  <div class="form-container">
+    <div class="form-card">
+      <form [formGroup]="otpForm" (ngSubmit)="verifyOTP()">
+        <div class="form-header">
+          <h2 class="form-title">Enter Verification Code</h2>
+          <p class="form-description">Please enter the 6-digit code sent to your phone</p>
+        </div>
+
+        <div class="otp-input-section">
+          <div class="otp-inputs">
+            <input
+              *ngFor="let digit of otpDigits; let i = index"
+              type="text"
+              maxlength="1"
+              [formControlName]="'digit' + i"
+              class="otp-digit"
+              [class.error]="otpForm.get('digit' + i)?.invalid && otpForm.get('digit' + i)?.touched"
+              (input)="onDigitInput($event, i)"
+              (keydown)="onKeyDown($event, i)"
+              (paste)="onPaste($event)">
+          </div>
+          
+          <div *ngIf="otpForm.invalid && otpForm.touched" class="error-message">
+            Please enter a valid 6-digit code
+          </div>
+        </div>
+
+        <!-- Timer -->
+        <div class="timer-section">
+          <div class="timer" [class.expired]="timeLeft === 0">
+            <i class="fas fa-clock"></i>
+            <span>{{ formatTime(timeLeft) }}</span>
+          </div>
+          <p class="timer-text" *ngIf="timeLeft > 0">
+            Code expires in {{ timeLeft }} seconds
+          </p>
+          <p class="timer-text expired" *ngIf="timeLeft === 0">
+            Code has expired. Please request a new one.
+          </p>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-footer">
+          <button
+            type="submit"
+            [disabled]="otpForm.invalid || isVerifying || timeLeft === 0"
+            class="verify-btn">
+            <i *ngIf="isVerifying" class="fas fa-spinner fa-spin"></i>
+            <i *ngIf="!isVerifying" class="fas fa-check"></i>
+            <span>{{ isVerifying ? 'Verifying...' : 'Verify & Continue' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Back Button -->
+  <div class="back-section">
+    <button 
+      (click)="goBack()"
+      class="back-btn">
+      <i class="fas fa-arrow-left"></i>
+      <span>Back to Registration</span>
+    </button>
+  </div>
+
+  <!-- Success Toast -->
+  <div 
+    *ngIf="showSuccessToast" 
+    class="success-toast">
+    <div class="toast-content">
+      <i class="fas fa-check-circle"></i>
+      <span>Phone verified successfully!</span>
+    </div>
+  </div>
+
+  <!-- Error Toast -->
+  <div 
+    *ngIf="showErrorToast" 
+    class="error-toast">
+    <div class="toast-content">
+      <i class="fas fa-exclamation-circle"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-section">
+    <p class="footer-text">© 2024 Coupon Hub. All rights reserved.</p>
+  </div>
+</div>

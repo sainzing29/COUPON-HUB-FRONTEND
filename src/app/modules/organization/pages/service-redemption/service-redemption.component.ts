@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { Router } from '@angular/router';
 
 interface Coupon {
   id: number;
@@ -14,11 +15,11 @@ interface Coupon {
 }
 
 @Component({
-  selector: 'app-coupons',
+  selector: 'app-service-redemption',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './coupons.component.html',
-  styleUrls: ['./coupons.component.scss'],
+  templateUrl: './service-redemption.component.html',
+  styleUrls: ['./service-redemption.component.scss'],
   animations: [
     trigger('pageFadeIn', [
       transition(':enter', [
@@ -34,7 +35,7 @@ interface Coupon {
     ])
   ]
 })
-export class CouponsComponent implements OnInit {
+export class ServiceRedemptionComponent implements OnInit {
   coupons: Coupon[] = [];
   filteredCoupons: Coupon[] = [];
   
@@ -136,7 +137,7 @@ export class CouponsComponent implements OnInit {
     }
   ];
 
-  constructor() { }
+  constructor(private router: Router) { }
 
   ngOnInit(): void {
     this.coupons = [...this.mockCoupons];
@@ -171,5 +172,12 @@ export class CouponsComponent implements OnInit {
 
   formatDate(dateString: string): string {
     return new Date(dateString).toLocaleDateString();
+  }
+
+  redeemService(coupon: Coupon): void {
+    // Navigate to redeem service page with coupon code as query parameter
+    this.router.navigate(['/organization/redeem-service'], {
+      queryParams: { couponCode: coupon.code, customerName: coupon.customer }
+    });
   }
 }

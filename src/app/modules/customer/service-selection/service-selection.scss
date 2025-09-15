@@ -1,0 +1,282 @@
+// Service Selection Component Styles
+
+.service-selection-container {
+  @apply min-h-screen bg-gradient-to-br from-green-50 to-blue-100 flex flex-col;
+}
+
+// Header Section
+.header-section {
+  @apply py-8 px-6 text-center;
+  
+  .logo-section {
+    @apply max-w-4xl mx-auto;
+    
+    .logo {
+      @apply mb-6;
+      
+      .logo-text {
+        @apply text-3xl font-bold text-green-600;
+      }
+    }
+    
+    .page-title {
+      @apply text-3xl font-bold text-gray-900 mb-2;
+    }
+    
+    .page-subtitle {
+      @apply text-gray-600 text-lg mb-4;
+    }
+    
+    .customer-info {
+      @apply bg-white rounded-lg p-4 shadow-sm max-w-md mx-auto;
+      
+      .info-text {
+        @apply text-sm text-gray-700;
+        
+        .label {
+          @apply font-medium;
+        }
+        
+        .coupon-number {
+          @apply font-mono font-bold text-green-600;
+        }
+      }
+    }
+  }
+}
+
+// Services Container
+.services-container {
+  @apply flex-1 px-6 pb-8;
+  
+  .services-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8;
+  }
+}
+
+// Service Card
+.service-card {
+  @apply bg-white rounded-xl shadow-sm border-2 border-transparent p-6 transition-all duration-200 hover:shadow-md cursor-pointer;
+  
+  &.selected {
+    @apply border-green-300 bg-green-50;
+  }
+  
+  &.service-1 {
+    @apply border-blue-200 bg-blue-50;
+    
+    &.selected {
+      @apply border-blue-400 bg-blue-100;
+    }
+  }
+  
+  &.service-2 {
+    @apply border-green-200 bg-green-50;
+    
+    &.selected {
+      @apply border-green-400 bg-green-100;
+    }
+  }
+  
+  &.service-3 {
+    @apply border-purple-200 bg-purple-50;
+    
+    &.selected {
+      @apply border-purple-400 bg-purple-100;
+    }
+  }
+  
+  &.service-4 {
+    @apply border-yellow-200 bg-yellow-50;
+    
+    &.selected {
+      @apply border-yellow-400 bg-yellow-100;
+    }
+  }
+  
+  &.service-5 {
+    @apply border-red-200 bg-red-50;
+    
+    &.selected {
+      @apply border-red-400 bg-red-100;
+    }
+  }
+  
+  .service-content {
+    @apply flex items-start space-x-4 mb-4;
+    
+    .service-number {
+      @apply w-8 h-8 bg-white rounded-full flex items-center justify-center text-sm font-bold text-gray-600 shadow-sm;
+    }
+    
+    .service-details {
+      @apply flex-1;
+      
+      .service-name {
+        @apply text-lg font-semibold text-gray-900 mb-2;
+      }
+      
+      .service-description {
+        @apply text-sm text-gray-600 mb-3;
+      }
+      
+      .service-price {
+        @apply flex items-center space-x-2;
+        
+        .price-label {
+          @apply text-xs text-gray-500 font-medium;
+        }
+        
+        .price-value {
+          @apply text-sm font-bold text-green-600;
+        }
+      }
+    }
+  }
+  
+  .service-action {
+    @apply flex justify-end;
+    
+    .select-btn {
+      @apply px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2;
+      
+      &.selected {
+        @apply bg-green-600 text-white;
+      }
+    }
+  }
+}
+
+// Service-specific button colors
+.service-1 .select-btn:not(.selected) {
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+}
+
+.service-2 .select-btn:not(.selected) {
+  @apply bg-green-600 hover:bg-green-700 text-white;
+}
+
+.service-3 .select-btn:not(.selected) {
+  @apply bg-purple-600 hover:bg-purple-700 text-white;
+}
+
+.service-4 .select-btn:not(.selected) {
+  @apply bg-yellow-600 hover:bg-yellow-700 text-white;
+}
+
+.service-5 .select-btn:not(.selected) {
+  @apply bg-red-600 hover:bg-red-700 text-white;
+}
+
+// Summary Section
+.summary-section {
+  @apply max-w-4xl mx-auto;
+  
+  .summary-card {
+    @apply bg-white rounded-xl shadow-lg p-6;
+    
+    .summary-title {
+      @apply text-xl font-bold text-gray-900 mb-4;
+    }
+    
+    .selected-services-list {
+      @apply space-y-3 mb-6;
+      
+      .selected-service-item {
+        @apply flex justify-between items-center py-2 px-3 bg-gray-50 rounded-lg;
+        
+        .service-name {
+          @apply font-medium text-gray-900;
+        }
+        
+        .service-value {
+          @apply text-sm font-bold text-green-600;
+        }
+      }
+    }
+    
+    .summary-actions {
+      @apply flex justify-end;
+      
+      .proceed-btn {
+        @apply px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2;
+      }
+    }
+  }
+}
+
+// Back Section
+.back-section {
+  @apply px-6 pb-4;
+  
+  .back-btn {
+    @apply px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200 flex items-center space-x-2;
+  }
+}
+
+// Footer Section
+.footer-section {
+  @apply py-4 px-6 text-center;
+  
+  .footer-text {
+    @apply text-gray-500 text-sm;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .header-section {
+    @apply py-6 px-4;
+    
+    .logo-section {
+      .page-title {
+        @apply text-2xl;
+      }
+      
+      .page-subtitle {
+        @apply text-base;
+      }
+    }
+  }
+  
+  .services-container {
+    @apply px-4 pb-6;
+    
+    .services-grid {
+      @apply grid-cols-1 gap-4;
+    }
+  }
+  
+  .service-card {
+    @apply p-4;
+  }
+  
+  .summary-section {
+    .summary-card {
+      @apply p-4;
+    }
+  }
+}
+
+// Animation for cards
+.service-card {
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Staggered animation for service cards
+.service-card:nth-child(1) { animation-delay: 0.1s; }
+.service-card:nth-child(2) { animation-delay: 0.2s; }
+.service-card:nth-child(3) { animation-delay: 0.3s; }
+.service-card:nth-child(4) { animation-delay: 0.4s; }
+.service-card:nth-child(5) { animation-delay: 0.5s; }

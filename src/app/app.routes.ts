@@ -3,8 +3,21 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: '/sign-in',
+    redirectTo: '/customer/register',
     pathMatch: 'full'
+  },
+  // Customer routes (outside admin layout)
+  {
+    path: 'customer/register',
+    loadComponent: () => import('./modules/customer/register-customer/register-customer').then(m => m.RegisterCustomerComponent)
+  },
+  {
+    path: 'customer/otp-verification',
+    loadComponent: () => import('./modules/customer/otp-verification/otp-verification').then(m => m.OtpVerificationComponent)
+  },
+  {
+    path: 'customer/service-selection',
+    loadComponent: () => import('./modules/customer/service-selection/service-selection').then(m => m.ServiceSelectionComponent)
   },
   {
     path: 'sign-in',
@@ -41,8 +54,20 @@ export const routes: Routes = [
         loadComponent: () => import('./modules/organization/pages/customers/customers.component').then(m => m.CustomersComponent)
       },
       {
-        path: 'coupons',
-        loadComponent: () => import('./modules/organization/pages/coupons/coupons.component').then(m => m.CouponsComponent)
+        path: 'service-redemption',
+        loadComponent: () => import('./modules/organization/pages/service-redemption/service-redemption.component').then(m => m.ServiceRedemptionComponent)
+      },
+      {
+        path: 'redeem-service',
+        loadComponent: () => import('./modules/organization/pages/redeem-service/redeem-service').then(m => m.RedeemServiceComponent)
+      },
+      {
+        path: 'new-coupons',
+        loadComponent: () => import('./modules/organization/pages/new-coupons/new-coupons').then(m => m.NewCouponsComponent)
+      },
+      {
+        path: 'new-coupons/sale',
+        loadComponent: () => import('./modules/organization/pages/coupon-sale/coupon-sale').then(m => m.CouponSaleComponent)
       },
       {
         path: 'invoices',

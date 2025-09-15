@@ -1,0 +1,127 @@
+<div class="register-customer-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="logo-section">
+      <div class="logo">
+        <span class="logo-text">COUPON HUB</span>
+      </div>
+      <h1 class="page-title">Customer Registration</h1>
+      <p class="page-subtitle">Register with your coupon number to access our services</p>
+    </div>
+  </div>
+
+  <!-- Registration Form -->
+  <div class="form-container">
+    <div class="form-card">
+      <form [formGroup]="registrationForm" (ngSubmit)="submitRegistration()">
+        <div class="form-header">
+          <h2 class="form-title">Enter Your Details</h2>
+          <p class="form-description">Please provide your information and coupon number</p>
+        </div>
+
+        <div class="form-fields">
+          <!-- Full Name -->
+          <div class="form-group">
+            <label class="form-label">
+              Full Name <span class="required">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="fullName"
+              class="form-input"
+              [class.error]="registrationForm.get('fullName')?.invalid && registrationForm.get('fullName')?.touched"
+              placeholder="Enter your full name">
+            <div *ngIf="registrationForm.get('fullName')?.invalid && registrationForm.get('fullName')?.touched" 
+                 class="error-message">
+              Full name is required
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label class="form-label">
+              Email Address <span class="required">*</span>
+            </label>
+            <input
+              type="email"
+              formControlName="email"
+              class="form-input"
+              [class.error]="registrationForm.get('email')?.invalid && registrationForm.get('email')?.touched"
+              placeholder="Enter your email address">
+            <div *ngIf="registrationForm.get('email')?.invalid && registrationForm.get('email')?.touched" 
+                 class="error-message">
+              <span *ngIf="registrationForm.get('email')?.errors?.['required']">Email is required</span>
+              <span *ngIf="registrationForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+            </div>
+          </div>
+
+          <!-- Phone Number -->
+          <div class="form-group">
+            <label class="form-label">
+              Phone Number <span class="required">*</span>
+            </label>
+            <input
+              type="tel"
+              formControlName="phone"
+              class="form-input"
+              [class.error]="registrationForm.get('phone')?.invalid && registrationForm.get('phone')?.touched"
+              placeholder="Enter your phone number">
+            <div *ngIf="registrationForm.get('phone')?.invalid && registrationForm.get('phone')?.touched" 
+                 class="error-message">
+              <span *ngIf="registrationForm.get('phone')?.errors?.['required']">Phone number is required</span>
+              <span *ngIf="registrationForm.get('phone')?.errors?.['pattern']">Please enter a valid phone number</span>
+            </div>
+          </div>
+
+          <!-- Coupon Number -->
+          <div class="form-group">
+            <label class="form-label">
+              Coupon Number <span class="required">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="couponNumber"
+              class="form-input coupon-input"
+              [class.error]="registrationForm.get('couponNumber')?.invalid && registrationForm.get('couponNumber')?.touched"
+              placeholder="Enter your coupon number">
+            <div *ngIf="registrationForm.get('couponNumber')?.invalid && registrationForm.get('couponNumber')?.touched" 
+                 class="error-message">
+              <span *ngIf="registrationForm.get('couponNumber')?.errors?.['required']">Coupon number is required</span>
+              <span *ngIf="registrationForm.get('couponNumber')?.errors?.['pattern']">Please enter a valid coupon number</span>
+            </div>
+            <p class="help-text">Enter the 10-digit coupon number you received</p>
+          </div>
+
+          <!-- Address -->
+          <div class="form-group">
+            <label class="form-label">
+              Address
+            </label>
+            <textarea
+              formControlName="address"
+              class="form-textarea"
+              rows="3"
+              placeholder="Enter your address (optional)"></textarea>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-footer">
+          <button
+            type="submit"
+            [disabled]="registrationForm.invalid || isSubmitting"
+            class="submit-btn">
+            <i *ngIf="isSubmitting" class="fas fa-spinner fa-spin"></i>
+            <i *ngIf="!isSubmitting" class="fas fa-user-plus"></i>
+            <span>{{ isSubmitting ? 'Registering...' : 'Register & Continue' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-section">
+    <p class="footer-text">© 2024 Coupon Hub. All rights reserved.</p>
+  </div>
+</div>

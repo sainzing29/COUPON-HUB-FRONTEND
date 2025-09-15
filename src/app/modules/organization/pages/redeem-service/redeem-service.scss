@@ -1,0 +1,263 @@
+// Redeem Service Component Styles
+
+.redeem-service-container {
+  @apply p-6;
+}
+
+// Header Section
+.header-section {
+  .back-button {
+    @apply mr-4 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200;
+  }
+  
+  .header-title {
+    @apply text-2xl font-bold text-gray-900;
+  }
+  
+  .header-subtitle {
+    @apply text-sm text-gray-600 mt-1;
+    
+    .coupon-code {
+      @apply font-semibold text-blue-600;
+    }
+    
+    .customer-name {
+      @apply font-semibold;
+    }
+  }
+}
+
+// Services Grid
+.services-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+// Service Card
+.service-card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-all duration-200 hover:shadow-md;
+  
+  &.service-1 {
+    @apply border-blue-200 bg-blue-50;
+  }
+  
+  &.service-2 {
+    @apply border-green-200 bg-green-50;
+  }
+  
+  &.service-3 {
+    @apply border-purple-200 bg-purple-50;
+  }
+  
+  &.service-4 {
+    @apply border-yellow-200 bg-yellow-50;
+  }
+  
+  &.service-5 {
+    @apply border-red-200 bg-red-50;
+  }
+  
+  .service-content {
+    @apply flex items-start space-x-4 mb-4;
+    
+    .service-number {
+      @apply w-8 h-8 bg-white rounded-full flex items-center justify-center text-sm font-bold text-gray-600 shadow-sm;
+    }
+    
+    .service-details {
+      @apply flex-1;
+      
+      .service-name {
+        @apply text-lg font-semibold text-gray-900 mb-1;
+      }
+      
+      .service-description {
+        @apply text-sm text-gray-600;
+      }
+    }
+  }
+  
+  .service-action {
+    @apply flex justify-end;
+    
+    .confirm-btn {
+      @apply px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2;
+      
+      &:disabled {
+        @apply cursor-not-allowed opacity-50;
+      }
+      
+      .spinner {
+        @apply animate-spin;
+      }
+    }
+  }
+}
+
+// Service-specific button colors
+.service-1 .confirm-btn {
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+}
+
+.service-2 .confirm-btn {
+  @apply bg-green-600 hover:bg-green-700 text-white;
+}
+
+.service-3 .confirm-btn {
+  @apply bg-purple-600 hover:bg-purple-700 text-white;
+}
+
+.service-4 .confirm-btn {
+  @apply bg-yellow-600 hover:bg-yellow-700 text-white;
+}
+
+.service-5 .confirm-btn {
+  @apply bg-red-600 hover:bg-red-700 text-white;
+}
+
+// Confirmation Dialog
+.confirmation-dialog {
+  @apply fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50;
+  
+  .dialog-content {
+    @apply relative top-20 mx-auto p-6 border w-96 shadow-lg rounded-md bg-white;
+  }
+  
+  .dialog-header {
+    @apply flex justify-between items-center mb-4;
+    
+    .dialog-title {
+      @apply text-lg font-semibold text-gray-900;
+    }
+    
+    .close-btn {
+      @apply text-gray-400 hover:text-gray-600 transition-colors duration-200;
+    }
+  }
+  
+  .dialog-body {
+    @apply mb-6;
+    
+    .confirmation-text {
+      @apply text-gray-700 mb-2;
+    }
+    
+    .service-preview {
+      @apply bg-gray-50 p-3 rounded-lg;
+      
+      .service-name {
+        @apply font-medium text-gray-900;
+      }
+      
+      .service-description {
+        @apply text-sm text-gray-600;
+      }
+    }
+  }
+  
+  .dialog-footer {
+    @apply flex justify-end space-x-3;
+    
+    .cancel-btn {
+      @apply px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200;
+    }
+    
+    .confirm-btn {
+      @apply px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200;
+    }
+  }
+}
+
+// Toast Notification
+.toast-notification {
+  @apply fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300;
+  
+  &.show {
+    @apply translate-x-0;
+  }
+  
+  &.hide {
+    @apply translate-x-full;
+  }
+  
+  .toast-content {
+    @apply flex items-center space-x-2;
+    
+    .toast-icon {
+      @apply text-lg;
+    }
+    
+    .toast-message {
+      @apply font-medium;
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .redeem-service-container {
+    @apply p-4;
+  }
+  
+  .services-grid {
+    @apply grid-cols-1 gap-4;
+  }
+  
+  .service-card {
+    @apply p-4;
+  }
+  
+  .confirmation-dialog {
+    .dialog-content {
+      @apply w-full mx-4;
+    }
+  }
+  
+  .toast-notification {
+    @apply top-2 right-2 left-2 mx-auto;
+  }
+}
+
+// Animation for spinner
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+// Toast animation
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.toast-enter {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.toast-exit {
+  animation: slideOutRight 0.3s ease-in;
+}

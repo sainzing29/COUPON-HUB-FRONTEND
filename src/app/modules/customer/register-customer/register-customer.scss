@@ -1,0 +1,174 @@
+// Register Customer Component Styles
+
+.register-customer-container {
+  @apply min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col;
+}
+
+// Header Section
+.header-section {
+  @apply py-8 px-6 text-center;
+  
+  .logo-section {
+    @apply max-w-md mx-auto;
+    
+    .logo {
+      @apply mb-6;
+      
+      .logo-text {
+        @apply text-3xl font-bold text-blue-600;
+      }
+    }
+    
+    .page-title {
+      @apply text-3xl font-bold text-gray-900 mb-2;
+    }
+    
+    .page-subtitle {
+      @apply text-gray-600 text-lg;
+    }
+  }
+}
+
+// Form Container
+.form-container {
+  @apply flex-1 flex items-center justify-center px-6 pb-8;
+  
+  .form-card {
+    @apply w-full max-w-md bg-white rounded-xl shadow-lg p-8;
+  }
+}
+
+// Form Header
+.form-header {
+  @apply text-center mb-8;
+  
+  .form-title {
+    @apply text-2xl font-bold text-gray-900 mb-2;
+  }
+  
+  .form-description {
+    @apply text-gray-600;
+  }
+}
+
+// Form Fields
+.form-fields {
+  @apply space-y-6;
+  
+  .form-group {
+    @apply space-y-2;
+    
+    .form-label {
+      @apply block text-sm font-medium text-gray-700;
+      
+      .required {
+        @apply text-red-500;
+      }
+    }
+    
+    .form-input {
+      @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200;
+      
+      &.error {
+        @apply border-red-500 focus:ring-red-500;
+      }
+      
+      &.coupon-input {
+        @apply font-mono text-lg tracking-wider;
+      }
+    }
+    
+    .form-textarea {
+      @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 resize-none;
+    }
+    
+    .help-text {
+      @apply text-xs text-gray-500;
+    }
+    
+    .error-message {
+      @apply text-red-500 text-sm;
+    }
+  }
+}
+
+// Form Footer
+.form-footer {
+  @apply mt-8;
+  
+  .submit-btn {
+    @apply w-full py-3 px-6 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2;
+    
+    .spinner {
+      @apply animate-spin;
+    }
+  }
+}
+
+// Footer Section
+.footer-section {
+  @apply py-4 px-6 text-center;
+  
+  .footer-text {
+    @apply text-gray-500 text-sm;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .header-section {
+    @apply py-6 px-4;
+    
+    .logo-section {
+      .page-title {
+        @apply text-2xl;
+      }
+      
+      .page-subtitle {
+        @apply text-base;
+      }
+    }
+  }
+  
+  .form-container {
+    @apply px-4 pb-6;
+    
+    .form-card {
+      @apply p-6;
+    }
+  }
+  
+  .form-fields {
+    @apply space-y-4;
+  }
+}
+
+// Animation for spinner
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+// Form animations
+.form-card {
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

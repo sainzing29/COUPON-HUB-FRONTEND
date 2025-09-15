@@ -1,0 +1,87 @@
+<div class="service-selection-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="logo-section">
+      <div class="logo">
+        <span class="logo-text">COUPON HUB</span>
+      </div>
+      <h1 class="page-title">Available Services</h1>
+      <p class="page-subtitle">Welcome {{ customerName }}! Select the services you'd like to redeem</p>
+      <div class="customer-info">
+        <p class="info-text">
+          <span class="label">Coupon:</span> 
+          <span class="coupon-number">{{ couponNumber }}</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Services Grid -->
+  <div class="services-container">
+    <div class="services-grid">
+      <div 
+        *ngFor="let service of services; let i = index" 
+        class="service-card"
+        [class]="getServiceCardClass(i)"
+        [class.selected]="service.isSelected">
+        <div class="service-content">
+          <div class="service-number">{{ i + 1 }}</div>
+          <div class="service-details">
+            <h3 class="service-name">{{ service.name }}</h3>
+            <p class="service-description">{{ service.description }}</p>
+            <div class="service-price">
+              <span class="price-label">Value:</span>
+              <span class="price-value">{{ service.value }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="service-action">
+          <button 
+            (click)="toggleService(service, i)"
+            class="select-btn"
+            [class]="getSelectButtonClass(i, service.isSelected)">
+            <i *ngIf="service.isSelected" class="fas fa-check"></i>
+            <i *ngIf="!service.isSelected" class="fas fa-plus"></i>
+            <span>{{ service.isSelected ? 'Selected' : 'Select' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selected Services Summary -->
+    <div *ngIf="selectedServices.length > 0" class="summary-section">
+      <div class="summary-card">
+        <h3 class="summary-title">Selected Services ({{ selectedServices.length }})</h3>
+        <div class="selected-services-list">
+          <div *ngFor="let service of selectedServices" class="selected-service-item">
+            <span class="service-name">{{ service.name }}</span>
+            <span class="service-value">{{ service.value }}</span>
+          </div>
+        </div>
+        <div class="summary-actions">
+          <button 
+            (click)="proceedToRedeem()"
+            class="proceed-btn">
+            <i class="fas fa-arrow-right"></i>
+            <span>Proceed to Redeem</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back Button -->
+  <div class="back-section">
+    <button 
+      (click)="goBack()"
+      class="back-btn">
+      <i class="fas fa-arrow-left"></i>
+      <span>Back to Registration</span>
+    </button>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-section">
+    <p class="footer-text">© 2024 Coupon Hub. All rights reserved.</p>
+  </div>
+</div>
