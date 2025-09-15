@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: '/customer/register',
+    redirectTo: '/sign-in',
     pathMatch: 'full'
   },
   // Customer routes (outside admin layout)
