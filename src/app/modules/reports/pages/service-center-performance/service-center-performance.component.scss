@@ -1,0 +1,193 @@
+// Service Center Performance Component Styles
+
+// KPI Cards styling
+.kpi-card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+  
+  .kpi-icon {
+    @apply w-8 h-8 rounded-lg flex items-center justify-center;
+    
+    &.green {
+      @apply bg-green-100;
+      i {
+        @apply text-green-600;
+      }
+    }
+    
+    &.red {
+      @apply bg-red-100;
+      i {
+        @apply text-red-600;
+      }
+    }
+    
+    &.yellow {
+      @apply bg-yellow-100;
+      i {
+        @apply text-yellow-600;
+      }
+    }
+  }
+  
+  .kpi-value {
+    @apply text-2xl font-semibold text-gray-900;
+  }
+  
+  .kpi-label {
+    @apply text-sm font-medium text-gray-500;
+  }
+}
+
+// Chart styling
+.chart-container {
+  @apply h-64 flex items-end justify-between space-x-2;
+  
+  .chart-bar {
+    @apply bg-blue-500 rounded-t w-full mb-2 transition-all duration-300;
+    
+    &:hover {
+      @apply bg-blue-600;
+    }
+  }
+  
+  .chart-label {
+    @apply text-xs text-gray-600 text-center;
+    
+    .chart-value {
+      @apply font-medium;
+    }
+    
+    .chart-name {
+      @apply mt-1;
+    }
+  }
+}
+
+// Pie chart styling
+.pie-chart-container {
+  @apply h-64 flex items-center justify-center;
+  
+  .pie-chart {
+    @apply relative w-48 h-48;
+    
+    svg {
+      @apply w-full h-full transform -rotate-90;
+    }
+    
+    .pie-segment {
+      @apply transition-all duration-300 hover:opacity-80;
+    }
+    
+    .pie-center {
+      @apply absolute inset-0 flex items-center justify-center;
+      
+      .center-text {
+        @apply text-center;
+        
+        .center-value {
+          @apply text-2xl font-bold text-gray-900;
+        }
+        
+        .center-label {
+          @apply text-sm text-gray-500;
+        }
+      }
+    }
+  }
+  
+  .pie-legend {
+    @apply mt-4 grid grid-cols-2 gap-2;
+    
+    .legend-item {
+      @apply flex items-center space-x-2;
+      
+      .legend-color {
+        @apply w-3 h-3 rounded-full;
+      }
+      
+      .legend-text {
+        @apply text-xs text-gray-600;
+      }
+    }
+  }
+}
+
+// Export buttons styling
+.export-buttons {
+  @apply flex items-center gap-3;
+  
+  .export-btn {
+    @apply px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200;
+    
+    &.csv {
+      @apply bg-green-600 hover:bg-green-700 text-white;
+    }
+    
+    &.pdf {
+      @apply bg-red-600 hover:bg-red-700 text-white;
+    }
+  }
+}
+
+// Table styling
+table {
+  th {
+    @apply text-gray-500 text-xs font-medium uppercase tracking-wider;
+  }
+  
+  td {
+    @apply text-sm text-gray-900;
+  }
+}
+
+// Hover effects
+.hover-row:hover {
+  @apply bg-gray-50;
+}
+
+// Filter styling
+.filter-section {
+  @apply flex items-center gap-4;
+  
+  .filter-group {
+    @apply flex items-center space-x-2;
+    
+    label {
+      @apply text-sm font-medium text-gray-700 whitespace-nowrap;
+    }
+    
+    input, select {
+      @apply px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm font-medium text-gray-700 shadow-sm hover:border-gray-400 transition-colors duration-200;
+    }
+    
+    select {
+      @apply appearance-none cursor-pointer;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .filter-section {
+    @apply flex-col items-start gap-2;
+  }
+  
+  .chart-container {
+    @apply h-48;
+  }
+  
+  .pie-chart-container {
+    @apply h-48;
+    
+    .pie-chart {
+      @apply w-36 h-36;
+    }
+  }
+  
+  .pie-legend {
+    @apply grid-cols-1;
+  }
+}
+
+
+

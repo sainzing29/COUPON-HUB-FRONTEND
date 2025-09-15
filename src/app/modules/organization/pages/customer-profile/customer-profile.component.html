@@ -1,0 +1,325 @@
+<!-- Page Content with Animation -->
+<div [@pageFadeIn] *ngIf="customer">
+  <!-- Header Section -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <button 
+          (click)="onBack()"
+          class="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+          <i class="bi bi-arrow-left text-xl"></i>
+        </button>
+        <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
+          <span class="text-gray-600 font-medium text-2xl">
+            {{ customer.firstName.charAt(0) }}{{ customer.lastName.charAt(0) }}
+          </span>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">{{ customer.fullName }}</h1>
+          <p class="text-gray-600">{{ customer.email }}</p>
+          <div class="flex items-center space-x-4 mt-2">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                  [class]="customer.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+              <i class="bi bi-circle-fill text-xs mr-1"></i>
+              {{ customer.isActive ? 'Active' : 'Inactive' }}
+            </span>
+            <span class="text-sm text-gray-500">ID: {{ customer.id }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center space-x-3">
+        <button 
+          *ngIf="!isEditMode"
+          (click)="onEdit()"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200">
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
+        <div *ngIf="isEditMode" class="flex items-center space-x-2">
+          <button 
+            (click)="onCancel()"
+            class="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+            Cancel
+          </button>
+          <button 
+            (click)="onSave()"
+            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Details Section -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Customer Details</h2>
+    
+    <div *ngIf="!isEditMode" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div>
+        <label class="text-sm font-medium text-gray-500">Email</label>
+        <p class="text-sm text-gray-900">{{ customer.email }}</p>
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-500">Mobile Number</label>
+        <p class="text-sm text-gray-900">{{ customer.mobileNumber }}</p>
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-500">Member Since</label>
+        <p class="text-sm text-gray-900">{{ formatDate(customer.createdAt) }}</p>
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-500">Coupon Count</label>
+        <p class="text-sm text-gray-900">{{ customer.couponCount || 0 }}</p>
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-500">Invoice Count</label>
+        <p class="text-sm text-gray-900">{{ customer.invoiceCount || 0 }}</p>
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-500">Google ID</label>
+        <p class="text-sm text-gray-900">{{ customer.googleId || 'Not connected' }}</p>
+      </div>
+    </div>
+
+    <!-- Edit Form -->
+    <form *ngIf="isEditMode" [formGroup]="editForm" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="form-group">
+          <label for="firstName" class="form-label">First Name *</label>
+          <input 
+            type="text" 
+            id="firstName"
+            formControlName="firstName" 
+            placeholder="Enter first name"
+            class="form-input"
+            [class.error]="getFieldError('firstName')">
+          <div *ngIf="getFieldError('firstName')" class="form-error">
+            {{ getFieldError('firstName') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName" class="form-label">Last Name *</label>
+          <input 
+            type="text" 
+            id="lastName"
+            formControlName="lastName" 
+            placeholder="Enter last name"
+            class="form-input"
+            [class.error]="getFieldError('lastName')">
+          <div *ngIf="getFieldError('lastName')" class="form-error">
+            {{ getFieldError('lastName') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email" class="form-label">Email *</label>
+        <input 
+          type="email" 
+          id="email"
+          formControlName="email" 
+          placeholder="Enter email address"
+          class="form-input"
+          [class.error]="getFieldError('email')">
+        <div *ngIf="getFieldError('email')" class="form-error">
+          {{ getFieldError('email') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="mobileNumber" class="form-label">Mobile Number *</label>
+        <input 
+          type="tel" 
+          id="mobileNumber"
+          formControlName="mobileNumber" 
+          placeholder="Enter mobile number"
+          class="form-input"
+          [class.error]="getFieldError('mobileNumber')">
+        <div *ngIf="getFieldError('mobileNumber')" class="form-error">
+          {{ getFieldError('mobileNumber') }}
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Tabs Section -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="customer-tabs">
+      <!-- Coupons Tab -->
+      <mat-tab label="Coupons">
+        <div class="p-6">
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Coupon History</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div class="bg-green-50 p-4 rounded-lg">
+                <div class="text-2xl font-bold text-green-600">{{ getCouponsByStatus('Active').length }}</div>
+                <div class="text-sm text-green-600">Active Coupons</div>
+              </div>
+              <div class="bg-blue-50 p-4 rounded-lg">
+                <div class="text-2xl font-bold text-blue-600">{{ getCouponsByStatus('Used').length }}</div>
+                <div class="text-sm text-blue-600">Used Coupons</div>
+              </div>
+              <div class="bg-red-50 p-4 rounded-lg">
+                <div class="text-2xl font-bold text-red-600">{{ getCouponsByStatus('Expired').length }}</div>
+                <div class="text-sm text-red-600">Expired Coupons</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purchase Date</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiry Date</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let coupon of coupons" class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ coupon.code }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <span class="font-semibold text-gray-900">99</span>
+                    <span class="font-semibold text-blue-600 ml-1">AED</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                          [class]="getStatusBadgeClass(coupon.status)">
+                      <i class="bi bi-circle-fill text-xs mr-1"></i>
+                      {{ coupon.status }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(coupon.purchaseDate) }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(coupon.expiryDate) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Service History Tab -->
+      <mat-tab label="Service History">
+        <div class="p-6">
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Service History</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div class="bg-green-50 p-4 rounded-lg">
+                <div class="text-2xl font-bold text-green-600">{{ getCompletedServicesCount() }}</div>
+                <div class="text-sm text-green-600">Completed Services</div>
+              </div>
+              <div class="bg-yellow-50 p-4 rounded-lg">
+                <div class="text-2xl font-bold text-yellow-600">{{ getInProgressServicesCount() }}</div>
+                <div class="text-sm text-yellow-600">In Progress</div>
+              </div>
+              <div class="bg-blue-50 p-4 rounded-lg">
+                <div class="text-2xl font-bold text-blue-600">{{ getTotalServiceAmount() }} AED</div>
+                <div class="text-sm text-blue-600">Total Spent</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service Center</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Technician</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let service of serviceHistory" class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ service.serviceName }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ service.serviceCenterName }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(service.serviceDate) }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ service.technician }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <span class="text-gray-900">199</span>
+                    <span class="text-blue-600 ml-1">AED</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                          [class]="getStatusBadgeClass(service.status)">
+                      <i class="bi bi-circle-fill text-xs mr-1"></i>
+                      {{ service.status }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Invoices Tab -->
+      <mat-tab label="Invoices">
+        <div class="p-6">
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Invoice History</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div class="bg-blue-50 p-4 rounded-lg">
+                <div class="text-2xl font-bold text-blue-600">{{ invoices.length }}</div>
+                <div class="text-sm text-blue-600">Total Invoices</div>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <div class="text-2xl font-bold text-gray-600">297 <span class="text-blue-600">AED</span></div>
+                <div class="text-sm text-gray-600">Total Amount</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice #</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service Center</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issue Date</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let invoice of invoices" class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ invoice.invoiceNumber }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ invoice.serviceCenterName }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(invoice.issueDate) }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(invoice.dueDate) }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <span class="text-gray-900">99</span>
+                    <span class="text-blue-600 ml-1">AED</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                          [class]="getStatusBadgeClass(invoice.status)">
+                      <i class="bi bi-circle-fill text-xs mr-1"></i>
+                      {{ invoice.status }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div *ngIf="!customer" class="flex items-center justify-center h-64">
+  <div class="text-center">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+    <p class="text-gray-600">Loading customer details...</p>
+  </div>
+</div>

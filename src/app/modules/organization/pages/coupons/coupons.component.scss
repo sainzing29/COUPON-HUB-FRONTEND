@@ -1,0 +1,52 @@
+// Coupons Component Styles
+
+// Table styling
+table {
+  th {
+    @apply text-gray-500 text-xs font-medium uppercase tracking-wider;
+  }
+  
+  td {
+    @apply text-sm text-gray-900;
+  }
+}
+
+// Status badges
+.status-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  
+  &.active {
+    @apply bg-green-100 text-green-800;
+  }
+  
+  &.expired {
+    @apply bg-red-100 text-red-800;
+  }
+}
+
+// Filter styling
+.filter-section {
+  @apply flex items-center gap-4;
+  
+  label {
+    @apply text-sm font-medium text-gray-700;
+  }
+  
+  select, input {
+    @apply px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
+}
+
+// Hover effects
+.hover-row:hover {
+  @apply bg-gray-50;
+}
+
+// No results styling
+.no-results {
+  @apply text-center py-8 text-gray-500;
+  
+  i {
+    @apply text-4xl mb-2;
+  }
+}

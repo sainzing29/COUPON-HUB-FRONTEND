@@ -1,0 +1,163 @@
+<div class="space-y-6" [@staggerCards]>
+  <!-- Statistics Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!-- Total Coupons Sold Card -->
+    <div class="stat-card bg-white rounded-lg shadow-card p-6 card-hover" [@fadeInUp]>
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+              <span class="material-icons text-white text-xl">local_offer</span>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-gray-600">Total Coupons Sold</h3>
+              <p class="text-2xl font-bold text-gray-900">{{ stats[0].value || '0' }}</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2 mt-3">
+            <span class="material-icons text-gray-400 text-sm">trending_up</span>
+            <span class="text-sm text-gray-500">+12% from last month</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Coupons Card -->
+    <div class="stat-card bg-white rounded-lg shadow-card p-6 card-hover" [@fadeInUp]>
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+              <span class="material-icons text-white text-xl">check_circle</span>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-gray-600">Active Coupons</h3>
+              <p class="text-2xl font-bold text-gray-900">{{ stats[1].value || '0' }}</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2 mt-3">
+            <span class="material-icons text-gray-400 text-sm">schedule</span>
+            <span class="text-sm text-gray-500">Currently active</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Services Completed Card -->
+    <div class="stat-card bg-white rounded-lg shadow-card p-6 card-hover" [@fadeInUp]>
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+              <span class="material-icons text-white text-xl">build</span>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-gray-600">Services Completed</h3>
+              <p class="text-2xl font-bold text-gray-900">{{ stats[2].value || '0' }}</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2 mt-3">
+            <span class="material-icons text-gray-400 text-sm">done_all</span>
+            <span class="text-sm text-gray-500">This month</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Revenue Card -->
+    <div class="stat-card bg-white rounded-lg shadow-card p-6 card-hover" [@fadeInUp]>
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center">
+              <span class="material-icons text-white text-xl">attach_money</span>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-gray-600">Revenue</h3>
+              <p class="text-2xl font-bold text-gray-900">${{ stats[3].value || '0' }}</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2 mt-3">
+            <span class="material-icons text-gray-400 text-sm">trending_up</span>
+            <span class="text-sm text-gray-500">+8% from last month</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Sales Trends Chart -->
+    <div class="bg-white rounded-lg shadow-card p-6 card-hover" [@slideInFromRight]>
+      <div class="mb-4">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Sales Trends</h3>
+        <p class="text-sm text-blue-600">Monthly sales performance over time</p>
+      </div>
+      
+      <!-- Simple Chart Visualization -->
+      <div class="h-48 mb-4">
+        <div class="h-full flex items-end space-x-1">
+          <div *ngFor="let value of charts[0].chartData || []; let i = index" 
+               class="flex-1 bg-gradient-to-t from-blue-500 to-blue-300 rounded-t"
+               [style.height.%]="(value / getMaxValue(charts[0].chartData || [])) * 100"
+               [@fadeInUp]>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex items-center space-x-2 text-sm text-gray-500">
+        <span class="material-icons text-sm">schedule</span>
+        <span>Last 6 months</span>
+      </div>
+    </div>
+
+    <!-- Services by Service Center Chart -->
+    <div class="bg-white rounded-lg shadow-card p-6 card-hover" [@slideInFromRight]>
+      <div class="mb-4">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Services by Service Center</h3>
+        <p class="text-sm text-green-600">Distribution of services across centers</p>
+      </div>
+      
+      <!-- Simple Chart Visualization -->
+      <div class="h-48 mb-4">
+        <div class="h-full flex items-end space-x-1">
+          <div *ngFor="let value of charts[1].chartData || []; let i = index" 
+               class="flex-1 bg-gradient-to-t from-green-500 to-green-300 rounded-t"
+               [style.height.%]="(value / getMaxValue(charts[1].chartData || [])) * 100"
+               [@fadeInUp]>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex items-center space-x-2 text-sm text-gray-500">
+        <span class="material-icons text-sm">location_on</span>
+        <span>By location</span>
+      </div>
+    </div>
+
+    <!-- Coupon Usage Chart -->
+    <div class="bg-white rounded-lg shadow-card p-6 card-hover" [@slideInFromRight]>
+      <div class="mb-4">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Coupon Usage</h3>
+        <p class="text-sm text-purple-600">Usage patterns and redemption rates</p>
+      </div>
+      
+      <!-- Simple Chart Visualization -->
+      <div class="h-48 mb-4">
+        <div class="h-full flex items-end space-x-1">
+          <div *ngFor="let value of charts[2].chartData || []; let i = index" 
+               class="flex-1 bg-gradient-to-t from-purple-500 to-purple-300 rounded-t"
+               [style.height.%]="(value / getMaxValue(charts[2].chartData || [])) * 100"
+               [@fadeInUp]>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex items-center space-x-2 text-sm text-gray-500">
+        <span class="material-icons text-sm">local_offer</span>
+        <span>Redemption rate</span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,70 @@
+<!-- Sidebar -->
+<div 
+  class="bg-white shadow-lg transition-all duration-300 ease-in-out h-screen flex flex-col relative fixed left-0 top-0 z-40"
+  [class.w-64]="sidebarOpen"
+  [class.w-16]="!sidebarOpen"
+  [@slideInOut]="sidebarOpen ? 'in' : 'out'"
+>
+  <!-- Brand Section -->
+  <div class="flex items-center justify-center h-16 px-4 bg-gradient-to-r from-red-500 to-red-600">
+    <div class="flex items-center space-x-2">
+      <div class="w-8 h-8 bg-white rounded flex items-center justify-center">
+        <span class="text-red-500 font-bold text-lg">A</span>
+      </div>
+      <span *ngIf="sidebarOpen" class="text-white font-bold text-lg">CREATIVE TIM</span>
+    </div>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav class="flex-1 mt-8 px-4">
+    <ul class="space-y-2">
+      <li *ngFor="let item of menuItems" class="relative">
+        <!-- Main Menu Item -->
+        <div 
+          (click)="onMenuItemClick($event, item.id)"
+          class="cursor-pointer transition-all duration-200 ease-in-out"
+          [class.bg-red-500]="item.active"
+          [class.text-white]="item.active"
+          [class.text-gray-600]="!item.active"
+          [class.hover:bg-gray-100]="!item.active"
+          [class.hover:text-gray-800]="!item.active"
+          [class.rounded-lg]="true"
+          [class.p-3]="true"
+          [class.flex]="true"
+          [class.items-center]="true"
+          [class.space-x-3]="sidebarOpen"
+          [class.justify-between]="item.hasSubmenu && sidebarOpen">
+          <div class="flex items-center space-x-3">
+            <span class="material-icons text-xl">{{ item.icon }}</span>
+            <span *ngIf="sidebarOpen" class="font-medium">{{ item.label }}</span>
+          </div>
+          <!-- Submenu Toggle Arrow -->
+          <span *ngIf="item.hasSubmenu && sidebarOpen" 
+                class="material-icons text-sm transition-transform duration-200"
+                [class.rotate-90]="item.expanded">
+            chevron_right
+          </span>
+        </div>
+        
+        <!-- Submenu Items -->
+        <ul *ngIf="item.hasSubmenu && item.submenu && item.expanded && sidebarOpen" 
+            class="ml-6 mt-2 space-y-1">
+          <li *ngFor="let subItem of item.submenu">
+            <div 
+              (click)="onSubmenuItemClick($event, subItem.id, item.id)"
+              class="cursor-pointer transition-all duration-200 ease-in-out p-2 rounded-lg flex items-center space-x-3"
+              [class.bg-red-100]="subItem.active"
+              [class.text-red-600]="subItem.active"
+              [class.text-gray-500]="!subItem.active"
+              [class.hover:bg-gray-50]="!subItem.active"
+              [class.hover:text-gray-700]="!subItem.active">
+              <span class="material-icons text-sm">{{ subItem.icon }}</span>
+              <span class="font-medium">{{ subItem.label }}</span>
+            </div>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+</div>

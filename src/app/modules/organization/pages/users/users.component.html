@@ -1,0 +1,338 @@
+
+  <!-- Page Content with Animation -->
+  <div [@pageFadeIn]>
+    <!-- Search and Actions Bar -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+    <div class="flex items-center justify-between gap-4" [formGroup]="searchForm">
+      <!-- Search Section -->
+      <div class="flex items-center gap-4 flex-1">
+        <div class="flex-1 relative">
+          <input 
+            type="text" 
+            formControlName="search" 
+            placeholder="Search by name, email, or role..." 
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <i class="bi bi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+        </div>
+        
+        <!-- Filters Button -->
+        <button class="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-2">
+          <i class="bi bi-funnel"></i>
+          <span>Filters</span>
+        </button>
+      </div>
+
+      <!-- Add User Button -->
+      <button 
+        (click)="onAddUser()"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200">
+        <i class="bi bi-person-plus"></i>
+        <span>Add User</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Name
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Email
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Role
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Service Center
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Status
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Created
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let user of paginatedUsers" class="hover:bg-gray-50">
+            <!-- Name Column -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                  <span class="text-gray-600 font-medium text-sm">
+                    {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
+                  </span>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">{{ user.firstName }} {{ user.lastName }}</div>
+                  <div class="text-sm text-gray-500">{{ user.mobileNumber }}</div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Email Column -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ user.email }}</div>
+            </td>
+
+            <!-- Role Column -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    [class]="getRoleBadgeClass(user.role)">
+                {{ user.role }}
+              </span>
+            </td>
+
+            <!-- Service Center Column -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">
+                {{ getServiceCenterName(user.serviceCenterId) }}
+              </div>
+           </td>
+
+            <!-- Status Column -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    [class]="user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                <i class="bi bi-circle-fill text-xs mr-1"></i>
+                {{ user.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+
+            <!-- Created Date Column -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ formatDate(user.createdAt) }}</div>
+              <div class="text-sm text-gray-500" *ngIf="user.lastLogin">
+                Last login: {{ formatDate(user.lastLogin) }}
+              </div>
+            </td>
+
+            <!-- Actions Column -->
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <div class="flex items-center space-x-2">
+                <button 
+                  (click)="onEditUser(user)"
+                  class="text-blue-600 hover:text-blue-800 p-1 rounded"
+                  title="Edit User">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+                
+                <button 
+                  (click)="onDeactivateUser(user)"
+                  [class]="user.isActive ? 'text-orange-600 hover:text-orange-800' : 'text-green-600 hover:text-green-800'"
+                  class="p-1 rounded"
+                  [title]="user.isActive ? 'Deactivate User' : 'Activate User'">
+                  <i class="bi" [class]="user.isActive ? 'bi-person-x' : 'bi-person-check'"></i>
+                </button>
+                
+                <button 
+                  (click)="onDeleteUser(user)"
+                  class="text-red-600 hover:text-red-800 p-1 rounded"
+                  title="Delete User">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+      <div class="flex-1 flex justify-between sm:hidden">
+        <button 
+          (click)="previousPage()"
+          [disabled]="currentPage === 1"
+          class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+          Previous
+        </button>
+        <button 
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages"
+          class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+          Next
+        </button>
+      </div>
+      <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div>
+          <p class="text-sm text-gray-700">
+            Showing
+            <span class="font-medium">{{ (currentPage - 1) * pageSize + 1 }}</span>
+            to
+            <span class="font-medium">{{ Math.min(currentPage * pageSize, totalItems) }}</span>
+            of
+            <span class="font-medium">{{ totalItems }}</span>
+            results
+          </p>
+        </div>
+        <div>
+          <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+            <button 
+              (click)="goToPage(1)"
+              [disabled]="currentPage === 1"
+              class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="bi bi-chevron-double-left"></i>
+            </button>
+            <button 
+              (click)="previousPage()"
+              [disabled]="currentPage === 1"
+              class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="bi bi-chevron-left"></i>
+            </button>
+            
+            <!-- Page Numbers -->
+            <button 
+              *ngFor="let page of getPageNumbers()"
+              (click)="goToPage(page)"
+              [class]="page === currentPage ? 'bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'"
+              class="relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+              {{ page }}
+            </button>
+            
+            <button 
+              (click)="nextPage()"
+              [disabled]="currentPage === totalPages"
+              class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="bi bi-chevron-right"></i>
+            </button>
+            <button 
+              (click)="goToPage(totalPages)"
+              [disabled]="currentPage === totalPages"
+              class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="bi bi-chevron-double-right"></i>
+            </button>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit User Form Modal -->
+  <div *ngIf="showAddUserForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-900">
+            {{ isEditMode ? 'Edit User' : 'Add New User' }}
+          </h2>
+          <button 
+            (click)="onCancel()"
+            class="text-gray-400 hover:text-gray-600">
+            <i class="bi bi-x-lg text-xl"></i>
+          </button>
+        </div>
+
+        <!-- Form -->
+        <form [formGroup]="userForm" (ngSubmit)="onSaveUser()" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- First Name -->
+            <div class="form-group">
+              <label for="firstName" class="form-label">First Name *</label>
+              <input 
+                type="text" 
+                id="firstName"
+                formControlName="firstName" 
+                placeholder="Enter first name"
+                class="form-input"
+                [class.error]="getFieldError('firstName')">
+              <div *ngIf="getFieldError('firstName')" class="form-error">
+                {{ getFieldError('firstName') }}
+              </div>
+            </div>
+
+            <!-- Last Name -->
+            <div class="form-group">
+              <label for="lastName" class="form-label">Last Name *</label>
+              <input 
+                type="text" 
+                id="lastName"
+                formControlName="lastName" 
+                placeholder="Enter last name"
+                class="form-input"
+                [class.error]="getFieldError('lastName')">
+              <div *ngIf="getFieldError('lastName')" class="form-error">
+                {{ getFieldError('lastName') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email" class="form-label">Email *</label>
+            <input 
+              type="email" 
+              id="email"
+              formControlName="email" 
+              placeholder="Enter email address"
+              class="form-input"
+              [class.error]="getFieldError('email')">
+            <div *ngIf="getFieldError('email')" class="form-error">
+              {{ getFieldError('email') }}
+            </div>
+          </div>
+
+          <!-- Mobile Number -->
+          <div class="form-group">
+            <label for="mobileNumber" class="form-label">Mobile Number *</label>
+            <input 
+              type="tel" 
+              id="mobileNumber"
+              formControlName="mobileNumber" 
+              placeholder="Enter mobile number"
+              class="form-input"
+              [class.error]="getFieldError('mobileNumber')">
+            <div *ngIf="getFieldError('mobileNumber')" class="form-error">
+              {{ getFieldError('mobileNumber') }}
+            </div>
+          </div>
+
+          <!-- Service Center -->
+          <div class="form-group">
+            <label for="serviceCenterId" class="form-label">Service Center</label>
+            <select 
+              id="serviceCenterId"
+              formControlName="serviceCenterId" 
+              class="form-select"
+              [class.error]="getFieldError('serviceCenterId')">
+              <option value="">Select a service center</option>
+              <option *ngFor="let center of serviceCenters" [value]="center.id">
+                {{ center.name }}
+              </option>
+            </select>
+            <div *ngIf="getFieldError('serviceCenterId')" class="form-error">
+              {{ getFieldError('serviceCenterId') }}
+            </div>
+          </div>
+
+
+          <!-- Form Actions -->
+          <div class="flex justify-end space-x-3 pt-4">
+            <button 
+              type="button"
+              (click)="onCancel()"
+              class="form-button form-button-secondary">
+              Cancel
+            </button>
+            <button 
+              type="submit"
+              [disabled]="userForm.invalid"
+              class="form-button">
+              {{ isEditMode ? 'Update User' : 'Add User' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  </div>
+

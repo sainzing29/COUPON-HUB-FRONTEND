@@ -1,1 +1,329 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* You can add global styles to this file, and also import other style files */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Angular Material Theme */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+/* Ensure Material Icons are available */
+@import 'https://fonts.googleapis.com/icon?family=Material+Icons';
+
+body {
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8fafc;
+}
+
+/* Custom Material Form Styling */
+.mat-mdc-form-field {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+/* Ensure proper Material appearance */
+.mat-mdc-form-field .mat-mdc-text-field-wrapper {
+  background-color: transparent;
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-outline {
+  color: #d1d5db;
+  border-width: 1px;
+}
+
+.mat-mdc-form-field.mat-focused .mat-mdc-form-field-outline {
+  color: #3b82f6;
+  border-width: 2px;
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-label {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.mat-mdc-form-field.mat-focused .mat-mdc-form-field-label {
+  color: #3b82f6;
+}
+
+.mat-mdc-form-field .mat-mdc-input-element {
+  color: #111827;
+  font-size: 16px;
+  padding: 12px 0;
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-error {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Override any conflicting styles */
+.mat-mdc-form-field .mat-mdc-form-field-subscript-wrapper {
+  padding: 0;
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-infix {
+  padding: 0;
+  border-top: none;
+}
+
+/* Material Select Styling */
+.mat-mdc-select {
+  color: #111827;
+}
+
+.mat-mdc-select .mat-mdc-select-trigger {
+  background-color: #f9fafb;
+  border-radius: 8px;
+}
+
+.mat-mdc-select.mat-focused .mat-mdc-select-trigger {
+  background-color: #ffffff;
+}
+
+/* Material Button Styling */
+.mat-mdc-raised-button {
+  border-radius: 8px;
+  font-weight: 500;
+  text-transform: none;
+}
+
+.mat-mdc-raised-button.mat-primary {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.mat-mdc-raised-button.mat-primary:hover {
+  background-color: #2563eb;
+}
+
+.mat-mdc-button {
+  border-radius: 8px;
+  font-weight: 500;
+  text-transform: none;
+}
+
+/* Force Material Design styling */
+.mat-mdc-form-field {
+  font-family: 'Inter', sans-serif;
+  margin-bottom: 16px;
+}
+
+.mat-mdc-form-field .mat-mdc-text-field-wrapper {
+  background-color: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  transition: all 0.2s ease-in-out;
+}
+
+.mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
+  background-color: #ffffff;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-label {
+  color: #666666;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s ease-in-out;
+}
+
+.mat-mdc-form-field.mat-focused .mat-mdc-form-field-label {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.mat-mdc-form-field .mat-mdc-input-element {
+  color: #333333;
+  font-size: 16px;
+  padding: 12px 16px;
+}
+
+.mat-mdc-form-field .mat-mdc-input-element::placeholder {
+  color: #999999;
+  font-size: 14px;
+}
+
+/* Material Select specific styling */
+.mat-mdc-select .mat-mdc-select-trigger {
+  background-color: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  min-height: 48px;
+}
+
+.mat-mdc-select.mat-focused .mat-mdc-select-trigger {
+  background-color: #ffffff;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.mat-mdc-select .mat-mdc-select-value {
+  color: #333333;
+  font-size: 16px;
+  padding: 12px 16px;
+}
+
+.mat-mdc-select .mat-mdc-select-placeholder {
+  color: #999999;
+  font-size: 14px;
+}
+
+.mat-mdc-select .mat-mdc-select-arrow {
+  color: #666666;
+  font-size: 20px;
+}
+
+/* Material Form Field Error Styling */
+.mat-mdc-form-field .mat-mdc-form-field-error {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* Material Form Field Hint Styling */
+.mat-mdc-form-field .mat-mdc-form-field-hint {
+  color: #6b7280;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Custom Form Controls Styling */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #111827;
+  background-color: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input::placeholder {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.form-input.error,
+.form-select.error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-error {
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* Form Select Specific Styling */
+.form-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.form-select:focus {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%233b82f6' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+}
+
+/* Form Button Styling */
+.form-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #ffffff;
+  background-color: #3b82f6;
+  border: 2px solid #3b82f6;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  min-height: 48px;
+}
+
+.form-button:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.form-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.form-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.form-button-secondary {
+  color: #6b7280;
+  background-color: #ffffff;
+  border-color: #d1d5db;
+}
+
+.form-button-secondary:hover {
+  color: #374151;
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+/* Form Layout */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

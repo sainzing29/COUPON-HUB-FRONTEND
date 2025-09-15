@@ -1,0 +1,263 @@
+  <!-- Page Content with Animation -->
+  <div [@pageFadeIn]>
+    <!-- Search and Actions Bar -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+    <div class="flex items-center justify-between gap-4" [formGroup]="searchForm">
+      <!-- Search Section -->
+      <div class="flex items-center gap-4 flex-1">
+        <div class="flex-1 relative">
+          <input 
+            type="text" 
+            formControlName="search" 
+            placeholder="Search by name, address, or contact..." 
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <i class="bi bi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+        </div>
+        
+        <!-- Filters Button -->
+        <button class="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-2">
+          <i class="bi bi-funnel"></i>
+          <span>Filters</span>
+        </button>
+      </div>
+
+      <!-- Add Service Center Button -->
+      <button 
+        (click)="onAddServiceCenter()"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200">
+        <i class="bi bi-building-add"></i>
+        <span>Add Service Center</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Service Centers Table -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Name
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Address
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Contact
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let center of paginatedServiceCenters" class="hover:bg-gray-50">
+            <!-- Name Column -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                  <span class="text-gray-600 font-medium text-sm">
+                    {{ center.name.charAt(0) }}
+                  </span>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">{{ center.name }}</div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Address Column -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ center.address }}</div>
+            </td>
+
+            <!-- Contact Column -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ center.contactNumber }}</div>
+            </td>
+
+            <!-- Actions Column -->
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <div class="flex items-center space-x-2">
+                <button 
+                  (click)="onEditServiceCenter(center)"
+                  class="text-blue-600 hover:text-blue-800 p-1 rounded"
+                  title="Edit Service Center">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+                
+                <button 
+                  (click)="onDeactivateServiceCenter(center)"
+                  [class]="center.isActive ? 'text-orange-600 hover:text-orange-800' : 'text-green-600 hover:text-green-800'"
+                  class="p-1 rounded"
+                  [title]="center.isActive ? 'Deactivate Service Center' : 'Activate Service Center'">
+                  <i class="bi" [class]="center.isActive ? 'bi-building-x' : 'bi-building-check'"></i>
+                </button>
+                
+                <button 
+                  (click)="onDeleteServiceCenter(center)"
+                  class="text-red-600 hover:text-red-800 p-1 rounded"
+                  title="Delete Service Center">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+      <div class="flex-1 flex justify-between sm:hidden">
+        <button 
+          (click)="previousPage()"
+          [disabled]="currentPage === 1"
+          class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+          Previous
+        </button>
+        <button 
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages"
+          class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+          Next
+        </button>
+      </div>
+      <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div>
+          <p class="text-sm text-gray-700">
+            Showing
+            <span class="font-medium">{{ (currentPage - 1) * pageSize + 1 }}</span>
+            to
+            <span class="font-medium">{{ Math.min(currentPage * pageSize, totalItems) }}</span>
+            of
+            <span class="font-medium">{{ totalItems }}</span>
+            results
+          </p>
+        </div>
+        <div>
+          <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+            <button 
+              (click)="goToPage(1)"
+              [disabled]="currentPage === 1"
+              class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="bi bi-chevron-double-left"></i>
+            </button>
+            <button 
+              (click)="previousPage()"
+              [disabled]="currentPage === 1"
+              class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="bi bi-chevron-left"></i>
+            </button>
+            
+            <!-- Page Numbers -->
+            <button 
+              *ngFor="let page of getPageNumbers()"
+              (click)="goToPage(page)"
+              [class]="page === currentPage ? 'bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'"
+              class="relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+              {{ page }}
+            </button>
+            
+            <button 
+              (click)="nextPage()"
+              [disabled]="currentPage === totalPages"
+              class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="bi bi-chevron-right"></i>
+            </button>
+            <button 
+              (click)="goToPage(totalPages)"
+              [disabled]="currentPage === totalPages"
+              class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="bi bi-chevron-double-right"></i>
+            </button>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Service Center Form Modal -->
+  <div *ngIf="showAddServiceCenterForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-900">
+            {{ isEditMode ? 'Edit Service Center' : 'Add New Service Center' }}
+          </h2>
+          <button 
+            (click)="onCancel()"
+            class="text-gray-400 hover:text-gray-600">
+            <i class="bi bi-x-lg text-xl"></i>
+          </button>
+        </div>
+
+        <!-- Form -->
+        <form [formGroup]="serviceCenterForm" (ngSubmit)="onSaveServiceCenter()" class="space-y-6">
+          <!-- Name -->
+          <div class="form-group">
+            <label for="name" class="form-label">Name *</label>
+            <input 
+              type="text" 
+              id="name"
+              formControlName="name" 
+              placeholder="Enter service center name"
+              class="form-input"
+              [class.error]="getFieldError('name')">
+            <div *ngIf="getFieldError('name')" class="form-error">
+              {{ getFieldError('name') }}
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div class="form-group">
+            <label for="address" class="form-label">Address *</label>
+            <input 
+              type="text" 
+              id="address"
+              formControlName="address" 
+              placeholder="Enter service center address"
+              class="form-input"
+              [class.error]="getFieldError('address')">
+            <div *ngIf="getFieldError('address')" class="form-error">
+              {{ getFieldError('address') }}
+            </div>
+          </div>
+
+          <!-- Contact Number -->
+          <div class="form-group">
+            <label for="contactNumber" class="form-label">Contact Number *</label>
+            <input 
+              type="tel" 
+              id="contactNumber"
+              formControlName="contactNumber" 
+              placeholder="Enter contact number"
+              class="form-input"
+              [class.error]="getFieldError('contactNumber')">
+            <div *ngIf="getFieldError('contactNumber')" class="form-error">
+              {{ getFieldError('contactNumber') }}
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="flex justify-end space-x-3 pt-4">
+            <button 
+              type="button"
+              (click)="onCancel()"
+              class="form-button form-button-secondary">
+              Cancel
+            </button>
+            <button 
+              type="submit"
+              [disabled]="serviceCenterForm.invalid"
+              class="form-button">
+              {{ isEditMode ? 'Update Service Center' : 'Add Service Center' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  </div>

@@ -1,0 +1,25 @@
+<div class="h-screen bg-gray-50 flex overflow-hidden">
+  <!-- Sidebar -->
+  <app-sidebar 
+    [sidebarOpen]="sidebarOpen"
+    [activeMenuItem]="activeMenuItem"
+    (menuItemClick)="onMenuItemClick($event)">
+  </app-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <!-- Header -->
+    <app-header 
+      [pageTitle]="pageTitle" 
+      [sidebarOpen]="sidebarOpen"
+      (toggleSidebar)="toggleSidebar()">
+    </app-header>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-6 pt-20">
+      <div class="h-full" [@pageFadeIn]>
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>

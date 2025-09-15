@@ -1,0 +1,182 @@
+<!-- Page Content with Animation -->
+<div [@pageFadeIn]>
+  <!-- Filters and Export Buttons Bar -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+    <div class="flex items-center justify-between">
+      <!-- Filters -->
+      <div class="flex items-center gap-4">
+        <!-- Date Range Filter -->
+        <div class="flex items-center space-x-2">
+          <label class="text-sm font-medium text-gray-700 whitespace-nowrap">Date Range:</label>
+          <div class="flex items-center space-x-2">
+            <input 
+              type="date" 
+              [(ngModel)]="dateFromFilter"
+              (ngModelChange)="onDateFilterChange()"
+              class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm font-medium text-gray-700 shadow-sm hover:border-gray-400 transition-colors duration-200">
+            <span class="text-gray-500">to</span>
+            <input 
+              type="date" 
+              [(ngModel)]="dateToFilter"
+              (ngModelChange)="onDateFilterChange()"
+              class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm font-medium text-gray-700 shadow-sm hover:border-gray-400 transition-colors duration-200">
+          </div>
+        </div>
+
+        <!-- Service Center Filter -->
+        <div class="flex items-center space-x-2">
+          <label class="text-sm font-medium text-gray-700 whitespace-nowrap">Service Center:</label>
+          <select 
+            [(ngModel)]="serviceCenterFilter"
+            (ngModelChange)="onServiceCenterFilterChange()"
+            class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm font-medium text-gray-700 shadow-sm hover:border-gray-400 transition-colors duration-200 appearance-none cursor-pointer w-40 pl-3 pr-8">
+            <option value="all">All</option>
+            <option value="downtown">Downtown SC</option>
+            <option value="techfix">TechFix Hub</option>
+            <option value="central">Central Service</option>
+            <option value="north">North Branch</option>
+          </select>
+        </div>
+
+        <!-- Customer Filter -->
+        <div class="flex items-center space-x-2">
+          <label class="text-sm font-medium text-gray-700 whitespace-nowrap">Customer:</label>
+          <input 
+            type="text" 
+            [(ngModel)]="customerFilter"
+            (ngModelChange)="onCustomerFilterChange()"
+            placeholder="Search by customer..."
+            class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+      </div>
+
+      <!-- Export Buttons -->
+      <div class="flex items-center gap-3">
+        <button 
+          (click)="onExportCSV()"
+          class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200">
+          <i class="bi bi-file-earmark-spreadsheet"></i>
+          <span>Export CSV</span>
+        </button>
+        <button 
+          (click)="onExportPDF()"
+          class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200">
+          <i class="bi bi-file-earmark-pdf"></i>
+          <span>Export PDF</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <!-- Total Services Redeemed -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+            <i class="bi bi-check-circle text-blue-600"></i>
+          </div>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-500">Total Services Redeemed</p>
+          <p class="text-2xl font-semibold text-gray-900">{{ totalServicesRedeemed }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Average Services per Coupon -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+            <i class="bi bi-graph-up text-green-600"></i>
+          </div>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-500">Avg Services per Coupon</p>
+          <p class="text-2xl font-semibold text-gray-900">{{ formatNumber(avgServicesPerCoupon) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Most Active Customer -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+            <i class="bi bi-person-star text-yellow-600"></i>
+          </div>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-500">Most Active Customer</p>
+          <p class="text-lg font-semibold text-gray-900 truncate">{{ mostActiveCustomer }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Service Usage Table -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Date
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Customer
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Coupon Code
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Services Used
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Service Center
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let item of filteredServiceUsageData" class="hover:bg-gray-50">
+            <!-- Date Column -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ formatDate(item.date) }}</div>
+            </td>
+
+            <!-- Customer Column -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ item.customer }}</div>
+            </td>
+
+            <!-- Coupon Code Column -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">{{ item.couponCode }}</div>
+            </td>
+
+            <!-- Services Used Column -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ item.servicesUsed }}</div>
+            </td>
+
+            <!-- Service Center Column -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ item.serviceCenter }}</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- No Results Message -->
+    <div *ngIf="filteredServiceUsageData.length === 0" class="text-center py-8">
+      <div class="text-gray-500">
+        <i class="bi bi-search text-4xl mb-2"></i>
+        <p>No service usage data found matching your filters.</p>
+      </div>
+    </div>
+  </div>
+</div>
