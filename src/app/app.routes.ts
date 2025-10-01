@@ -8,6 +8,10 @@ export const routes: Routes = [
   },
   // Customer routes (outside admin layout)
   {
+    path: 'customer/login',
+    loadComponent: () => import('./modules/customer/customer-login/customer-login').then(m => m.CustomerLoginComponent)
+  },
+  {
     path: 'customer/register',
     loadComponent: () => import('./modules/customer/register-customer/register-customer').then(m => m.RegisterCustomerComponent)
   },
@@ -20,12 +24,20 @@ export const routes: Routes = [
     loadComponent: () => import('./modules/customer/service-selection/service-selection').then(m => m.ServiceSelectionComponent)
   },
   {
+    path: 'customer/invoice',
+    loadComponent: () => import('./modules/customer/customer-invoice/customer-invoice').then(m => m.CustomerInvoiceComponent)
+  },
+  {
     path: 'sign-in',
     loadComponent: () => import('./modules/auth/pages/sign-in/sign-in.component').then(m => m.SignInComponent)
   },
   {
     path: 'sign-up',
     loadComponent: () => import('./modules/auth/pages/sign-up/sign-up.component').then(m => m.SignUpComponent)
+  },
+  {
+    path: 'set-password',
+    loadComponent: () => import('./modules/auth/pages/set-password/set-password.component').then(m => m.SetPasswordComponent)
   },
   {
     path: 'dashboard',
@@ -58,7 +70,7 @@ export const routes: Routes = [
         loadComponent: () => import('./modules/organization/pages/service-redemption/service-redemption.component').then(m => m.ServiceRedemptionComponent)
       },
       {
-        path: 'redeem-service',
+        path: 'service-redemption/redeem-service',
         loadComponent: () => import('./modules/organization/pages/redeem-service/redeem-service').then(m => m.RedeemServiceComponent)
       },
       {
@@ -74,8 +86,12 @@ export const routes: Routes = [
         loadComponent: () => import('./modules/organization/pages/invoices/invoices.component').then(m => m.InvoicesComponent)
       },
       {
-        path: 'customer-profile/:id',
+        path: 'customers/:id',
         loadComponent: () => import('./modules/organization/pages/customer-profile/customer-profile.component').then(m => m.CustomerProfileComponent)
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('./modules/organization/pages/settings/settings.component').then(m => m.SettingsComponent)
       }
     ]
   },
@@ -96,5 +112,9 @@ export const routes: Routes = [
         loadComponent: () => import('./modules/reports/pages/service-center-performance/service-center-performance.component').then(m => m.ServiceCenterPerformanceComponent)
       }
     ]
+  },
+  {
+    path: '**',
+    redirectTo: '/sign-in'
   }
 ];

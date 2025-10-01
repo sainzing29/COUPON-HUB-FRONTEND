@@ -2,6 +2,18 @@ import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitte
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { AuthService } from '../../../../core/services/auth.service';
+
+interface MenuItem {
+  id: string;
+  label: string;
+  icon: string;
+  route: string;
+  active: boolean;
+  hasSubmenu: boolean;
+  expanded?: boolean;
+  submenu?: MenuItem[];
+}
 
 @Component({
   selector: 'app-sidebar',
@@ -29,7 +41,7 @@ export class SidebarComponent implements OnInit, OnChanges {
   @Input() activeMenuItem = 'dashboard';
   @Output() menuItemClick = new EventEmitter<string>();
 
-  menuItems = [
+  allMenuItems: MenuItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: 'grid_view', route: '/dashboard', active: true, hasSubmenu: false },
     { id: 'users', label: 'Users', icon: 'person', route: '/organization/users', active: false, hasSubmenu: false },
     { id: 'customers', label: 'Customers', icon: 'people', route: '/organization/customers', active: false, hasSubmenu: false },
@@ -37,6 +49,18 @@ export class SidebarComponent implements OnInit, OnChanges {
     { id: 'service-redemption', label: 'Service Redemption', icon: 'local_offer', route: '/organization/service-redemption', active: false, hasSubmenu: false },
     { id: 'new-coupons', label: 'New Coupons', icon: 'add_circle', route: '/organization/new-coupons', active: false, hasSubmenu: false },
     { id: 'invoices', label: 'Invoices & Payments', icon: 'receipt', route: '/organization/invoices', active: false, hasSubmenu: false },
+    { 
+      id: 'configuration', 
+      label: 'Configuration', 
+      icon: 'settings', 
+      route: '', 
+      active: false, 
+      hasSubmenu: true,
+      expanded: false,
+      submenu: [
+        { id: 'settings', label: 'Settings', icon: 'tune', route: '/organization/settings', active: false, hasSubmenu: false }
+      ]
+    },
     { 
       id: 'reports', 
       label: 'Reports', 
@@ -46,18 +70,42 @@ export class SidebarComponent implements OnInit, OnChanges {
       hasSubmenu: true,
       expanded: false,
       submenu: [
-        { id: 'sales-report', label: 'Sales Report', icon: 'assessment', route: '/reports/sales-report', active: false },
-        { id: 'service-usage-report', label: 'Service Usage', icon: 'trending_up', route: '/reports/service-usage-report', active: false },
-        { id: 'service-center-performance', label: 'Center Performance', icon: 'business_center', route: '/reports/service-center-performance', active: false }
+        { id: 'sales-report', label: 'Sales Report', icon: 'assessment', route: '/reports/sales-report', active: false, hasSubmenu: false },
+        { id: 'service-usage-report', label: 'Service Usage', icon: 'trending_up', route: '/reports/service-usage-report', active: false, hasSubmenu: false },
+        { id: 'service-center-performance', label: 'Center Performance', icon: 'business_center', route: '/reports/service-center-performance', active: false, hasSubmenu: false }
       ]
     }
   ];
 
-  constructor(private router: Router) { }
+  menuItems: MenuItem[] = [];
+
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
+    this.filterMenuItemsByRole();
     this.updateActiveState();
     this.ensureSubmenuExpanded();
+  }
+
+  private filterMenuItemsByRole(): void {
+    const currentUser = this.authService.getCurrentUser();
+    const userRole = currentUser?.role;
+
+    // For Admin users, hide users, service-centers, reports, and configuration
+    if (userRole === 'Admin') {
+      this.menuItems = this.allMenuItems.filter(item => 
+        item.id !== 'users' && 
+        item.id !== 'service-centers' && 
+        item.id !== 'reports' &&
+        item.id !== 'configuration'
+      );
+    } else {
+      // For SuperAdmin and other roles, show all menu items
+      this.menuItems = [...this.allMenuItems];
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {

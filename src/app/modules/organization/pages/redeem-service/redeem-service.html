@@ -7,13 +7,19 @@
         class="mr-4 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200">
         <i class="fas fa-arrow-left"></i>
       </button>
-      <div>
+      <div class="flex-1">
         <h1 class="text-2xl font-bold text-gray-900">Redeem Service</h1>
         <p class="text-sm text-gray-600 mt-1">
           Coupon: <span class="font-semibold text-blue-600">{{ couponCode }}</span> | 
           Customer: <span class="font-semibold">{{ customerName }}</span>
         </p>
       </div>
+      <!-- Debug Button -->
+      <button 
+        (click)="checkServiceStatuses()"
+        class="px-3 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600">
+        Debug Status
+      </button>
     </div>
   </div>
 
@@ -22,24 +28,44 @@
     <div 
       *ngFor="let service of services; let i = index" 
       class="service-card"
-      [class]="getServiceCardClass(i)">
+      [class]="getServiceCardClass(i)"
+      [class.redeemed]="service.status === 'redeemed'"
+      [class.processing]="service.status === 'processing'">
       <div class="service-content">
         <div class="service-number">{{ i + 1 }}</div>
         <div class="service-details">
           <h3 class="service-name">{{ service.name }}</h3>
           <p class="service-description">{{ service.description }}</p>
+          <!-- Debug: Show current status -->
+          <p class="text-xs text-gray-500 mt-1">Status: {{ service.status }} | Redeeming: {{ service.isRedeeming }}</p>
         </div>
       </div>
       <div class="service-action">
         <button 
+          *ngIf="service.status === 'available'"
           (click)="confirmRedeem(service, i)"
           [disabled]="service.isRedeeming"
           class="confirm-btn"
           [class]="getConfirmButtonClass(i)">
-          <i *ngIf="service.isRedeeming" class="fas fa-spinner fa-spin"></i>
-          <i *ngIf="!service.isRedeeming" class="fas fa-check"></i>
-          <span>{{ service.isRedeeming ? 'Processing...' : 'Confirm Redeem' }}</span>
+          <i class="fas fa-check"></i>
+          <span>Confirm Redeem</span>
         </button>
+        
+        <button 
+          *ngIf="service.status === 'processing'"
+          [disabled]="true"
+          class="confirm-btn processing"
+          [class]="getConfirmButtonClass(i)">
+          <i class="fas fa-spinner fa-spin"></i>
+          <span>Processing...</span>
+        </button>
+        
+        <div 
+          *ngIf="service.status === 'redeemed'"
+          class="redeemed-label">
+          <i class="fas fa-check-circle"></i>
+          <span>Redeemed</span>
+        </div>
       </div>
     </div>
   </div>

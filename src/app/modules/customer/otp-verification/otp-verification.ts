@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { interval, Subscription } from 'rxjs';
+import { CustomerAuthService } from '../services/customer-auth.service';
 
 @Component({
   selector: 'app-otp-verification',
@@ -25,11 +26,13 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
   
   private timerSubscription?: Subscription;
   private customerData: any = {};
+  private isLoginFlow = false;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private customerAuthService: CustomerAuthService
   ) {
     this.otpForm = this.fb.group({
       digit0: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
@@ -45,12 +48,15 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
     // Get customer data from route parameters
     this.route.queryParams.subscribe(params => {
       this.customerData = {
-        customerName: params['customerName'],
-        email: params['email'],
+        customerName: params['customerName'] || 'Customer',
+        email: params['email'] || 'customer@example.com',
         phone: params['phone'],
-        couponNumber: params['couponNumber'],
-        address: params['address']
+        couponNumber: params['couponNumber'] || '1234567890',
+        address: params['address'] || 'Customer Address'
       };
+      
+      // Check if this is a login flow
+      this.isLoginFlow = params['isLogin'] === 'true';
       
       // Mask phone number for display
       this.maskedPhoneNumber = this.maskPhoneNumber(params['phone'] || '');
@@ -151,23 +157,28 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
         this.otpForm.get(`digit${index}`)?.value
       ).join('');
       
-      // Simulate API call with 2-second delay
-      setTimeout(() => {
-        this.isVerifying = false;
-        
-        // Mock verification - accept any 6-digit code for demo
-        if (enteredOTP.length === 6) {
-          this.showSuccessToast = true;
+      // Use auth service to complete login
+      this.customerAuthService.completeLogin(this.customerData.phone, enteredOTP).subscribe({
+        next: (response) => {
+          this.isVerifying = false;
           
-          // Hide success toast and navigate after 2 seconds
-          setTimeout(() => {
-            this.showSuccessToast = false;
-            this.navigateToServiceSelection();
-          }, 2000);
-        } else {
-          this.showError('Invalid OTP. Please try again.');
+          if (response.success && response.customerData) {
+            this.showSuccessToast = true;
+            
+            // Hide success toast and navigate after 2 seconds
+            setTimeout(() => {
+              this.showSuccessToast = false;
+              this.navigateToServiceSelection(response.customerData);
+            }, 2000);
+          } else {
+            this.showError(response.message || 'Invalid OTP. Please try again.');
+          }
+        },
+        error: (error) => {
+          this.isVerifying = false;
+          this.showError('Verification failed. Please try again.');
         }
-      }, 2000);
+      });
     } else if (this.timeLeft === 0) {
       this.showError('OTP has expired. Please request a new one.');
     }
@@ -200,9 +211,17 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
     }, 2000);
   }
 
-  private navigateToServiceSelection(): void {
+  private navigateToServiceSelection(customerData?: any): void {
+    const dataToPass = customerData || this.customerData;
     this.router.navigate(['/customer/service-selection'], {
-      queryParams: this.customerData
+      queryParams: {
+        customerName: dataToPass.customerName,
+        email: dataToPass.email,
+        phone: dataToPass.phone,
+        couponNumber: dataToPass.couponNumber,
+        address: dataToPass.address,
+        isLogin: this.isLoginFlow ? 'true' : 'false'
+      }
     });
   }
 
@@ -216,9 +235,13 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.router.navigate(['/customer/register'], {
-      queryParams: this.customerData
-    });
+    if (this.isLoginFlow) {
+      this.router.navigate(['/customer/login']);
+    } else {
+      this.router.navigate(['/customer/register'], {
+        queryParams: this.customerData
+      });
+    }
   }
 
   formatTime(seconds: number): string {

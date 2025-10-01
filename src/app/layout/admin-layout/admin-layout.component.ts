@@ -89,10 +89,22 @@ export class AdminLayoutComponent implements OnInit {
       this.activeMenuItem = 'customers';
       this.pageTitle = 'Customers Management';
       this.pageDescription = 'Manage customer information and accounts';
-    } else if (url.includes('/organization/coupons')) {
-      this.activeMenuItem = 'coupons';
-      this.pageTitle = 'Coupons';
-      this.pageDescription = 'Manage and view coupon information';
+    } else if (url.includes('/organization/service-redemption/redeem-service')) {
+      this.activeMenuItem = 'redeem-service';
+      this.pageTitle = 'Redeem Service';
+      this.pageDescription = 'Redeem customer services and manage redemptions';
+    } else if (url.includes('/organization/service-redemption')) {
+      this.activeMenuItem = 'service-redemption';
+      this.pageTitle = 'Service Redemption';
+      this.pageDescription = 'Manage service redemption and customer services';
+    } else if (url.includes('/organization/new-coupons')) {
+      this.activeMenuItem = 'new-coupons';
+      this.pageTitle = 'New Coupons';
+      this.pageDescription = 'Create and manage new coupon batches';
+    } else if (url.includes('/organization/settings')) {
+      this.activeMenuItem = 'settings';
+      this.pageTitle = 'Settings';
+      this.pageDescription = 'Configure system settings and preferences';
     } else if (url.includes('/organization/invoices')) {
       this.activeMenuItem = 'invoices';
       this.pageTitle = 'Invoices & Payments';

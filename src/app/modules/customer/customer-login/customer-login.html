@@ -1,0 +1,99 @@
+<div class="customer-login-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="logo-section">
+      <div class="logo">
+        <span class="logo-text">COUPON HUB</span>
+      </div>
+      <h1 class="page-title">Customer Login</h1>
+      <p class="page-subtitle">Enter your phone number to receive OTP and access your services</p>
+    </div>
+  </div>
+
+  <!-- Login Form -->
+  <div class="form-container">
+    <div class="form-card">
+      <form [formGroup]="loginForm" (ngSubmit)="submitLogin()">
+        <div class="form-header">
+          <h2 class="form-title">Welcome Back</h2>
+          <p class="form-description">Enter your phone number to receive OTP</p>
+        </div>
+
+        <div class="form-body">
+          <!-- Phone Number Input -->
+          <div class="input-group">
+            <label for="phone" class="input-label">
+              <i class="fas fa-mobile-alt"></i>
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              formControlName="phone"
+              class="form-input"
+              [class.error]="phoneControl?.invalid && phoneControl?.touched"
+              placeholder="Enter your phone number"
+              autocomplete="tel">
+            <div *ngIf="phoneControl?.invalid && phoneControl?.touched" class="error-message">
+              <span *ngIf="phoneControl?.errors?.['required']">Phone number is required</span>
+              <span *ngIf="phoneControl?.errors?.['pattern']">Please enter a valid phone number</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-footer">
+          <button
+            type="submit"
+            [disabled]="loginForm.invalid || isSubmitting"
+            class="login-btn">
+            <i *ngIf="isSubmitting" class="fas fa-spinner fa-spin"></i>
+            <i *ngIf="!isSubmitting" class="fas fa-sign-in-alt"></i>
+            <span>{{ isSubmitting ? 'Sending OTP...' : 'Send OTP' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Alternative Actions -->
+  <div class="alternative-section">
+    <div class="divider">
+      <span>or</span>
+    </div>
+    <button 
+      (click)="goToRegister()"
+      class="register-btn">
+      <i class="fas fa-user-plus"></i>
+      <span>New Customer? Register Here</span>
+    </button>
+  </div>
+
+  <!-- Error Toast -->
+  <div 
+    *ngIf="showError" 
+    class="error-toast">
+    <div class="toast-content">
+      <i class="fas fa-exclamation-circle"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-section">
+    <p class="footer-text">© 2024 Coupon Hub. All rights reserved.</p>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+

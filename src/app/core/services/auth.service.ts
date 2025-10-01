@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { ApiService } from './api.service';
+import { TokenService } from './token.service';
 
 export interface LoginRequest {
   email: string;
@@ -9,29 +10,53 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  token: string; // JWT token
+}
+
+export interface ValidateTokenRequest {
+  token: string;
+}
+
+export interface ValidateTokenResponse {
+  isValid: boolean;
+  user?: User;
+  message?: string;
+}
+
+export interface SetPasswordRequest {
+  token: string;
+  password: string;
+}
+
+export interface SetPasswordResponse {
+  success: boolean;
   message: string;
-  role: string;
-  user: User;
+}
+
+export interface JwtPayload {
+  sub: string;                    // User ID
+  name: string;                   // First Name
+  role: string;                   // User Role
+  serviceCenterId?: string;       // Only for Admin users with ServiceCenterId
+  email?: string;                 // User Email
+  mobileNumber?: string;          // User Mobile Number
+  authProvider?: string;          // Authentication Provider
+  isActive?: boolean;             // User Active Status
+  iss: string;                    // Issuer
+  aud: string;                    // Audience
+  exp: number;                    // Expiration timestamp
+  iat: number;                    // Issued at timestamp
 }
 
 export interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  mobileNumber: string;
+  id: string;
+  name: string;
   role: string;
-  authProvider: string;
-  passwordHash: string;
-  otpCode: string | null;
-  otpExpiry: string | null;
-  googleId: string | null;
-  serviceCenterId: number | null;
-  serviceCenter: any | null;
-  coupons: any[];
-  invoices: any[];
-  createdAt: string;
-  isActive: boolean;
+  serviceCenterId?: string;
+  email?: string;
+  mobileNumber?: string;
+  authProvider?: string;
+  isActive?: boolean;
 }
 
 @Injectable({
@@ -41,9 +66,12 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private apiService: ApiService) {
-    // Check if user is already logged in (from localStorage)
-    this.loadUserFromStorage();
+  constructor(
+    private apiService: ApiService,
+    private tokenService: TokenService
+  ) {
+    // Check if user is already logged in (from token)
+    this.loadUserFromToken();
   }
 
   /**
@@ -52,13 +80,27 @@ export class AuthService {
   login(credentials: LoginRequest): Observable<LoginResponse> {
     return this.apiService.post<LoginResponse>('/Auth/login', credentials).pipe(
       tap(response => {
-        // Store user data in localStorage
-        localStorage.setItem('currentUser', JSON.stringify(response.user));
-        localStorage.setItem('userRole', response.role);
-        localStorage.setItem('loginMessage', response.message);
+        // Store JWT token
+        this.tokenService.setToken(response.token);
+        
+        // Decode token to get user information
+        const payload = this.decodeToken(response.token);
+        const user: User = {
+          id: payload.sub || '',
+          name: payload.name || '',
+          role: payload.role || '',
+          serviceCenterId: payload.serviceCenterId,
+          email: payload.email || undefined,
+          mobileNumber: payload.mobileNumber || undefined,
+          authProvider: payload.authProvider || undefined,
+          isActive: payload.isActive !== undefined ? payload.isActive : true
+        };
+        
+        // Store user data
+        this.tokenService.setUser(user);
         
         // Update current user subject
-        this.currentUserSubject.next(response.user);
+        this.currentUserSubject.next(user);
       })
     );
   }
@@ -67,10 +109,8 @@ export class AuthService {
    * Logout user
    */
   logout(): void {
-    // Clear localStorage
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('loginMessage');
+    // Clear all authentication data
+    this.tokenService.clearAuthData();
     
     // Update current user subject
     this.currentUserSubject.next(null);
@@ -87,14 +127,15 @@ export class AuthService {
    * Check if user is logged in
    */
   isLoggedIn(): boolean {
-    return this.currentUserSubject.value !== null;
+    return this.tokenService.isAuthenticated() && this.currentUserSubject.value !== null;
   }
 
   /**
    * Get user role
    */
   getUserRole(): string | null {
-    return localStorage.getItem('userRole');
+    const user = this.getCurrentUser();
+    return user ? user.role : null;
   }
 
   /**
@@ -106,21 +147,118 @@ export class AuthService {
   }
 
   /**
-   * Load user from localStorage on app initialization
+   * Get JWT token
    */
-  private loadUserFromStorage(): void {
-    const userData = localStorage.getItem('currentUser');
-    if (userData) {
-      try {
-        const user = JSON.parse(userData);
-        this.currentUserSubject.next(user);
-      } catch (error) {
-        console.error('Error parsing user data from localStorage:', error);
-        this.logout();
+  getToken(): string | null {
+    return this.tokenService.getToken();
+  }
+
+  /**
+   * Check if token needs refresh
+   */
+  needsTokenRefresh(): boolean {
+    return this.tokenService.needsRefresh();
+  }
+
+  /**
+   * Refresh user data from current token
+   */
+  refreshUserFromToken(): void {
+    this.loadUserFromToken();
+  }
+
+  /**
+   * Get all user data including additional fields
+   */
+  getFullUserData(): User | null {
+    const user = this.getCurrentUser();
+    if (user) {
+      console.log('Full user data:', user);
+      return user;
+    }
+    return null;
+  }
+
+  /**
+   * Validate setup token for password setting
+   */
+  validateSetupToken(token: string): Observable<ValidateTokenResponse> {
+    return this.apiService.post<ValidateTokenResponse>('/Auth/validate-setup-token', { token });
+  }
+
+  /**
+   * Set password using setup token
+   */
+  setPassword(request: SetPasswordRequest): Observable<SetPasswordResponse> {
+    return this.apiService.post<SetPasswordResponse>('/Auth/set-password', request);
+  }
+
+
+  /**
+   * Load user from token on app initialization
+   */
+  private loadUserFromToken(): void {
+    if (this.tokenService.isAuthenticated()) {
+      const token = this.tokenService.getToken();
+      if (token) {
+        try {
+          // Decode token to get fresh user information
+          const payload = this.decodeToken(token);
+          console.log('JWT Payload:', payload);
+          
+          const user: User = {
+            id: payload.sub || '',
+            name: payload.name || '',
+            role: payload.role || '',
+            serviceCenterId: payload.serviceCenterId,
+            email: payload.email || undefined,
+            mobileNumber: payload.mobileNumber || undefined,
+            authProvider: payload.authProvider || undefined,
+            isActive: payload.isActive !== undefined ? payload.isActive : true
+          };
+          
+          console.log('Final User Object:', user);
+          
+          // Update stored user data with fresh token data
+          this.tokenService.setUser(user);
+          
+          // Update current user subject
+          this.currentUserSubject.next(user);
+        } catch (error) {
+          console.error('Error loading user from token:', error);
+          // Fallback to stored user data
+          const user = this.tokenService.getUser();
+          if (user) {
+            this.currentUserSubject.next(user);
+          }
+        }
       }
     }
   }
+
+  /**
+   * Decode JWT token to extract payload
+   */
+  private decodeToken(token: string): JwtPayload {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      return JSON.parse(jsonPayload);
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      throw new Error('Invalid token format');
+    }
+  }
 }
+
+
+
 
 
 

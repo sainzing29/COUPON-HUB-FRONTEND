@@ -62,14 +62,19 @@ export class HeaderComponent implements OnInit {
 
   getUserDisplayName(): string {
     if (this.currentUser) {
-      return `${this.currentUser.firstName} ${this.currentUser.lastName}`;
+      return this.currentUser.name;
     }
     return 'User';
   }
 
   getUserInitials(): string {
     if (this.currentUser) {
-      return `${this.currentUser.firstName.charAt(0)}${this.currentUser.lastName.charAt(0)}`.toUpperCase();
+      const nameParts = this.currentUser.name.split(' ');
+      if (nameParts.length >= 2) {
+        return `${nameParts[0].charAt(0)}${nameParts[1].charAt(0)}`.toUpperCase();
+      } else {
+        return this.currentUser.name.charAt(0).toUpperCase();
+      }
     }
     return 'U';
   }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ApiService } from '../../../core/services/api.service';
 
 export interface ServiceCenter {
   id: number;
@@ -35,53 +35,56 @@ export interface ServiceCentersResponse {
   providedIn: 'root'
 })
 export class ServiceCenterService {
-  constructor(private http: HttpClient) { }
+  constructor(private apiService: ApiService) { }
 
   // Get all service centers
   getServiceCenters(): Observable<ServiceCenter[]> {
-    return this.http.get<ServiceCenter[]>('/servicecenters');
+    return this.apiService.get<ServiceCenter[]>('/servicecenters');
   }
 
   // Get service center by ID
   getServiceCenterById(id: number): Observable<ServiceCenter> {
-    return this.http.get<ServiceCenter>(`/servicecenters/${id}`);
+    return this.apiService.get<ServiceCenter>(`/servicecenters/${id}`);
   }
 
   // Create new service center
   createServiceCenter(serviceCenter: ServiceCenterCreateRequest): Observable<ServiceCenter> {
-    return this.http.post<ServiceCenter>('/servicecenters', serviceCenter);
+    return this.apiService.post<ServiceCenter>('/servicecenters', serviceCenter);
   }
 
   // Update service center
   updateServiceCenter(id: number, serviceCenter: ServiceCenterUpdateRequest): Observable<ServiceCenter> {
-    return this.http.put<ServiceCenter>(`/servicecenters/${id}`, serviceCenter);
+    return this.apiService.put<ServiceCenter>(`/servicecenters/${id}`, serviceCenter);
   }
 
   // Delete service center
   deleteServiceCenter(id: number): Observable<void> {
-    return this.http.delete<void>(`/servicecenters/${id}`);
+    return this.apiService.delete<void>(`/servicecenters/${id}`);
   }
 
   // Toggle service center status
   toggleServiceCenterStatus(id: number, isActive: boolean): Observable<ServiceCenter> {
-    return this.http.patch<ServiceCenter>(`/servicecenters/${id}/status`, { isActive });
+    return this.apiService.patch<ServiceCenter>(`/servicecenters/${id}/status`, { isActive });
   }
 
   // Search service centers
   searchServiceCenters(query: string): Observable<ServiceCenter[]> {
-    return this.http.get<ServiceCenter[]>(`/servicecenters/search?q=${query}`);
+    return this.apiService.get<ServiceCenter[]>(`/servicecenters/search?q=${query}`);
   }
 
   // Get service centers by status
   getServiceCentersByStatus(isActive: boolean): Observable<ServiceCenter[]> {
-    return this.http.get<ServiceCenter[]>(`/servicecenters?isActive=${isActive}`);
+    return this.apiService.get<ServiceCenter[]>(`/servicecenters?isActive=${isActive}`);
   }
 
   // Get service center statistics
   getServiceCenterStats(): Observable<{ total: number; active: number; inactive: number }> {
-    return this.http.get<{ total: number; active: number; inactive: number }>('/servicecenters/stats');
+    return this.apiService.get<{ total: number; active: number; inactive: number }>('/servicecenters/stats');
   }
 }
+
+
+
 
 
 

@@ -69,76 +69,8 @@ export class UsersComponent implements OnInit {
   userForm: FormGroup;
   isEditMode = false;
   editingUser: User | null = null;
+  isSubmitting = false;
 
-  // Sample data - replace with actual API calls
-  private sampleUsers: User[] = [
-    {
-      id: 1,
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john.doe@example.com',
-      mobileNumber: '1234567890',
-      role: 'Admin',
-      serviceCenterId: 1,
-      serviceCenterName: 'Downtown Service Center',
-      isActive: true,
-      createdAt: '2024-01-15T10:30:00Z',
-      lastLogin: '2024-01-20T14:22:00Z'
-    },
-    {
-      id: 2,
-      firstName: 'Jane',
-      lastName: 'Smith',
-      email: 'jane.smith@example.com',
-      mobileNumber: '0987654321',
-      role: 'User',
-      serviceCenterId: 2,
-      serviceCenterName: 'Uptown Service Center',
-      isActive: true,
-      createdAt: '2024-01-16T09:15:00Z',
-      lastLogin: '2024-01-19T16:45:00Z'
-    },
-    {
-      id: 3,
-      firstName: 'Mike',
-      lastName: 'Johnson',
-      email: 'mike.johnson@example.com',
-      mobileNumber: '1122334455',
-      role: 'Manager',
-      serviceCenterId: 1,
-      serviceCenterName: 'Downtown Service Center',
-      isActive: false,
-      createdAt: '2024-01-10T11:20:00Z'
-    }
-  ];
-
-  // Sample service centers data - replace with actual API calls
-  private sampleServiceCenters: ServiceCenter[] = [
-    {
-      id: 1,
-      name: 'Downtown Service Center',
-      address: '123 Main Street, Downtown',
-      contactNumber: '555-0101',
-      isActive: true,
-      createdAt: '2024-01-01T00:00:00Z'
-    },
-    {
-      id: 2,
-      name: 'Uptown Service Center',
-      address: '456 Oak Avenue, Uptown',
-      contactNumber: '555-0102',
-      isActive: true,
-      createdAt: '2024-01-02T00:00:00Z'
-    },
-    {
-      id: 3,
-      name: 'Westside Service Center',
-      address: '789 Pine Road, Westside',
-      contactNumber: '555-0103',
-      isActive: true,
-      createdAt: '2024-01-03T00:00:00Z'
-    }
-  ];
 
   constructor(
     private fb: FormBuilder,
@@ -156,7 +88,8 @@ export class UsersComponent implements OnInit {
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       mobileNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
-      serviceCenterId: ['']
+      role: ['Admin'], // Hidden field with default value
+      serviceCenterId: ['', [this.serviceCenterRequiredValidator.bind(this)]]
     });
   }
 
@@ -164,6 +97,26 @@ export class UsersComponent implements OnInit {
     this.loadUsers();
     this.loadServiceCenters();
     this.setupSearch();
+  }
+
+  // Custom validator for serviceCenterId - required only when role is 'Admin'
+  private serviceCenterRequiredValidator(control: any) {
+    const roleControl = this.userForm?.get('role');
+    const role = roleControl?.value;
+    
+    // Only require serviceCenterId when role is 'Admin' and we're creating a new user
+    if (role === 'Admin' && !this.isEditMode && (!control.value || control.value === '')) {
+      return { required: true };
+    }
+    return null;
+  }
+
+  // Method to update serviceCenterId validation when role changes
+  private updateServiceCenterValidation(): void {
+    const serviceCenterControl = this.userForm.get('serviceCenterId');
+    if (serviceCenterControl) {
+      serviceCenterControl.updateValueAndValidity();
+    }
   }
 
   private loadUsers(): void {
@@ -180,9 +133,8 @@ export class UsersComponent implements OnInit {
           horizontalPosition: 'right',
           verticalPosition: 'top'
         });
-        // Fallback to sample data on error
-        this.users = this.sampleUsers;
-        this.filteredUsers = [...this.sampleUsers];
+        this.users = [];
+        this.filteredUsers = [];
         this.updatePagination();
       }
     });
@@ -200,8 +152,7 @@ export class UsersComponent implements OnInit {
           horizontalPosition: 'right',
           verticalPosition: 'top'
         });
-        // Fallback to sample data on error
-        this.serviceCenters = this.sampleServiceCenters;
+        this.serviceCenters = [];
       }
     });
   }
@@ -228,6 +179,10 @@ export class UsersComponent implements OnInit {
     this.isEditMode = false;
     this.editingUser = null;
     this.userForm.reset();
+    // Explicitly set role to 'Admin' for new users
+    this.userForm.patchValue({
+      role: 'Admin'
+    });
     this.showAddUserForm = true;
   }
 
@@ -239,8 +194,11 @@ export class UsersComponent implements OnInit {
       lastName: user.lastName,
       email: user.email,
       mobileNumber: user.mobileNumber,
+      role: user.role, // Set role from selected user
       serviceCenterId: user.serviceCenterId || ''
     });
+    // Update validation after setting role
+    this.updateServiceCenterValidation();
     this.showAddUserForm = true;
   }
 
@@ -336,103 +294,91 @@ export class UsersComponent implements OnInit {
   }
 
   onSaveUser(): void {
-    if (this.userForm.valid) {
+    if (this.userForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
       const formValue = this.userForm.value;
+      console.log('Form values:', formValue); // Debug log
       
       if (this.isEditMode && this.editingUser) {
-        // Update existing user
-        const updatedUser = {
-          ...this.editingUser,
-          ...formValue,
-          serviceCenterName: this.getServiceCenterName(formValue.serviceCenterId)
-        };
-        
-        const index = this.users.findIndex(u => u.id === this.editingUser!.id);
-        if (index > -1) {
-          this.users[index] = updatedUser;
-        }
-        
-        const filteredIndex = this.filteredUsers.findIndex(u => u.id === this.editingUser!.id);
-        if (filteredIndex > -1) {
-          this.filteredUsers[filteredIndex] = updatedUser;
-        }
-        
-        this.updatePagination();
-        
-        // Uncomment when API is ready:
-        // this.userService.updateUser(this.editingUser.id, formValue).subscribe({
-        //   next: (updatedUser) => {
-        //     const index = this.users.findIndex(u => u.id === this.editingUser!.id);
-        //     if (index > -1) {
-        //       this.users[index] = updatedUser;
-        //     }
-        //     this.updatePagination();
-        //     this.snackBar.open('User updated successfully', 'Close', {
-        //       duration: 3000,
-        //       horizontalPosition: 'right',
-        //       verticalPosition: 'top'
-        //     });
-        //   },
-        //   error: (error) => {
-        //     console.error('Error updating user:', error);
-        //     this.snackBar.open('Error updating user', 'Close', {
-        //       duration: 3000,
-        //       horizontalPosition: 'right',
-        //       verticalPosition: 'top'
-        //     });
-        //   }
-        // });
-        
-        this.snackBar.open('User updated successfully', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
+        // Update existing user - role is already set from form
+        this.userService.updateUser(this.editingUser.id, formValue).subscribe({
+          next: (updatedUser) => {
+            this.isSubmitting = false;
+            const index = this.users.findIndex(u => u.id === this.editingUser!.id);
+            if (index > -1) {
+              this.users[index] = updatedUser;
+            }
+            
+            const filteredIndex = this.filteredUsers.findIndex(u => u.id === this.editingUser!.id);
+            if (filteredIndex > -1) {
+              this.filteredUsers[filteredIndex] = updatedUser;
+            }
+            
+            this.updatePagination();
+            this.snackBar.open('User updated successfully', 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+            
+            // Close popup and reset form on success
+            this.showAddUserForm = false;
+            this.userForm.reset();
+            this.userForm.patchValue({ role: 'Admin' });
+          },
+          error: (error) => {
+            this.isSubmitting = false;
+            console.error('Error updating user:', error);
+            this.snackBar.open('Error updating user', 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+            // Don't close popup on error
+          }
         });
       } else {
-        // Add new user
-        const newUser: User = {
-          id: Date.now(), // Simple ID generation
-          ...formValue,
-          serviceCenterName: this.getServiceCenterName(formValue.serviceCenterId),
-          isActive: true,
-          createdAt: new Date().toISOString()
+        // Add new user - role is already set from form (defaults to 'Admin')
+        const createData = {
+          firstName: formValue.firstName,
+          lastName: formValue.lastName,
+          email: formValue.email,
+          mobileNumber: formValue.mobileNumber,
+          role: formValue.role || 'Admin', // Use role from form, fallback to 'Admin' if null
+          passwordHash: '', // Empty password hash for new users
+          serviceCenterId: formValue.serviceCenterId || null,
+          isActive: true
         };
         
-        this.users.unshift(newUser);
-        this.filteredUsers.unshift(newUser);
-        this.updatePagination();
-        
-        // Uncomment when API is ready:
-        // this.userService.createUser(formValue).subscribe({
-        //   next: (createdUser) => {
-        //     this.users.unshift(createdUser);
-        //     this.filteredUsers.unshift(createdUser);
-        //     this.updatePagination();
-        //     this.snackBar.open('User added successfully', 'Close', {
-        //       duration: 3000,
-        //       horizontalPosition: 'right',
-        //       verticalPosition: 'top'
-        //     });
-        //   },
-        //   error: (error) => {
-        //     console.error('Error creating user:', error);
-        //     this.snackBar.open('Error creating user', 'Close', {
-        //       duration: 3000,
-        //       horizontalPosition: 'right',
-        //       verticalPosition: 'top'
-        //     });
-        //   }
-        // });
-        
-        this.snackBar.open('User added successfully', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
+        this.userService.createUser(createData).subscribe({
+          next: (createdUser) => {
+            this.isSubmitting = false;
+            this.users.unshift(createdUser);
+            this.filteredUsers.unshift(createdUser);
+            this.updatePagination();
+            this.snackBar.open('User added successfully', 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+            
+            // Close popup and reset form on success
+            this.showAddUserForm = false;
+            this.userForm.reset();
+            this.userForm.patchValue({ role: 'Admin' });
+          },
+          error: (error) => {
+            this.isSubmitting = false;
+            console.error('Error creating user:', error);
+            this.snackBar.open('Error creating user', 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+            // Don't close popup on error
+          }
         });
       }
-      
-      this.showAddUserForm = false;
-      this.userForm.reset();
     } else {
       this.markFormGroupTouched();
     }
@@ -441,8 +387,13 @@ export class UsersComponent implements OnInit {
   onCancel(): void {
     this.showAddUserForm = false;
     this.userForm.reset();
+    // Ensure role is set to 'Admin' after reset
+    this.userForm.patchValue({
+      role: 'Admin'
+    });
     this.isEditMode = false;
     this.editingUser = null;
+    this.isSubmitting = false; // Reset submitting state
   }
 
   private markFormGroupTouched(): void {
@@ -477,6 +428,7 @@ export class UsersComponent implements OnInit {
       lastName: 'Last Name',
       email: 'Email',
       mobileNumber: 'Mobile Number',
+      role: 'Role',
       serviceCenterId: 'Service Center'
     };
     return labels[fieldName] || fieldName;

@@ -67,8 +67,13 @@ export class SignInComponent implements OnInit {
           console.log('Login successful:', response);
           this.isLoading = false;
           
-          // Navigate to dashboard based on role
-          this.navigateBasedOnRole(response.role);
+          // Get user role from the current user (decoded from token)
+          const currentUser = this.authService.getCurrentUser();
+          if (currentUser) {
+            this.navigateBasedOnRole(currentUser.role);
+          } else {
+            this.errorMessage = 'Failed to get user information after login.';
+          }
         },
         error: (error) => {
           console.error('Login error:', error);

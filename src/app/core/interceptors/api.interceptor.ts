@@ -2,10 +2,14 @@ import { HttpRequest, HttpHandlerFn, HttpEvent, HttpResponse, HttpErrorResponse 
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { EnvironmentService } from '../services/environment.service';
+import { TokenService } from '../services/token.service';
 
 export function apiInterceptor(req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> {
   const environmentService = inject(EnvironmentService);
+  const tokenService = inject(TokenService);
+  
   // Clone the request and add base URL if it's a relative URL
   let apiReq = req;
   
@@ -16,8 +20,8 @@ export function apiInterceptor(req: HttpRequest<any>, next: HttpHandlerFn): Obse
     });
   }
 
-  // Add common headers
-  apiReq = addCommonHeaders(apiReq);
+  // Add common headers and authentication token
+  apiReq = addCommonHeaders(apiReq, tokenService);
 
   // Log request in development mode
   if (environmentService.isDebugMode()) {
@@ -40,7 +44,7 @@ export function apiInterceptor(req: HttpRequest<any>, next: HttpHandlerFn): Obse
       }
     }),
     catchError((error: HttpErrorResponse) => {
-      return handleError(error, environmentService);
+      return handleError(error, environmentService, tokenService);
     })
   );
 }
@@ -55,7 +59,7 @@ function isRelativeUrl(url: string): boolean {
 /**
  * Add common headers to all API requests
  */
-function addCommonHeaders(req: HttpRequest<any>): HttpRequest<any> {
+function addCommonHeaders(req: HttpRequest<any>, tokenService: TokenService): HttpRequest<any> {
   let headers = req.headers;
 
   // Add Content-Type if not already present
@@ -71,13 +75,19 @@ function addCommonHeaders(req: HttpRequest<any>): HttpRequest<any> {
   // Add custom headers if needed
   headers = headers.set('X-Requested-With', 'XMLHttpRequest');
 
+  // Add Authorization header with JWT token if available
+  const token = tokenService.getToken();
+  if (token && tokenService.isAuthenticated()) {
+    headers = headers.set('Authorization', `Bearer ${token}`);
+  }
+
   return req.clone({ headers });
 }
 
 /**
  * Handle HTTP errors
  */
-function handleError(error: HttpErrorResponse, environmentService: EnvironmentService): Observable<never> {
+function handleError(error: HttpErrorResponse, environmentService: EnvironmentService, tokenService: TokenService): Observable<never> {
   let errorMessage = 'An unknown error occurred';
 
   if (environmentService.isDebugMode()) {
@@ -100,6 +110,10 @@ function handleError(error: HttpErrorResponse, environmentService: EnvironmentSe
         break;
       case 401:
         errorMessage = 'Unauthorized - Please check your credentials';
+        // Clear token and redirect to login on 401
+        tokenService.clearAuthData();
+        const router = inject(Router);
+        router.navigate(['/auth/sign-in']);
         break;
       case 403:
         errorMessage = 'Forbidden - You do not have permission to access this resource';

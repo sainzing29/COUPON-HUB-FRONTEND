@@ -1,24 +1,66 @@
 <div class="service-selection-container">
-  <!-- Header Section -->
-  <div class="header-section">
-    <div class="logo-section">
-      <div class="logo">
-        <span class="logo-text">COUPON HUB</span>
-      </div>
-      <h1 class="page-title">Available Services</h1>
-      <p class="page-subtitle">Welcome {{ customerName }}! Select the services you'd like to redeem</p>
-      <div class="customer-info">
-        <p class="info-text">
-          <span class="label">Coupon:</span> 
-          <span class="coupon-number">{{ couponNumber }}</span>
-        </p>
+  <!-- Main Content Container -->
+  <div class="main-container">
+    <!-- Header Section -->
+    <div class="header-section">
+      <div class="logo-section">
+        <div class="logo">
+          <span class="logo-text">COUPON HUB</span>
+        </div>
+        <h1 class="page-title">Service Redemption Status</h1>
+        <p class="page-subtitle">Welcome {{ customerName }}! View your service redemption status</p>
       </div>
     </div>
-  </div>
 
-  <!-- Services Grid -->
-  <div class="services-container">
-    <div class="services-grid">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-card">
+      <div class="profile-info">
+        <div class="profile-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="profile-details">
+          <h2 class="profile-name">{{ customerName }}</h2>
+          <div class="profile-meta">
+            <div class="meta-item" *ngIf="customerEmail">
+              <i class="fas fa-envelope"></i>
+              <span>{{ customerEmail }}</span>
+            </div>
+            <div class="meta-item" *ngIf="customerPhone">
+              <i class="fas fa-phone"></i>
+              <span>{{ customerPhone }}</span>
+            </div>
+            <div class="meta-item" *ngIf="customerAddress">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>{{ customerAddress }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="profile-actions">
+        <div class="coupon-info">
+          <span class="coupon-label">Coupon Number:</span>
+          <span class="coupon-number">{{ couponNumber }}</span>
+          <button 
+            (click)="viewInvoice()"
+            class="invoice-btn">
+            <i class="fas fa-file-invoice"></i>
+            <span>See Invoice</span>
+          </button>
+        </div>
+        <button 
+          (click)="logout()"
+          class="logout-btn">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+      </div>
+    </div>
+
+    <!-- Services Grid -->
+    <div class="services-container">
+      <div class="services-grid">
       <div 
         *ngFor="let service of services; let i = index" 
         class="service-card"
@@ -36,52 +78,46 @@
           </div>
         </div>
         <div class="service-action">
-          <button 
-            (click)="toggleService(service, i)"
-            class="select-btn"
-            [class]="getSelectButtonClass(i, service.isSelected)">
-            <i *ngIf="service.isSelected" class="fas fa-check"></i>
-            <i *ngIf="!service.isSelected" class="fas fa-plus"></i>
-            <span>{{ service.isSelected ? 'Selected' : 'Select' }}</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Selected Services Summary -->
-    <div *ngIf="selectedServices.length > 0" class="summary-section">
-      <div class="summary-card">
-        <h3 class="summary-title">Selected Services ({{ selectedServices.length }})</h3>
-        <div class="selected-services-list">
-          <div *ngFor="let service of selectedServices" class="selected-service-item">
-            <span class="service-name">{{ service.name }}</span>
-            <span class="service-value">{{ service.value }}</span>
+          <div class="redemption-status" [class]="getRedemptionStatusClass(service.redemptionStatus)">
+            <i [class]="getRedemptionStatusIcon(service.redemptionStatus)"></i>
+            <span class="status-text">{{ getRedemptionStatusText(service.redemptionStatus) }}</span>
+            <span *ngIf="service.redeemedDate" class="redeemed-date">{{ service.redeemedDate }}</span>
           </div>
         </div>
-        <div class="summary-actions">
-          <button 
-            (click)="proceedToRedeem()"
-            class="proceed-btn">
-            <i class="fas fa-arrow-right"></i>
-            <span>Proceed to Redeem</span>
-          </button>
+        </div>
+      </div>
+
+      <!-- Service Redemption Summary -->
+      <div class="summary-section">
+        <div class="summary-card">
+          <h3 class="summary-title">Service Redemption Status</h3>
+          <div class="redemption-stats">
+            <div class="stat-item">
+              <span class="stat-label">Available:</span>
+              <span class="stat-value available">{{ getServicesByStatus('available').length }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Redeemed:</span>
+              <span class="stat-value redeemed">{{ getServicesByStatus('redeemed').length }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Back Button -->
-  <div class="back-section">
-    <button 
-      (click)="goBack()"
-      class="back-btn">
-      <i class="fas fa-arrow-left"></i>
-      <span>Back to Registration</span>
-    </button>
-  </div>
+    <!-- Back Button -->
+    <div class="back-section">
+      <button 
+        (click)="goBack()"
+        class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back to Registration</span>
+      </button>
+    </div>
 
-  <!-- Footer -->
-  <div class="footer-section">
-    <p class="footer-text">© 2024 Coupon Hub. All rights reserved.</p>
+    <!-- Footer -->
+    <div class="footer-section">
+      <p class="footer-text">© 2024 Coupon Hub. All rights reserved.</p>
+    </div>
   </div>
 </div>

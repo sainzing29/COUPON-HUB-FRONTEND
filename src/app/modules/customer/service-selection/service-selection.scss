@@ -1,12 +1,33 @@
 // Service Selection Component Styles
 
 .service-selection-container {
-  @apply min-h-screen bg-gradient-to-br from-green-50 to-blue-100 flex flex-col;
+  @apply min-h-screen flex flex-col;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+// Main Container for consistent alignment
+.main-container {
+  @apply max-w-6xl mx-auto w-full px-6 flex flex-col flex-1 relative z-10;
 }
 
 // Header Section
 .header-section {
-  @apply py-8 px-6 text-center;
+  @apply py-8 text-center;
   
   .logo-section {
     @apply max-w-4xl mx-auto;
@@ -15,16 +36,27 @@
       @apply mb-6;
       
       .logo-text {
-        @apply text-3xl font-bold text-green-600;
+        @apply text-4xl font-bold;
+        background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        animation: logoGlow 2s ease-in-out infinite alternate;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
       }
     }
     
     .page-title {
-      @apply text-3xl font-bold text-gray-900 mb-2;
+      @apply text-4xl font-bold text-white mb-2;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      animation: fadeInUp 0.8s ease-out;
     }
     
     .page-subtitle {
-      @apply text-gray-600 text-lg mb-4;
+      @apply text-white text-lg mb-4;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      animation: fadeInUp 0.8s ease-out 0.2s both;
     }
     
     .customer-info {
@@ -45,9 +77,104 @@
   }
 }
 
+// Profile Header
+.profile-header {
+  @apply pb-6;
+  
+  .profile-card {
+    @apply rounded-2xl p-6;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.1),
+      0 2px 8px rgba(0, 0, 0, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    animation: slideInUp 0.6s ease-out;
+    
+    .profile-info {
+      @apply flex items-start space-x-4 mb-4;
+      
+      .profile-avatar {
+        @apply w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        
+        i {
+          @apply text-white text-2xl;
+        }
+      }
+      
+      .profile-details {
+        @apply flex-1;
+        
+        .profile-name {
+          @apply text-2xl font-bold text-gray-900 mb-2;
+        }
+        
+        .profile-meta {
+          @apply space-y-2;
+          
+          .meta-item {
+            @apply flex items-center space-x-2 text-sm text-gray-600;
+            
+            i {
+              @apply text-blue-500 w-4;
+            }
+          }
+        }
+      }
+    }
+    
+    .profile-actions {
+      @apply flex items-center justify-between pt-4 border-t border-gray-200;
+      
+      .coupon-info {
+        @apply flex items-center space-x-3;
+        
+        .coupon-label {
+          @apply text-sm text-gray-600 font-medium;
+        }
+        
+        .coupon-number {
+          @apply text-lg font-bold font-mono;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        
+        .invoice-btn {
+          @apply px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 flex items-center space-x-2;
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          color: white;
+          box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+          
+          &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
+          }
+          
+          i {
+            @apply text-xs;
+          }
+        }
+      }
+      
+      .logout-btn {
+        @apply px-4 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200 flex items-center space-x-2;
+        
+        i {
+          @apply text-sm;
+        }
+      }
+    }
+  }
+}
+
 // Services Container
 .services-container {
-  @apply flex-1 px-6 pb-8;
+  @apply flex-1 pb-8;
   
   .services-grid {
     @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8;
@@ -56,49 +183,64 @@
 
 // Service Card
 .service-card {
-  @apply bg-white rounded-xl shadow-sm border-2 border-transparent p-6 transition-all duration-200 hover:shadow-md cursor-pointer;
+  @apply rounded-2xl border-2 border-transparent p-6 transition-all duration-300 cursor-pointer;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.15),
+      0 4px 8px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
   
   &.selected {
     @apply border-green-300 bg-green-50;
   }
   
   &.service-1 {
-    @apply border-blue-200 bg-blue-50;
+    border-left: 4px solid #3b82f6;
     
-    &.selected {
-      @apply border-blue-400 bg-blue-100;
+    &:hover {
+      border-left-color: #1d4ed8;
     }
   }
   
   &.service-2 {
-    @apply border-green-200 bg-green-50;
+    border-left: 4px solid #10b981;
     
-    &.selected {
-      @apply border-green-400 bg-green-100;
+    &:hover {
+      border-left-color: #047857;
     }
   }
   
   &.service-3 {
-    @apply border-purple-200 bg-purple-50;
+    border-left: 4px solid #8b5cf6;
     
-    &.selected {
-      @apply border-purple-400 bg-purple-100;
+    &:hover {
+      border-left-color: #7c3aed;
     }
   }
   
   &.service-4 {
-    @apply border-yellow-200 bg-yellow-50;
+    border-left: 4px solid #f59e0b;
     
-    &.selected {
-      @apply border-yellow-400 bg-yellow-100;
+    &:hover {
+      border-left-color: #d97706;
     }
   }
   
   &.service-5 {
-    @apply border-red-200 bg-red-50;
+    border-left: 4px solid #ef4444;
     
-    &.selected {
-      @apply border-red-400 bg-red-100;
+    &:hover {
+      border-left-color: #dc2626;
     }
   }
   
@@ -106,7 +248,8 @@
     @apply flex items-start space-x-4 mb-4;
     
     .service-number {
-      @apply w-8 h-8 bg-white rounded-full flex items-center justify-center text-sm font-bold text-gray-600 shadow-sm;
+      @apply w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-lg;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
     
     .service-details {
@@ -128,7 +271,11 @@
         }
         
         .price-value {
-          @apply text-sm font-bold text-green-600;
+          @apply text-sm font-bold;
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
       }
     }
@@ -137,69 +284,97 @@
   .service-action {
     @apply flex justify-end;
     
-    .select-btn {
-      @apply px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2;
+    .redemption-status {
+      @apply px-4 py-2 text-sm font-medium rounded-xl flex items-center space-x-2 min-w-[120px] justify-center;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       
-      &.selected {
-        @apply bg-green-600 text-white;
+      .status-text {
+        @apply font-semibold;
+      }
+      
+      .redeemed-date {
+        @apply text-xs opacity-75 block mt-1;
+      }
+      
+      &.status-available {
+        background: rgba(16, 185, 129, 0.1);
+        color: #047857;
+        border-color: rgba(16, 185, 129, 0.3);
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+      }
+      
+      &.status-redeemed {
+        background: rgba(59, 130, 246, 0.1);
+        color: #1e40af;
+        border-color: rgba(59, 130, 246, 0.3);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
       }
     }
   }
 }
 
-// Service-specific button colors
-.service-1 .select-btn:not(.selected) {
-  @apply bg-blue-600 hover:bg-blue-700 text-white;
+// Service-specific redemption status colors
+.service-1 .redemption-status {
+  @apply border-blue-300;
 }
 
-.service-2 .select-btn:not(.selected) {
-  @apply bg-green-600 hover:bg-green-700 text-white;
+.service-2 .redemption-status {
+  @apply border-green-300;
 }
 
-.service-3 .select-btn:not(.selected) {
-  @apply bg-purple-600 hover:bg-purple-700 text-white;
+.service-3 .redemption-status {
+  @apply border-purple-300;
 }
 
-.service-4 .select-btn:not(.selected) {
-  @apply bg-yellow-600 hover:bg-yellow-700 text-white;
+.service-4 .redemption-status {
+  @apply border-yellow-300;
 }
 
-.service-5 .select-btn:not(.selected) {
-  @apply bg-red-600 hover:bg-red-700 text-white;
+.service-5 .redemption-status {
+  @apply border-red-300;
 }
 
 // Summary Section
 .summary-section {
-  @apply max-w-4xl mx-auto;
+  @apply mb-8;
   
   .summary-card {
-    @apply bg-white rounded-xl shadow-lg p-6;
+    @apply rounded-2xl p-6;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.1),
+      0 2px 8px rgba(0, 0, 0, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    animation: slideInUp 0.8s ease-out;
     
     .summary-title {
       @apply text-xl font-bold text-gray-900 mb-4;
     }
     
-    .selected-services-list {
-      @apply space-y-3 mb-6;
+    .redemption-stats {
+      @apply grid grid-cols-2 gap-4;
       
-      .selected-service-item {
-        @apply flex justify-between items-center py-2 px-3 bg-gray-50 rounded-lg;
+      .stat-item {
+        @apply flex flex-col items-center p-4 bg-gray-50 rounded-lg;
         
-        .service-name {
-          @apply font-medium text-gray-900;
+        .stat-label {
+          @apply text-sm text-gray-600 mb-1;
         }
         
-        .service-value {
-          @apply text-sm font-bold text-green-600;
+        .stat-value {
+          @apply text-2xl font-bold;
+          
+          &.available {
+            @apply text-green-600;
+          }
+          
+          &.redeemed {
+            @apply text-blue-600;
+          }
         }
-      }
-    }
-    
-    .summary-actions {
-      @apply flex justify-end;
-      
-      .proceed-btn {
-        @apply px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2;
       }
     }
   }
@@ -207,7 +382,7 @@
 
 // Back Section
 .back-section {
-  @apply px-6 pb-4;
+  @apply pb-4;
   
   .back-btn {
     @apply px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200 flex items-center space-x-2;
@@ -216,7 +391,7 @@
 
 // Footer Section
 .footer-section {
-  @apply py-4 px-6 text-center;
+  @apply py-4 text-center;
   
   .footer-text {
     @apply text-gray-500 text-sm;
@@ -225,8 +400,12 @@
 
 // Responsive Design
 @media (max-width: 768px) {
+  .main-container {
+    @apply px-4;
+  }
+  
   .header-section {
-    @apply py-6 px-4;
+    @apply py-6;
     
     .logo-section {
       .page-title {
@@ -239,8 +418,42 @@
     }
   }
   
+  .profile-header {
+    @apply pb-4;
+    
+    .profile-card {
+      @apply p-4;
+      
+      .profile-info {
+        @apply flex-col space-x-0 space-y-4;
+        
+        .profile-avatar {
+          @apply w-12 h-12;
+          
+          i {
+            @apply text-xl;
+          }
+        }
+        
+        .profile-details {
+          .profile-name {
+            @apply text-xl;
+          }
+        }
+      }
+      
+      .profile-actions {
+        @apply flex-col space-y-4 pt-4;
+        
+        .coupon-info {
+          @apply text-center;
+        }
+      }
+    }
+  }
+  
   .services-container {
-    @apply px-4 pb-6;
+    @apply pb-6;
     
     .services-grid {
       @apply grid-cols-1 gap-4;
@@ -258,9 +471,36 @@
   }
 }
 
-// Animation for cards
-.service-card {
-  animation: slideUp 0.5s ease-out;
+// Animations
+@keyframes logoGlow {
+  0% {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+  }
+  100% {
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.9));
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideUp {
@@ -272,6 +512,11 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+// Animation for cards
+.service-card {
+  animation: slideUp 0.6s ease-out;
 }
 
 // Staggered animation for service cards

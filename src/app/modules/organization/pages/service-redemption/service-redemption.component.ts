@@ -41,7 +41,13 @@ export class ServiceRedemptionComponent implements OnInit {
   
   // Filter properties
   statusFilter: string = 'all';
-  customerFilter: string = '';
+  couponNumberFilter: string = '';
+  
+  // OTP popup properties
+  showOtpDialog: boolean = false;
+  otpCode: string = '';
+  selectedCoupon: Coupon | null = null;
+  isOtpValidating: boolean = false;
   
   // Mock data
   private mockCoupons: Coupon[] = [
@@ -148,17 +154,17 @@ export class ServiceRedemptionComponent implements OnInit {
     this.applyFilters();
   }
 
-  onCustomerFilterChange(): void {
+  onCouponNumberFilterChange(): void {
     this.applyFilters();
   }
 
   private applyFilters(): void {
     this.filteredCoupons = this.coupons.filter(coupon => {
       const statusMatch = this.statusFilter === 'all' || coupon.status.toLowerCase() === this.statusFilter;
-      const customerMatch = !this.customerFilter || 
-        coupon.customer.toLowerCase().includes(this.customerFilter.toLowerCase());
+      const couponNumberMatch = !this.couponNumberFilter || 
+        coupon.code.toLowerCase().includes(this.couponNumberFilter.toLowerCase());
       
-      return statusMatch && customerMatch;
+      return statusMatch && couponNumberMatch;
     });
   }
 
@@ -175,9 +181,54 @@ export class ServiceRedemptionComponent implements OnInit {
   }
 
   redeemService(coupon: Coupon): void {
-    // Navigate to redeem service page with coupon code as query parameter
-    this.router.navigate(['/organization/redeem-service'], {
-      queryParams: { couponCode: coupon.code, customerName: coupon.customer }
-    });
+    // Prevent redemption for expired coupons
+    if (coupon.status === 'Expired') {
+      return;
+    }
+    
+    // Show OTP dialog for verification
+    this.selectedCoupon = coupon;
+    this.showOtpDialog = true;
+    this.otpCode = '';
+  }
+
+  closeOtpDialog(): void {
+    this.showOtpDialog = false;
+    this.selectedCoupon = null;
+    this.otpCode = '';
+    this.isOtpValidating = false;
+  }
+
+  confirmOtp(): void {
+    if (!this.otpCode || this.otpCode.length !== 6) {
+      return;
+    }
+
+    this.isOtpValidating = true;
+    
+    // Simulate OTP validation with 1-second delay
+    setTimeout(() => {
+      this.isOtpValidating = false;
+      
+      // For demo purposes, accept any 6-digit OTP
+      if (this.otpCode.length === 6) {
+        this.closeOtpDialog();
+        
+        // Navigate to redeem service page with coupon code as query parameter
+        this.router.navigate(['/organization/service-redemption/redeem-service'], {
+          queryParams: { 
+            couponCode: this.selectedCoupon?.code, 
+            customerName: this.selectedCoupon?.customer 
+          }
+        });
+      }
+    }, 1000);
+  }
+
+  onOtpInput(event: any): void {
+    // Only allow numeric input
+    const value = event.target.value.replace(/\D/g, '');
+    this.otpCode = value;
+    event.target.value = value;
   }
 }

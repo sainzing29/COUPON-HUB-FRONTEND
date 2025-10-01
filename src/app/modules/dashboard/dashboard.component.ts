@@ -1,11 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { trigger, state, style, transition, animate, stagger, query } from '@angular/animations';
+import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { BaseChartDirective } from 'ng2-charts';
+import { DashboardService } from './services/dashboard.service';
+import { AuthService } from '../../core/services/auth.service';
+import { DashboardStats, DashboardChartData, SalesTrendData, ServiceCenterData, CouponUsageData } from './models/dashboard';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, BaseChartDirective],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   animations: [
@@ -34,90 +39,473 @@ import { trigger, state, style, transition, animate, stagger, query } from '@ang
   ]
 })
 export class DashboardComponent implements OnInit {
-  stats = [
-    {
-      title: 'Used Space',
-      value: '49/50 GB',
-      icon: 'folder',
-      iconColor: 'bg-orange-500',
-      status: 'warning',
-      statusText: 'Get More Space...',
-      statusIcon: 'warning'
-    },
-    {
-      title: 'Revenue',
-      value: '$34,245',
-      icon: 'trending_up',
-      iconColor: 'bg-green-500',
-      status: 'info',
-      statusText: 'Last 24 Hours',
-      statusIcon: 'schedule'
-    },
-    {
-      title: 'Fixed Issues',
-      value: '75',
-      icon: 'info',
-      iconColor: 'bg-red-500',
-      status: 'info',
-      statusText: 'Tracked from Github',
-      statusIcon: 'code'
-    },
-    {
-      title: 'Followers',
-      value: '+245',
-      icon: 'people',
-      iconColor: 'bg-cyan-500',
-      status: 'success',
-      statusText: 'Just Updated',
-      statusIcon: 'refresh'
-    }
-  ];
 
-  charts = [
-    {
-      title: 'Daily Sales',
-      description: '↑ 55% increase in today sales.',
-      descriptionColor: 'text-green-600',
-      timeText: 'updated 4 minutes ago',
-      chartData: this.generateLineChartData(),
-      chartType: 'line'
-    },
-    {
-      title: 'Email Subscriptions',
-      description: 'Last Campaign Performance',
-      descriptionColor: 'text-gray-600',
-      timeText: 'campaign sent 2 days ago',
-      chartData: this.generateBarChartData(),
-      chartType: 'bar'
-    },
-    {
-      title: 'Completed Tasks',
-      description: 'Last Campaign Performance',
-      descriptionColor: 'text-gray-600',
-      timeText: 'campaign sent 2 days ago',
-      chartData: this.generateTaskChartData(),
-      chartType: 'line'
-    }
-  ];
+  dashboardStats: DashboardStats | null = null;
+  chartData: DashboardChartData | null = null;
+  isLoading = false;
+  errorMessage = '';
+  couponSoldGrowth = 0;
+  revenueGrowth = 0;
 
-  constructor() { }
+  // Chart.js configurations
+  public salesChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+      },
+      title: {
+        display: false
+      },
+      tooltip: {
+        enabled: true,
+        callbacks: {
+          label: function(context) {
+            return `${context.dataset.label}: ${context.parsed.y} AED`;
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        min: 0,
+        ticks: {
+          stepSize: 1
+        },
+        grid: {
+          color: 'rgba(0,0,0,0.1)'
+        }
+      },
+      x: {
+        grid: {
+          color: 'rgba(0,0,0,0.1)'
+        }
+      }
+    }
+  };
+
+  public serviceCenterChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+      },
+      title: {
+        display: false
+      },
+      tooltip: {
+        enabled: true,
+        callbacks: {
+          label: function(context) {
+            return `${context.dataset.label}: ${context.parsed.y}`;
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        min: 0,
+        ticks: {
+          stepSize: 1
+        },
+        grid: {
+          color: 'rgba(0,0,0,0.1)'
+        }
+      },
+      x: {
+        grid: {
+          color: 'rgba(0,0,0,0.1)'
+        }
+      }
+    }
+  };
+
+  public couponUsageChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+      },
+      title: {
+        display: false
+      },
+      tooltip: {
+        enabled: true,
+        callbacks: {
+          label: function(context) {
+            return `${context.dataset.label}: ${context.parsed.y}`;
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        min: 0,
+        ticks: {
+          stepSize: 1
+        },
+        grid: {
+          color: 'rgba(0,0,0,0.1)'
+        }
+      },
+      x: {
+        grid: {
+          color: 'rgba(0,0,0,0.1)'
+        }
+      }
+    }
+  };
+
+  public salesChartData: ChartData<'bar'> = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [
+      {
+        data: [0, 0, 0, 0, 0, 0],
+        label: 'Revenue',
+        backgroundColor: 'rgba(59, 130, 246, 0.6)',
+        borderColor: 'rgba(59, 130, 246, 1)',
+        borderWidth: 1
+      }
+    ]
+  };
+
+  public serviceCenterChartData: ChartData<'bar'> = {
+    labels: ['Center A', 'Center B', 'Center C', 'Center D', 'Center E'],
+    datasets: [
+      {
+        data: [0, 0, 0, 0, 0],
+        label: 'Services Completed',
+        backgroundColor: 'rgba(34, 197, 94, 0.6)',
+        borderColor: 'rgba(34, 197, 94, 1)',
+        borderWidth: 1
+      }
+    ]
+  };
+
+  public couponUsageChartData: ChartData<'bar'> = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [
+      {
+        data: [0, 0, 0, 0, 0, 0],
+        label: 'Coupons Redeemed',
+        backgroundColor: 'rgba(147, 51, 234, 0.6)',
+        borderColor: 'rgba(147, 51, 234, 1)',
+        borderWidth: 1
+      }
+    ]
+  };
+
+  public chartType: ChartType = 'bar';
+
+  constructor(
+    private dashboardService: DashboardService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
+    this.getDashboardStats();
+    this.getDashboardChartData();
   }
 
-  generateLineChartData(): number[] {
-    return [12, 19, 3, 5, 2, 3, 20, 25, 18, 22, 28, 35];
+  /**
+   * Initialize sample data for charts if API data is not available
+   */
+  private initializeSampleData(): void {
+    // Sample data for Sales Trends
+    this.salesChartData = {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      datasets: [
+        {
+          data: [12000, 15000, 18000, 14000, 16000, 20000, 22000, 19000, 25000, 28000, 26000, 30000],
+          label: 'Revenue',
+          backgroundColor: 'rgba(59, 130, 246, 0.6)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 1
+        }
+      ]
+    };
+
+    // Sample data for Service Centers
+    this.serviceCenterChartData = {
+      labels: ['Center A', 'Center B', 'Center C', 'Center D', 'Center E'],
+      datasets: [
+        {
+          data: [45, 38, 52, 41, 35],
+          label: 'Services Completed',
+          backgroundColor: 'rgba(34, 197, 94, 0.6)',
+          borderColor: 'rgba(34, 197, 94, 1)',
+          borderWidth: 1
+        }
+      ]
+    };
+
+    // Sample data for Coupon Usage
+    this.couponUsageChartData = {
+      labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+      datasets: [
+        {
+          data: [120, 150, 180, 140],
+          label: 'Coupons Used',
+          backgroundColor: 'rgba(147, 51, 234, 0.6)',
+          borderColor: 'rgba(147, 51, 234, 1)',
+          borderWidth: 1
+        }
+      ]
+    };
   }
 
-  generateBarChartData(): number[] {
-    return [200, 300, 400, 500, 600, 700, 800, 750, 650, 550, 450, 350];
+  /**
+   * Get dashboard statistics from API
+   */
+  getDashboardStats(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.dashboardService.getDashboardStats().subscribe({
+      next: (stats: DashboardStats) => {
+        this.dashboardStats = stats;
+        this.couponSoldGrowth = ((this.dashboardStats.couponsSoldThisMonth - this.dashboardStats.couponsSoldLastMonth)
+         / (this.dashboardStats.couponsSoldLastMonth == 0 ? 1 : this.dashboardStats.couponsSoldLastMonth)) * 100
+        this.revenueGrowth = ((this.dashboardStats.revenueThisMonth - this.dashboardStats.revenueLastMonth)
+         / (this.dashboardStats.revenueLastMonth == 0 ? 1 : this.dashboardStats.revenueLastMonth)) * 100
+
+        this.isLoading = false;
+        console.log('Dashboard stats loaded:', stats);
+      },
+      error: (error) => {
+        console.error('Error fetching dashboard stats:', error);
+        this.errorMessage = 'Failed to load dashboard statistics. Please try again.';
+        this.isLoading = false;
+      }
+    });
   }
 
-  generateTaskChartData(): number[] {
-    return [800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250];
+  /**
+   * Get dashboard chart data
+   */
+  getDashboardChartData(): void {
+    this.dashboardService.getDashboardChartData(6).subscribe({
+      next: (data: DashboardChartData) => {
+        this.chartData = data;
+        this.updateChartsWithData();
+        console.log('Chart data loaded:', data);
+      },
+      error: (error) => {
+        console.error('Error fetching chart data:', error);
+        this.errorMessage = 'Failed to load chart data. Please try again.';
+        // Only show sample data if API fails
+        this.initializeSampleData();
+      }
+    });
   }
 
-  getMaxValue(data: number[]): number {
-    return Math.max(...data);
+  /**
+   * Update charts with new data
+   */
+  updateChartsWithData(): void {
+    if (!this.chartData) return;
+
+    console.log('Updating charts with API data:', this.chartData);
+
+    // Update Sales Trends chart
+    const salesLabels = this.chartData.salesTrends.data.map(item => this.getShortDateLabel(item.month));
+    const salesData = this.chartData.salesTrends.data.map(item => item.revenue);
+    console.log('Sales chart - Labels:', salesLabels, 'Data:', salesData);
+
+    this.salesChartData = {
+      labels: salesLabels,
+      datasets: [
+        {
+          data: salesData,
+          label: 'Revenue',
+          backgroundColor: 'rgba(59, 130, 246, 0.6)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 1
+        }
+      ]
+    };
+    
+    // Update Service Center Distribution chart
+    const serviceLabels = this.chartData.serviceCenterDistribution.data.map(item => this.getShortDateLabel(item.serviceCenterName));
+    const serviceData = this.chartData.serviceCenterDistribution.data.map(item => item.servicesCompleted);
+    console.log('Service Center chart - Labels:', serviceLabels, 'Data:', serviceData);
+
+    this.serviceCenterChartData = {
+      labels: serviceLabels,
+      datasets: [
+        {
+          data: serviceData,
+          label: 'Services Completed',
+          backgroundColor: 'rgba(34, 197, 94, 0.6)',
+          borderColor: 'rgba(34, 197, 94, 1)',
+          borderWidth: 1
+        }
+      ]
+    };
+    
+    // Update Coupon Usage chart - show redeemed coupons instead of total
+    const couponLabels = this.chartData.couponUsage.data.map(item => this.getShortDateLabel(item.period));
+    const couponData = this.chartData.couponUsage.data.map(item => item.redeemedCoupons);
+    console.log('Coupon Usage chart - Labels:', couponLabels, 'Data:', couponData);
+
+    this.couponUsageChartData = {
+      labels: couponLabels,
+      datasets: [
+        {
+          data: couponData,
+          label: 'Coupons Redeemed',
+          backgroundColor: 'rgba(147, 51, 234, 0.6)',
+          borderColor: 'rgba(147, 51, 234, 1)',
+          borderWidth: 1
+        }
+      ]
+    };
+
+    console.log('Charts updated:', {
+      salesChartData: this.salesChartData,
+      serviceCenterChartData: this.serviceCenterChartData,
+      couponUsageChartData: this.couponUsageChartData
+    });
+  }
+
+  /**
+   * Refresh chart data from API
+   */
+  refreshChartData(): void {
+    this.getDashboardChartData();
+  }
+
+  /**
+   * Convert date string to short format (e.g., "Oct 2024" -> "oct-24")
+   */
+  getShortDateLabel(dateString: string): string {
+    if (!dateString || dateString === 'Service Center') {
+      return dateString;
+    }
+
+    // Handle formats like "Oct 2024", "Dec 2024", etc.
+    const parts = dateString.trim().split(' ');
+    if (parts.length >= 2) {
+      const month = parts[0].toLowerCase();
+      const year = parts[1];
+      const shortYear = year.length === 4 ? year.slice(-2) : year;
+      return `${month}-${shortYear}`;
+    }
+
+    // Handle other formats or return as is
+    return dateString;
+  }
+
+  /**
+   * Check if chart has any data
+   */
+  hasChartData(chartData: any[] | undefined): boolean {
+    if (!chartData || !Array.isArray(chartData)) {
+      return false;
+    }
+    
+    // Check if any item has meaningful numeric data > 0
+    const hasData = chartData.some(item => {
+      // Check specific numeric fields that matter for charts
+      const numericFields = ['revenue', 'couponsSold', 'servicesCompleted', 'couponsRedeemed', 'redeemedCoupons', 'totalCoupons'];
+      return numericFields.some(field => 
+        typeof item[field] === 'number' && item[field] > 0
+      );
+    });
+    
+    console.log('hasChartData check:', { chartData, hasData });
+    return hasData;
+  }
+
+  /**
+   * Chart event handlers (from ng2-charts documentation)
+   */
+  chartHovered(event: any): void {
+    console.log('Chart hovered:', event);
+  }
+
+  chartClicked(event: any): void {
+    console.log('Chart clicked:', event);
+  }
+
+  /**
+   * Get service center chart title based on user role
+   */
+  getServiceCenterTitle(): string {
+    const user = this.authService.getCurrentUser();
+    return user?.serviceCenterId ? "Your Center Performance" : "All Centers Performance";
+  }
+
+  /**
+   * Get service center chart description based on user role
+   */
+  getServiceCenterDescription(): string {
+    const user = this.authService.getCurrentUser();
+    return user?.serviceCenterId ? "Services completed at your center" : "Total services completed across all centers";
+  }
+
+
+  /**
+   * Get current user role from JWT token
+   */
+  getUserRole(): string | null {
+    return this.authService.getUserRole();
+  }
+
+  /**
+   * Check if current user is SuperAdmin
+   */
+  isSuperAdmin(): boolean {
+    return this.authService.hasRole('SuperAdmin');
+  }
+
+  /**
+   * Check if current user is Admin
+   */
+  isAdmin(): boolean {
+    return this.authService.hasRole('Admin');
+  }
+
+  /**
+   * Format currency values
+   */
+  formatCurrency(value: number): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(value);
+  }
+
+  /**
+   * Format number with commas
+   */
+  formatNumber(value: number): string {
+    return new Intl.NumberFormat('en-US').format(value);
+  }
+
+  /**
+   * Get dashboard stats for display
+   */
+  getDashboardStatsForDisplay() {
+    if (!this.dashboardStats) return null;
+
+    return {
+      totalCouponsSold: this.formatNumber(this.dashboardStats.totalCouponsSold),
+      couponsSoldLastMonth: this.formatNumber(this.dashboardStats.couponsSoldLastMonth),
+      activeCoupons: this.formatNumber(this.dashboardStats.activeCoupons),
+      servicesCompleted: this.formatNumber(this.dashboardStats.servicesCompleted),
+      servicesCompletedThisMonth: this.formatNumber(this.dashboardStats.servicesCompletedThisMonth),
+      totalRevenue: this.formatCurrency(this.dashboardStats.totalRevenue),
+      revenueThisMonth: this.formatCurrency(this.dashboardStats.revenueThisMonth)
+    };
   }
 }

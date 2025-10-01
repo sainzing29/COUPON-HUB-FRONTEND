@@ -25,6 +25,7 @@ export class CouponSaleComponent implements OnInit {
   ) {
     this.saleForm = this.fb.group({
       customerName: ['', [Validators.required, Validators.minLength(2)]],
+      customerEmail: ['', [Validators.required, Validators.email]],
       mobile: ['', [Validators.required, Validators.pattern(/^[0-9+\-\s()]+$/)]],
       amount: ['99 AED']
     });
@@ -79,6 +80,10 @@ export class CouponSaleComponent implements OnInit {
   // Getter for form validation
   get customerNameControl() {
     return this.saleForm.get('customerName');
+  }
+
+  get customerEmailControl() {
+    return this.saleForm.get('customerEmail');
   }
 
   get mobileControl() {

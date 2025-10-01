@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
 import { ApiService } from '../../../core/services/api.service';
 
 export interface User {
@@ -32,6 +31,9 @@ export interface UserCreateRequest {
   email: string;
   mobileNumber: string;
   role: string;
+  passwordHash: string;
+  serviceCenterId?: number;
+  isActive: boolean;
 }
 
 export interface UserUpdateRequest {
@@ -40,6 +42,7 @@ export interface UserUpdateRequest {
   email?: string;
   mobileNumber?: string;
   role?: string;
+  serviceCenterId?: number;
   isActive?: boolean;
 }
 
@@ -55,16 +58,13 @@ export interface UsersResponse {
 })
 export class UserService {
 
-  constructor(
-    private http: HttpClient,
-    private apiService: ApiService
-  ) { }
+  constructor(private apiService: ApiService) { }
 
   /**
    * Get all users
    */
   getUsers(): Observable<User[]> {
-    return this.http.get<User[]>('/users');
+    return this.apiService.get<User[]>('/users');
   }
 
   /**

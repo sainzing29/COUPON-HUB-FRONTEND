@@ -259,7 +259,7 @@ export class CustomersComponent implements OnInit {
   }
 
   onViewCustomer(customer: Customer): void {
-    this.router.navigate(['/organization/customer-profile', customer.id]);
+    this.router.navigate(['/organization/customers', customer.id]);
   }
 
   onCancel(): void {
