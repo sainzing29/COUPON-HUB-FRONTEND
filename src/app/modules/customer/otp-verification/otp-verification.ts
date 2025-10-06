@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -14,6 +14,8 @@ import { CustomerAuthService } from '../services/customer-auth.service';
   styleUrls: ['./otp-verification.scss']
 })
 export class OtpVerificationComponent implements OnInit, OnDestroy {
+  @ViewChildren('otpInput') otpInputs!: QueryList<ElementRef>;
+  
   otpForm: FormGroup;
   otpDigits: number[] = [0, 1, 2, 3, 4, 5];
   maskedPhoneNumber: string = '';
@@ -64,6 +66,13 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
 
     // Start timer
     this.startTimer();
+    
+    // Focus on first input after component loads
+    setTimeout(() => {
+      if (this.otpInputs && this.otpInputs.length > 0) {
+        this.otpInputs.first.nativeElement.focus();
+      }
+    }, 100);
   }
 
   ngOnDestroy(): void {
@@ -92,34 +101,91 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
   onDigitInput(event: any, index: number): void {
     const value = event.target.value;
     
+    console.log(`Input ${index}: "${value}"`); // Debug log
+    
     // Only allow single digit
     if (value.length > 1) {
       event.target.value = value.slice(-1);
     }
     
+    // Only allow numeric input
+    if (value && !/^[0-9]$/.test(value)) {
+      event.target.value = '';
+      return;
+    }
+    
+    // Update form control value
+    this.otpForm.get(`digit${index}`)?.setValue(value);
+    
     // Move to next input if current is filled
     if (value && index < 5) {
-      const nextInput = document.querySelector(`input[formControlName="digit${index + 1}"]`) as HTMLInputElement;
-      if (nextInput) {
-        nextInput.focus();
-      }
+      console.log(`Moving to next input: ${index + 1}`); // Debug log
+      setTimeout(() => {
+        // Try ViewChildren first
+        if (this.otpInputs && this.otpInputs.length > index + 1) {
+          const nextInput = this.otpInputs.toArray()[index + 1];
+          if (nextInput) {
+            console.log('Using ViewChildren to focus'); // Debug log
+            nextInput.nativeElement.focus();
+            nextInput.nativeElement.select();
+            return;
+          }
+        }
+        
+        // Fallback to DOM query
+        const nextInput = document.querySelector(`input[formControlName="digit${index + 1}"]`) as HTMLInputElement;
+        if (nextInput) {
+          console.log('Using DOM query to focus'); // Debug log
+          nextInput.focus();
+          nextInput.select();
+        } else {
+          console.log('Next input not found'); // Debug log
+        }
+      }, 10);
     }
     
     // Auto-verify when all digits are filled
     if (this.isAllDigitsFilled()) {
-      this.verifyOTP();
+      setTimeout(() => {
+        this.verifyOTP();
+      }, 200);
     }
   }
 
   onKeyDown(event: KeyboardEvent, index: number): void {
+    const input = event.target as HTMLInputElement;
+    
     // Handle backspace
     if (event.key === 'Backspace') {
-      const currentValue = (event.target as HTMLInputElement).value;
+      const currentValue = input.value;
       if (!currentValue && index > 0) {
-        const prevInput = document.querySelector(`input[formControlName="digit${index - 1}"]`) as HTMLInputElement;
+        // Move to previous input if current is empty
+        const prevInput = this.otpInputs.toArray()[index - 1];
         if (prevInput) {
-          prevInput.focus();
+          prevInput.nativeElement.focus();
         }
+      }
+    }
+    
+    // Handle arrow keys
+    if (event.key === 'ArrowLeft' && index > 0) {
+      const prevInput = this.otpInputs.toArray()[index - 1];
+      if (prevInput) {
+        prevInput.nativeElement.focus();
+      }
+    }
+    
+    if (event.key === 'ArrowRight' && index < 5) {
+      const nextInput = this.otpInputs.toArray()[index + 1];
+      if (nextInput) {
+        nextInput.nativeElement.focus();
+      }
+    }
+    
+    // Handle Enter key - verify OTP
+    if (event.key === 'Enter') {
+      if (this.isAllDigitsFilled()) {
+        this.verifyOTP();
       }
     }
   }
@@ -129,16 +195,30 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
     const pastedData = event.clipboardData?.getData('text') || '';
     const digits = pastedData.replace(/\D/g, '').slice(0, 6);
     
+    // Clear all inputs first
+    for (let i = 0; i < 6; i++) {
+      this.otpForm.get(`digit${i}`)?.setValue('');
+    }
+    
+    // Fill inputs with pasted digits
     for (let i = 0; i < digits.length && i < 6; i++) {
       this.otpForm.get(`digit${i}`)?.setValue(digits[i]);
     }
     
     // Focus on the next empty input or last input
     const nextEmptyIndex = digits.length < 6 ? digits.length : 5;
-    const nextInput = document.querySelector(`input[formControlName="digit${nextEmptyIndex}"]`) as HTMLInputElement;
-    if (nextInput) {
-      nextInput.focus();
-    }
+    setTimeout(() => {
+      if (this.otpInputs && this.otpInputs.length > nextEmptyIndex) {
+        this.otpInputs.toArray()[nextEmptyIndex].nativeElement.focus();
+      }
+      
+      // Auto-verify if all digits are filled
+      if (this.isAllDigitsFilled()) {
+        setTimeout(() => {
+          this.verifyOTP();
+        }, 100);
+      }
+    }, 0);
   }
 
   private isAllDigitsFilled(): boolean {
@@ -199,9 +279,8 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
       this.otpForm.reset();
       
       // Focus on first input
-      const firstInput = document.querySelector('input[formControlName="digit0"]') as HTMLInputElement;
-      if (firstInput) {
-        firstInput.focus();
+      if (this.otpInputs && this.otpInputs.length > 0) {
+        this.otpInputs.first.nativeElement.focus();
       }
       
       this.showSuccessToast = true;

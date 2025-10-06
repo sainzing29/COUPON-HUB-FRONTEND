@@ -171,8 +171,8 @@ export class DashboardComponent implements OnInit {
       {
         data: [0, 0, 0, 0, 0, 0],
         label: 'Revenue',
-        backgroundColor: 'rgba(59, 130, 246, 0.6)',
-        borderColor: 'rgba(59, 130, 246, 1)',
+        backgroundColor: 'rgba(0, 167, 225, 0.6)',
+        borderColor: 'rgba(0, 167, 225, 1)',
         borderWidth: 1
       }
     ]
@@ -184,8 +184,8 @@ export class DashboardComponent implements OnInit {
       {
         data: [0, 0, 0, 0, 0],
         label: 'Services Completed',
-        backgroundColor: 'rgba(34, 197, 94, 0.6)',
-        borderColor: 'rgba(34, 197, 94, 1)',
+        backgroundColor: 'rgba(0, 167, 225, 0.6)',
+        borderColor: 'rgba(0, 167, 225, 1)',
         borderWidth: 1
       }
     ]
@@ -197,8 +197,8 @@ export class DashboardComponent implements OnInit {
       {
         data: [0, 0, 0, 0, 0, 0],
         label: 'Coupons Redeemed',
-        backgroundColor: 'rgba(147, 51, 234, 0.6)',
-        borderColor: 'rgba(147, 51, 234, 1)',
+        backgroundColor: 'rgba(0, 167, 225, 0.6)',
+        borderColor: 'rgba(0, 167, 225, 1)',
         borderWidth: 1
       }
     ]
@@ -227,8 +227,8 @@ export class DashboardComponent implements OnInit {
         {
           data: [12000, 15000, 18000, 14000, 16000, 20000, 22000, 19000, 25000, 28000, 26000, 30000],
           label: 'Revenue',
-          backgroundColor: 'rgba(59, 130, 246, 0.6)',
-          borderColor: 'rgba(59, 130, 246, 1)',
+          backgroundColor: 'rgba(0, 167, 225, 0.6)',
+          borderColor: 'rgba(0, 167, 225, 1)',
           borderWidth: 1
         }
       ]
@@ -241,8 +241,8 @@ export class DashboardComponent implements OnInit {
         {
           data: [45, 38, 52, 41, 35],
           label: 'Services Completed',
-          backgroundColor: 'rgba(34, 197, 94, 0.6)',
-          borderColor: 'rgba(34, 197, 94, 1)',
+          backgroundColor: 'rgba(0, 167, 225, 0.6)',
+          borderColor: 'rgba(0, 167, 225, 1)',
           borderWidth: 1
         }
       ]
@@ -255,8 +255,8 @@ export class DashboardComponent implements OnInit {
         {
           data: [120, 150, 180, 140],
           label: 'Coupons Used',
-          backgroundColor: 'rgba(147, 51, 234, 0.6)',
-          borderColor: 'rgba(147, 51, 234, 1)',
+          backgroundColor: 'rgba(0, 167, 225, 0.6)',
+          borderColor: 'rgba(0, 167, 225, 1)',
           borderWidth: 1
         }
       ]
@@ -327,8 +327,8 @@ export class DashboardComponent implements OnInit {
         {
           data: salesData,
           label: 'Revenue',
-          backgroundColor: 'rgba(59, 130, 246, 0.6)',
-          borderColor: 'rgba(59, 130, 246, 1)',
+          backgroundColor: 'rgba(0, 167, 225, 0.6)',
+          borderColor: 'rgba(0, 167, 225, 1)',
           borderWidth: 1
         }
       ]
@@ -345,8 +345,8 @@ export class DashboardComponent implements OnInit {
         {
           data: serviceData,
           label: 'Services Completed',
-          backgroundColor: 'rgba(34, 197, 94, 0.6)',
-          borderColor: 'rgba(34, 197, 94, 1)',
+          backgroundColor: 'rgba(0, 167, 225, 0.6)',
+          borderColor: 'rgba(0, 167, 225, 1)',
           borderWidth: 1
         }
       ]
@@ -363,8 +363,8 @@ export class DashboardComponent implements OnInit {
         {
           data: couponData,
           label: 'Coupons Redeemed',
-          backgroundColor: 'rgba(147, 51, 234, 0.6)',
-          borderColor: 'rgba(147, 51, 234, 1)',
+          backgroundColor: 'rgba(0, 167, 225, 0.6)',
+          borderColor: 'rgba(0, 167, 225, 1)',
           borderWidth: 1
         }
       ]
@@ -421,8 +421,6 @@ export class DashboardComponent implements OnInit {
         typeof item[field] === 'number' && item[field] > 0
       );
     });
-    
-    console.log('hasChartData check:', { chartData, hasData });
     return hasData;
   }
 

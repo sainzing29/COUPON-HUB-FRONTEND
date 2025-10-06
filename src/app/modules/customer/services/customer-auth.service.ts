@@ -22,16 +22,27 @@ export class CustomerAuthService {
     this.loadCustomerFromStorage();
   }
 
-  // Login customer with phone number (first step - sends OTP)
-  login(phone: string): Observable<{ success: boolean; message: string }> {
+  // Login customer with email/phone and password
+  login(emailOrPhone: string, password: string): Observable<{ success: boolean; customerData?: CustomerData; message: string }> {
     return new Observable(observer => {
       // Simulate API call
       setTimeout(() => {
         // Mock validation - in real app, this would call your API
-        if (phone && phone.length >= 10) {
-          observer.next({ success: true, message: 'OTP sent successfully' });
+        if (emailOrPhone && password && password.length >= 6) {
+          // Mock customer data - in real app, this would come from API
+          const customerData: CustomerData = {
+            customerName: 'Customer', // This would come from API
+            email: emailOrPhone.includes('@') ? emailOrPhone : 'customer@example.com', // This would come from API
+            phone: emailOrPhone.includes('@') ? '1234567890' : emailOrPhone, // This would come from API
+            couponNumber: '1234567890', // This would come from API
+            address: 'Customer Address', // This would come from API
+            isLoggedIn: true
+          };
+          
+          this.setCustomer(customerData);
+          observer.next({ success: true, customerData, message: 'Login successful' });
         } else {
-          observer.next({ success: false, message: 'Invalid phone number' });
+          observer.next({ success: false, message: 'Invalid credentials' });
         }
         observer.complete();
       }, 1000);

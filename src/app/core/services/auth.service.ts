@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, throwError } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { TokenService } from './token.service';
 
@@ -101,6 +101,10 @@ export class AuthService {
         
         // Update current user subject
         this.currentUserSubject.next(user);
+      }),
+      catchError(error => {
+        console.error('Auth service error:', error);
+        return throwError(() => error);
       })
     );
   }

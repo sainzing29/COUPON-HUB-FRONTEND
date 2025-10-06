@@ -7,7 +7,6 @@ interface GeneralSettings {
   companyName: string;
   companyLogo: string;
   currency: string;
-  validityPeriod: number;
   timezone: string;
   language: string;
 }
@@ -23,7 +22,7 @@ interface EmailSettings {
 }
 
 interface CouponSettings {
-  defaultValidityDays: number;
+  defaultValidityPeriodMonths: number;
   maxServicesPerCoupon: number;
   maxCouponCount: number;
   allowMultipleRedemptions: boolean;
@@ -62,7 +61,6 @@ export class SettingsComponent implements OnInit {
     companyName: 'Coupon Hub',
     companyLogo: '',
     currency: 'AED',
-    validityPeriod: 12,
     timezone: 'Asia/Dubai',
     language: 'en'
   };
@@ -78,7 +76,7 @@ export class SettingsComponent implements OnInit {
   };
 
   couponSettings: CouponSettings = {
-    defaultValidityDays: 30,
+    defaultValidityPeriodMonths: 12,
     maxServicesPerCoupon: 5,
     maxCouponCount: 100,
     allowMultipleRedemptions: false,
@@ -125,7 +123,6 @@ export class SettingsComponent implements OnInit {
       companyName: ['', [Validators.required, Validators.minLength(2)]],
       companyLogo: [''],
       currency: ['AED', Validators.required],
-      validityPeriod: [12, [Validators.required, Validators.min(1), Validators.max(365)]],
       timezone: ['Asia/Dubai', Validators.required],
       language: ['en', Validators.required]
     });
@@ -143,7 +140,7 @@ export class SettingsComponent implements OnInit {
 
     // Coupon Settings Form
     this.couponForm = this.fb.group({
-      defaultValidityDays: [30, [Validators.required, Validators.min(1), Validators.max(365)]],
+      defaultValidityPeriodMonths: [12, [Validators.required, Validators.min(1), Validators.max(24)]],
       maxServicesPerCoupon: [5, [Validators.required, Validators.min(1), Validators.max(20)]],
       maxCouponCount: [100, [Validators.required, Validators.min(1), Validators.max(10000)]],
       allowMultipleRedemptions: [false],

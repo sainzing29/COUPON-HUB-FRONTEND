@@ -25,7 +25,12 @@
       <!-- Add Customer Button -->
       <button 
         (click)="onAddCustomer()"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200">
+        class="text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200"
+        style="background-color: var(--button-primary-bg);"
+        onmouseover="this.style.backgroundColor='var(--button-primary-hover)'"
+        onmouseout="this.style.backgroundColor='var(--button-primary-bg)'"
+        onfocus="this.style.backgroundColor='var(--button-primary-focus)'"
+        onblur="this.style.backgroundColor='var(--button-primary-bg)'">
         <i class="bi bi-person-plus"></i>
         <span>Add Customer</span>
       </button>

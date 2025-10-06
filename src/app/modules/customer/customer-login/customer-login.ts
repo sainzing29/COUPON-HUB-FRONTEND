@@ -24,7 +24,8 @@ export class CustomerLoginComponent implements OnInit {
     private customerAuthService: CustomerAuthService
   ) {
     this.loginForm = this.fb.group({
-      phone: ['', [Validators.required, Validators.pattern(/^[0-9+\-\s()]+$/)]]
+      emailOrPhone: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$|^[0-9+\-\s()]+$/)]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
@@ -40,20 +41,15 @@ export class CustomerLoginComponent implements OnInit {
       // Get form data
       const formData = this.loginForm.value;
       
-      // Use auth service to send OTP
-      this.customerAuthService.login(formData.phone).subscribe({
+      // Use auth service to login with email/phone and password
+      this.customerAuthService.login(formData.emailOrPhone, formData.password).subscribe({
         next: (response) => {
           this.isSubmitting = false;
           if (response.success) {
-            // Navigate to OTP verification page with phone number
-            this.router.navigate(['/customer/otp-verification'], {
-              queryParams: {
-                phone: formData.phone,
-                isLogin: 'true' // Flag to indicate this is a login flow
-              }
-            });
+            // Navigate to customer dashboard or service selection
+            this.router.navigate(['/customer/service-selection']);
           } else {
-            this.showErrorMessage(response.message || 'Failed to send OTP. Please try again.');
+            this.showErrorMessage(response.message || 'Login failed. Please check your credentials.');
           }
         },
         error: (error) => {
@@ -88,7 +84,11 @@ export class CustomerLoginComponent implements OnInit {
   }
 
   // Getters for form validation
-  get phoneControl() {
-    return this.loginForm.get('phone');
+  get emailOrPhoneControl() {
+    return this.loginForm.get('emailOrPhone');
+  }
+
+  get passwordControl() {
+    return this.loginForm.get('password');
   }
 }

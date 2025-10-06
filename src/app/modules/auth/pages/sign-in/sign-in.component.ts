@@ -78,7 +78,7 @@ export class SignInComponent implements OnInit {
         error: (error) => {
           console.error('Login error:', error);
           this.isLoading = false;
-          this.errorMessage = error.message || 'Login failed. Please check your credentials.';
+          this.errorMessage = error.message || 'Login failed. Something went wrong.';
         }
       });
     } else {

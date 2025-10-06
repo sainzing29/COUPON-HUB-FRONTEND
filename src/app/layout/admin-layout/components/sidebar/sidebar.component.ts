@@ -94,16 +94,25 @@ export class SidebarComponent implements OnInit, OnChanges {
     const currentUser = this.authService.getCurrentUser();
     const userRole = currentUser?.role;
 
-    // For Admin users, hide users, service-centers, reports, and configuration
     if (userRole === 'Admin') {
+      // For Admin users, hide users, service-centers, reports, and configuration
+      // Show customers, service-redemption, new-coupons, invoices
       this.menuItems = this.allMenuItems.filter(item => 
         item.id !== 'users' && 
         item.id !== 'service-centers' && 
         item.id !== 'reports' &&
         item.id !== 'configuration'
       );
+    } else if (userRole === 'SuperAdmin') {
+      // For SuperAdmin users, hide customers, service-redemption, new-coupons, invoices
+      this.menuItems = this.allMenuItems.filter(item => 
+        item.id !== 'customers' && 
+        item.id !== 'service-redemption' && 
+        item.id !== 'new-coupons' &&
+        item.id !== 'invoices'
+      );
     } else {
-      // For SuperAdmin and other roles, show all menu items
+      // For other roles, show all menu items
       this.menuItems = [...this.allMenuItems];
     }
   }

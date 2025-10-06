@@ -1,0 +1,69 @@
+<nav class="bg-purple-900 shadow-sm border-b border-purple-700">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo -->
+      <div class="flex items-center">
+        <img 
+          src="assets/images/ces-icon.svg" 
+          alt="CES Warranty Logo" 
+          class="h-8 w-auto object-contain mr-4">
+        <span class="text-white font-semibold text-lg">CES Warranty</span>
+      </div>
+
+      <!-- Navigation Menu -->
+      <div class="hidden md:flex items-center space-x-8">
+        <button 
+          (click)="navigateToHome()"
+          class="text-purple-200 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+          Home
+        </button>
+        <button 
+          (click)="navigateToAbout()"
+          class="text-purple-200 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+          About Us
+        </button>
+        <button 
+          (click)="navigateToLocations()"
+          class="text-purple-200 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+          Locations
+        </button>
+      </div>
+
+      <!-- User Menu -->
+      <div class="relative">
+        <button 
+          (click)="toggleUserDropdown()"
+          class="flex items-center space-x-2 text-purple-200 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+          <span class="material-icons">person</span>
+          <span>{{ customerName }}</span>
+          <span class="material-icons text-sm">{{ showUserDropdown ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</span>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div 
+          *ngIf="showUserDropdown"
+          class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+          <div class="px-4 py-3 border-b border-gray-200">
+            <p class="text-sm font-medium text-gray-900">{{ customerName }}</p>
+            <p class="text-sm text-gray-600" *ngIf="customerEmail">{{ customerEmail }}</p>
+            <p class="text-sm text-gray-600" *ngIf="customerPhone">{{ customerPhone }}</p>
+          </div>
+          <div class="py-1">
+            <button 
+              (click)="viewProfile()"
+              class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+              <span class="material-icons text-sm mr-3">person</span>
+              View Profile
+            </button>
+            <button 
+              (click)="logout()"
+              class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200">
+              <span class="material-icons text-sm mr-3">logout</span>
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

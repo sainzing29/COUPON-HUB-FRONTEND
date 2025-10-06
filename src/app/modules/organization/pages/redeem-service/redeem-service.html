@@ -107,7 +107,12 @@
         </button>
         <button
           (click)="processRedemption()"
-          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200">
+          class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors duration-200"
+          style="background-color: var(--button-primary-bg);"
+          onmouseover="this.style.backgroundColor='var(--button-primary-hover)'"
+          onmouseout="this.style.backgroundColor='var(--button-primary-bg)'"
+          onfocus="this.style.backgroundColor='var(--button-primary-focus)'"
+          onblur="this.style.backgroundColor='var(--button-primary-bg)'">
           Confirm
         </button>
       </div>

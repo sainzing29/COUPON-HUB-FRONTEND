@@ -1,0 +1,39 @@
+// Customer Navbar Component Styles
+
+nav {
+  background-color: var(--header-bg-primary) !important;
+  border-color: var(--header-border-primary) !important;
+  box-shadow: 0 1px 3px var(--header-shadow);
+}
+
+.bg-purple-900 {
+  background-color: var(--header-bg-primary) !important;
+}
+
+.border-purple-700 {
+  border-color: var(--header-border-primary) !important;
+}
+
+.text-purple-200 {
+  color: var(--header-text-secondary) !important;
+}
+
+.text-purple-200:hover {
+  color: var(--header-text-primary) !important;
+}
+
+.text-white {
+  color: var(--header-text-primary) !important;
+}
+
+// Dropdown styles
+.dropdown-menu {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+  .hidden.md\\:flex {
+    display: none;
+  }
+}

@@ -56,13 +56,23 @@
       <div class="flex items-center gap-3">
         <button 
           (click)="onExportCSV()"
-          class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200">
+          class="text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200"
+          style="background-color: #d41367;"
+          onmouseover="this.style.backgroundColor='#b8105a'"
+          onmouseout="this.style.backgroundColor='#d41367'"
+          onfocus="this.style.backgroundColor='#9e0d4d'"
+          onblur="this.style.backgroundColor='#d41367'">
           <i class="bi bi-file-earmark-spreadsheet"></i>
           <span>Export CSV</span>
         </button>
         <button 
           (click)="onExportPDF()"
-          class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200">
+          class="text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200"
+          style="background-color: #ffcd00;"
+          onmouseover="this.style.backgroundColor='#e6b800'"
+          onmouseout="this.style.backgroundColor='#ffcd00'"
+          onfocus="this.style.backgroundColor='#cc9900'"
+          onblur="this.style.backgroundColor='#ffcd00'">
           <i class="bi bi-file-earmark-pdf"></i>
           <span>Export PDF</span>
         </button>

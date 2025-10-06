@@ -50,7 +50,12 @@
         <button
           (click)="saveGeneralSettings()"
           [disabled]="generalForm.invalid || isSaving"
-          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+          class="px-4 py-2 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+          style="background-color: var(--button-primary-bg);"
+          onmouseover="this.style.backgroundColor='var(--button-primary-hover)'"
+          onmouseout="this.style.backgroundColor='var(--button-primary-bg)'"
+          onfocus="this.style.backgroundColor='var(--button-primary-focus)'"
+          onblur="this.style.backgroundColor='var(--button-primary-bg)'">
           <span *ngIf="isSaving" class="flex items-center">
             <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -104,20 +109,8 @@
           </div>
         </div>
 
-        <!-- Validity and Preferences -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Default Validity Period (Months)</label>
-            <input
-              type="number"
-              formControlName="validityPeriod"
-              min="1"
-              max="365"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <div *ngIf="generalForm.get('validityPeriod')?.invalid && generalForm.get('validityPeriod')?.touched" class="text-red-500 text-sm mt-1">
-              Validity period must be between 1 and 365 days
-            </div>
-          </div>
+        <!-- Preferences -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
@@ -161,7 +154,12 @@
           <button
             (click)="saveEmailSettings()"
             [disabled]="emailForm.invalid || isSaving"
-            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+            class="px-4 py-2 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            style="background-color: var(--button-primary-bg);"
+            onmouseover="this.style.backgroundColor='var(--button-primary-hover)'"
+            onmouseout="this.style.backgroundColor='var(--button-primary-bg)'"
+            onfocus="this.style.backgroundColor='var(--button-primary-focus)'"
+            onblur="this.style.backgroundColor='var(--button-primary-bg)'">
             <span *ngIf="isSaving" class="flex items-center">
               <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -278,7 +276,12 @@
         <button
           (click)="saveCouponSettings()"
           [disabled]="couponForm.invalid || isSaving"
-          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+          class="px-4 py-2 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+          style="background-color: var(--button-primary-bg);"
+          onmouseover="this.style.backgroundColor='var(--button-primary-hover)'"
+          onmouseout="this.style.backgroundColor='var(--button-primary-bg)'"
+          onfocus="this.style.backgroundColor='var(--button-primary-focus)'"
+          onblur="this.style.backgroundColor='var(--button-primary-bg)'">
           <span *ngIf="isSaving" class="flex items-center">
             <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -296,15 +299,15 @@
           <h3 class="text-md font-semibold text-gray-900 mb-4">Coupon Rules & Defaults</h3>
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Default Validity Days</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Default Validity Period (Months)</label>
               <input
                 type="number"
-                formControlName="defaultValidityDays"
+                formControlName="defaultValidityPeriodMonths"
                 min="1"
-                max="365"
+                max="24"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              <div *ngIf="couponForm.get('defaultValidityDays')?.invalid && couponForm.get('defaultValidityDays')?.touched" class="text-red-500 text-sm mt-1">
-                Validity days must be between 1 and 365
+              <div *ngIf="couponForm.get('defaultValidityPeriodMonths')?.invalid && couponForm.get('defaultValidityPeriodMonths')?.touched" class="text-red-500 text-sm mt-1">
+                Validity period must be between 1 and 24 months
               </div>
             </div>
 

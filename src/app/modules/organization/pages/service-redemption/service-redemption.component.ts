@@ -49,6 +49,15 @@ export class ServiceRedemptionComponent implements OnInit {
   selectedCoupon: Coupon | null = null;
   isOtpValidating: boolean = false;
   
+  // Verification method selection
+  verificationMethod: 'otp' | 'email' = 'otp';
+  emailAddress: string = '';
+  isEmailValidating: boolean = false;
+  
+  // Two-step verification flow
+  verificationStep: 'select' | 'verify' = 'select';
+  isSending: boolean = false;
+  
   // Mock data
   private mockCoupons: Coupon[] = [
     {
@@ -186,10 +195,13 @@ export class ServiceRedemptionComponent implements OnInit {
       return;
     }
     
-    // Show OTP dialog for verification
+    // Show verification dialog for verification
     this.selectedCoupon = coupon;
     this.showOtpDialog = true;
+    this.verificationStep = 'select';
     this.otpCode = '';
+    this.emailAddress = '';
+    this.verificationMethod = 'otp';
   }
 
   closeOtpDialog(): void {
@@ -197,6 +209,21 @@ export class ServiceRedemptionComponent implements OnInit {
     this.selectedCoupon = null;
     this.otpCode = '';
     this.isOtpValidating = false;
+    this.verificationMethod = 'otp';
+    this.emailAddress = '';
+    this.isEmailValidating = false;
+    this.verificationStep = 'select';
+    this.isSending = false;
+  }
+
+  sendVerification(): void {
+    this.isSending = true;
+    
+    // Simulate sending verification code/email with 1-second delay
+    setTimeout(() => {
+      this.isSending = false;
+      this.verificationStep = 'verify';
+    }, 1000);
   }
 
   confirmOtp(): void {
@@ -206,7 +233,7 @@ export class ServiceRedemptionComponent implements OnInit {
 
     this.isOtpValidating = true;
     
-    // Simulate OTP validation with 1-second delay
+    // Simulate OTP verification with 1-second delay
     setTimeout(() => {
       this.isOtpValidating = false;
       
@@ -218,7 +245,8 @@ export class ServiceRedemptionComponent implements OnInit {
         this.router.navigate(['/organization/service-redemption/redeem-service'], {
           queryParams: { 
             couponCode: this.selectedCoupon?.code, 
-            customerName: this.selectedCoupon?.customer 
+            customerName: this.selectedCoupon?.customer,
+            verificationMethod: this.verificationMethod
           }
         });
       }
@@ -230,5 +258,18 @@ export class ServiceRedemptionComponent implements OnInit {
     const value = event.target.value.replace(/\D/g, '');
     this.otpCode = value;
     event.target.value = value;
+  }
+
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  onVerificationMethodChange(): void {
+    // Reset form fields when switching methods
+    this.otpCode = '';
+    this.emailAddress = '';
+    this.isOtpValidating = false;
+    this.isEmailValidating = false;
   }
 }

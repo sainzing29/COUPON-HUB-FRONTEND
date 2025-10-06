@@ -1,127 +1,152 @@
-<div class="register-customer-container">
-  <!-- Header Section -->
-  <div class="header-section">
-    <div class="logo-section">
-      <div class="logo">
-        <span class="logo-text">COUPON HUB</span>
+<div class="min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative" style="background-image: url('assets/images/background1.png')">
+  <!-- Gradient Overlay with Lower Opacity -->
+  <div class="absolute inset-0" style="background: linear-gradient(-45deg, rgba(91, 207, 242, 0.6) 20%, rgba(65, 125, 210, 0.6) 50%, rgba(0, 169, 224, 0.6) 100%);"></div>
+  
+  <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 space-y-8 relative z-10">
+    <!-- Header -->
+    <div class="text-center">
+      <div class="mx-auto h-16 w-auto flex items-center justify-center mb-4">
+        <img 
+          src="assets/images/ces-icon.svg" 
+          alt="CES Warranty Logo" 
+          class="h-16 w-auto object-contain">
       </div>
-      <h1 class="page-title">Customer Registration</h1>
-      <p class="page-subtitle">Register with your coupon number to access our services</p>
+      <h2 class="text-xl font-semibold text-gray-700 mb-2">Customer Registration</h2>
     </div>
-  </div>
 
-  <!-- Registration Form -->
-  <div class="form-container">
-    <div class="form-card">
-      <form [formGroup]="registrationForm" (ngSubmit)="submitRegistration()">
-        <div class="form-header">
-          <h2 class="form-title">Enter Your Details</h2>
-          <p class="form-description">Please provide your information and coupon number</p>
-        </div>
+    <!-- Registration Form -->
+    <form [formGroup]="registrationForm" (ngSubmit)="submitRegistration()" class="space-y-6">
 
-        <div class="form-fields">
-          <!-- Full Name -->
-          <div class="form-group">
-            <label class="form-label">
-              Full Name <span class="required">*</span>
-            </label>
+      <div class="space-y-4">
+        <!-- Full Name -->
+        <div>
+          <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">
+            Full Name <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span class="material-icons text-gray-400 text-sm">person</span>
+            </div>
             <input
+              id="fullName"
               type="text"
               formControlName="fullName"
-              class="form-input"
-              [class.error]="registrationForm.get('fullName')?.invalid && registrationForm.get('fullName')?.touched"
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
+              [class.border-red-500]="registrationForm.get('fullName')?.invalid && registrationForm.get('fullName')?.touched"
               placeholder="Enter your full name">
-            <div *ngIf="registrationForm.get('fullName')?.invalid && registrationForm.get('fullName')?.touched" 
-                 class="error-message">
-              Full name is required
-            </div>
           </div>
+          <p class="mt-1 text-sm text-red-600" *ngIf="registrationForm.get('fullName')?.invalid && registrationForm.get('fullName')?.touched">
+            Full name is required
+          </p>
+        </div>
 
-          <!-- Email -->
-          <div class="form-group">
-            <label class="form-label">
-              Email Address <span class="required">*</span>
-            </label>
+        <!-- Email -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+            Email Address <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span class="material-icons text-gray-400 text-sm">email</span>
+            </div>
             <input
+              id="email"
               type="email"
               formControlName="email"
-              class="form-input"
-              [class.error]="registrationForm.get('email')?.invalid && registrationForm.get('email')?.touched"
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
+              [class.border-red-500]="registrationForm.get('email')?.invalid && registrationForm.get('email')?.touched"
               placeholder="Enter your email address">
-            <div *ngIf="registrationForm.get('email')?.invalid && registrationForm.get('email')?.touched" 
-                 class="error-message">
-              <span *ngIf="registrationForm.get('email')?.errors?.['required']">Email is required</span>
-              <span *ngIf="registrationForm.get('email')?.errors?.['email']">Please enter a valid email</span>
-            </div>
           </div>
+          <p class="mt-1 text-sm text-red-600" *ngIf="registrationForm.get('email')?.invalid && registrationForm.get('email')?.touched">
+            <span *ngIf="registrationForm.get('email')?.errors?.['required']">Email is required</span>
+            <span *ngIf="registrationForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+          </p>
+        </div>
 
-          <!-- Phone Number -->
-          <div class="form-group">
-            <label class="form-label">
-              Phone Number <span class="required">*</span>
-            </label>
+        <!-- Phone Number -->
+        <div>
+          <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">
+            Phone Number <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span class="material-icons text-gray-400 text-sm">phone</span>
+            </div>
             <input
+              id="phone"
               type="tel"
               formControlName="phone"
-              class="form-input"
-              [class.error]="registrationForm.get('phone')?.invalid && registrationForm.get('phone')?.touched"
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
+              [class.border-red-500]="registrationForm.get('phone')?.invalid && registrationForm.get('phone')?.touched"
               placeholder="Enter your phone number">
-            <div *ngIf="registrationForm.get('phone')?.invalid && registrationForm.get('phone')?.touched" 
-                 class="error-message">
-              <span *ngIf="registrationForm.get('phone')?.errors?.['required']">Phone number is required</span>
-              <span *ngIf="registrationForm.get('phone')?.errors?.['pattern']">Please enter a valid phone number</span>
-            </div>
           </div>
+          <p class="mt-1 text-sm text-red-600" *ngIf="registrationForm.get('phone')?.invalid && registrationForm.get('phone')?.touched">
+            <span *ngIf="registrationForm.get('phone')?.errors?.['required']">Phone number is required</span>
+            <span *ngIf="registrationForm.get('phone')?.errors?.['pattern']">Please enter a valid phone number</span>
+          </p>
+        </div>
 
-          <!-- Coupon Number -->
-          <div class="form-group">
-            <label class="form-label">
-              Coupon Number <span class="required">*</span>
-            </label>
+        <!-- Coupon Number -->
+        <div>
+          <label for="couponNumber" class="block text-sm font-medium text-gray-700 mb-1">
+            Coupon Number <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span class="material-icons text-gray-400 text-sm">local_offer</span>
+            </div>
             <input
+              id="couponNumber"
               type="text"
               formControlName="couponNumber"
-              class="form-input coupon-input"
-              [class.error]="registrationForm.get('couponNumber')?.invalid && registrationForm.get('couponNumber')?.touched"
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
+              [class.border-red-500]="registrationForm.get('couponNumber')?.invalid && registrationForm.get('couponNumber')?.touched"
               placeholder="Enter your coupon number">
-            <div *ngIf="registrationForm.get('couponNumber')?.invalid && registrationForm.get('couponNumber')?.touched" 
-                 class="error-message">
-              <span *ngIf="registrationForm.get('couponNumber')?.errors?.['required']">Coupon number is required</span>
-              <span *ngIf="registrationForm.get('couponNumber')?.errors?.['pattern']">Please enter a valid coupon number</span>
-            </div>
-            <p class="help-text">Enter the 10-digit coupon number you received</p>
           </div>
+          <p class="mt-1 text-sm text-red-600" *ngIf="registrationForm.get('couponNumber')?.invalid && registrationForm.get('couponNumber')?.touched">
+            <span *ngIf="registrationForm.get('couponNumber')?.errors?.['required']">Coupon number is required</span>
+            <span *ngIf="registrationForm.get('couponNumber')?.errors?.['pattern']">Please enter a valid coupon number</span>
+          </p>
+          <p class="mt-1 text-sm text-gray-500">Enter the 10-digit coupon number you received</p>
+        </div>
 
-          <!-- Address -->
-          <div class="form-group">
-            <label class="form-label">
-              Address
-            </label>
+        <!-- Address -->
+        <div>
+          <label for="address" class="block text-sm font-medium text-gray-700 mb-1">
+            Address
+          </label>
+          <div class="relative">
+            <div class="absolute top-3 left-3 flex items-center pointer-events-none">
+              <span class="material-icons text-gray-400 text-sm">location_on</span>
+            </div>
             <textarea
+              id="address"
               formControlName="address"
-              class="form-textarea"
               rows="3"
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
               placeholder="Enter your address (optional)"></textarea>
           </div>
         </div>
+      </div>
 
-        <!-- Submit Button -->
-        <div class="form-footer">
-          <button
-            type="submit"
-            [disabled]="registrationForm.invalid || isSubmitting"
-            class="submit-btn">
-            <i *ngIf="isSubmitting" class="fas fa-spinner fa-spin"></i>
-            <i *ngIf="!isSubmitting" class="fas fa-user-plus"></i>
-            <span>{{ isSubmitting ? 'Registering...' : 'Register & Continue' }}</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <div class="footer-section">
-    <p class="footer-text">© 2024 Coupon Hub. All rights reserved.</p>
+      <!-- Submit Button -->
+      <div>
+        <button
+          type="submit"
+          [disabled]="registrationForm.invalid || isSubmitting"
+          class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+          style="background-color: var(--button-primary-bg);"
+          onmouseover="this.style.backgroundColor='var(--button-primary-hover)'"
+          onmouseout="this.style.backgroundColor='var(--button-primary-bg)'"
+          onfocus="this.style.backgroundColor='var(--button-primary-focus)'"
+          onblur="this.style.backgroundColor='var(--button-primary-bg)'">
+          <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+            <span class="material-icons text-white text-sm" *ngIf="!isSubmitting">person_add</span>
+            <span class="material-icons text-white text-sm animate-spin" *ngIf="isSubmitting">refresh</span>
+          </span>
+          {{ isSubmitting ? 'Registering...' : 'Register & Continue' }}
+        </button>
+      </div>
+    </form>
   </div>
 </div>

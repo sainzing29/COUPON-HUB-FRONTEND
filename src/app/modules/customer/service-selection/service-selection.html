@@ -1,104 +1,80 @@
-<div class="service-selection-container">
-  <!-- Main Content Container -->
-  <div class="main-container">
-    <!-- Header Section -->
-    <div class="header-section">
-      <div class="logo-section">
-        <div class="logo">
-          <span class="logo-text">COUPON HUB</span>
-        </div>
-        <h1 class="page-title">Service Redemption Status</h1>
-        <p class="page-subtitle">Welcome {{ customerName }}! View your service redemption status</p>
-      </div>
+<div class="min-h-screen bg-cover bg-center bg-no-repeat py-12 px-4 sm:px-6 lg:px-8 relative" style="background-image: url('assets/images/background1.png')">
+  <!-- Gradient Overlay with Lower Opacity -->
+  <div class="absolute inset-0" style="background: linear-gradient(-45deg, rgba(91, 207, 242, 0.6) 20%, rgba(65, 125, 210, 0.6) 50%, rgba(0, 169, 224, 0.6) 100%);"></div>
+  
+  <div class="max-w-6xl mx-auto w-full space-y-8 relative z-10">
+    <!-- Header -->
+    <div class="text-center">
+      <h2 class="text-2xl font-semibold text-white mb-2">Service Redemption Status</h2>
+      <p class="text-sm text-gray-100 mb-4">Welcome {{ customerName }}! View your service redemption status</p>
     </div>
 
-    <!-- Profile Header -->
-    <div class="profile-header">
-      <div class="profile-card">
-      <div class="profile-info">
-        <div class="profile-avatar">
-          <i class="fas fa-user"></i>
-        </div>
-        <div class="profile-details">
-          <h2 class="profile-name">{{ customerName }}</h2>
-          <div class="profile-meta">
-            <div class="meta-item" *ngIf="customerEmail">
-              <i class="fas fa-envelope"></i>
-              <span>{{ customerEmail }}</span>
+    <!-- Coupon Selection -->
+    <div class="space-y-4">
+      <h3 class="text-lg font-semibold text-white">Your Coupons</h3>
+      <div class="space-y-3">
+        <div 
+          *ngFor="let coupon of coupons" 
+          class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <span class="material-icons text-purple-600">confirmation_number</span>
+              <div>
+                <h4 class="font-semibold text-gray-900">Coupon #{{ coupon.couponNumber }}</h4>
+                <p class="text-sm text-gray-600">{{ coupon.services.length }} services available</p>
+              </div>
             </div>
-            <div class="meta-item" *ngIf="customerPhone">
-              <i class="fas fa-phone"></i>
-              <span>{{ customerPhone }}</span>
-            </div>
-            <div class="meta-item" *ngIf="customerAddress">
-              <i class="fas fa-map-marker-alt"></i>
-              <span>{{ customerAddress }}</span>
+            <div class="flex items-center space-x-3">
+              <button 
+                (click)="viewInvoice()"
+                class="px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white">
+                <span class="material-icons text-sm">receipt</span>
+                <span>Invoice</span>
+              </button>
+              <button 
+                (click)="toggleCoupon(coupon.id)"
+                class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2"
+                [class]="selectedCouponId === coupon.id && showServices ? 'bg-purple-600 text-white' : 'bg-purple-100 text-purple-600 hover:bg-purple-200'">
+                <span class="material-icons text-sm">{{ selectedCouponId === coupon.id && showServices ? 'expand_less' : 'expand_more' }}</span>
+                <span>{{ selectedCouponId === coupon.id && showServices ? 'Hide Services' : 'View Services' }}</span>
+              </button>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="profile-actions">
-        <div class="coupon-info">
-          <span class="coupon-label">Coupon Number:</span>
-          <span class="coupon-number">{{ couponNumber }}</span>
-          <button 
-            (click)="viewInvoice()"
-            class="invoice-btn">
-            <i class="fas fa-file-invoice"></i>
-            <span>See Invoice</span>
-          </button>
-        </div>
-        <button 
-          (click)="logout()"
-          class="logout-btn">
-          <i class="fas fa-sign-out-alt"></i>
-          <span>Logout</span>
-        </button>
-      </div>
-      </div>
-    </div>
 
-    <!-- Services Grid -->
-    <div class="services-container">
-      <div class="services-grid">
-      <div 
-        *ngFor="let service of services; let i = index" 
-        class="service-card"
-        [class]="getServiceCardClass(i)"
-        [class.selected]="service.isSelected">
-        <div class="service-content">
-          <div class="service-number">{{ i + 1 }}</div>
-          <div class="service-details">
-            <h3 class="service-name">{{ service.name }}</h3>
-            <p class="service-description">{{ service.description }}</p>
-            <div class="service-price">
-              <span class="price-label">Value:</span>
-              <span class="price-value">{{ service.value }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="service-action">
-          <div class="redemption-status" [class]="getRedemptionStatusClass(service.redemptionStatus)">
-            <i [class]="getRedemptionStatusIcon(service.redemptionStatus)"></i>
-            <span class="status-text">{{ getRedemptionStatusText(service.redemptionStatus) }}</span>
-            <span *ngIf="service.redeemedDate" class="redeemed-date">{{ service.redeemedDate }}</span>
-          </div>
-        </div>
-        </div>
-      </div>
-
-      <!-- Service Redemption Summary -->
-      <div class="summary-section">
-        <div class="summary-card">
-          <h3 class="summary-title">Service Redemption Status</h3>
-          <div class="redemption-stats">
-            <div class="stat-item">
-              <span class="stat-label">Available:</span>
-              <span class="stat-value available">{{ getServicesByStatus('available').length }}</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-label">Redeemed:</span>
-              <span class="stat-value redeemed">{{ getServicesByStatus('redeemed').length }}</span>
+          <!-- Services Grid (Inline under each coupon) -->
+          <div 
+            [@slideInOut]="getAnimationState(coupon.id)"
+            class="mt-6 space-y-4 overflow-hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div 
+                *ngFor="let service of coupon.services; let i = index" 
+                [@fadeInUp]="getAnimationState(coupon.id)"
+                [style.animation-delay]="getAnimationState(coupon.id) === 'in' ? (i * 100 + 'ms') : '0ms'"
+                class="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200"
+                [class]="getServiceCardClass(i)">
+                <div class="flex items-start space-x-3 mb-3">
+                  <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white bg-purple-600">
+                    {{ i + 1 }}
+                  </div>
+                  <div class="flex-1">
+                    <h5 class="text-base font-semibold text-gray-900 mb-1">{{ service.name }}</h5>
+                    <p class="text-xs text-gray-600 mb-2">{{ service.description }}</p>
+                    <div class="flex items-center space-x-2">
+                      <span class="text-xs text-gray-500 font-medium">Value:</span>
+                      <span class="text-xs font-bold text-green-600">{{ service.value }}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="flex justify-end">
+                  <div class="px-3 py-1 text-xs font-medium rounded-lg flex items-center space-x-1 min-w-[100px] justify-center"
+                       [class]="getRedemptionStatusClass(service.redemptionStatus)">
+                    <span class="material-icons text-xs" [class]="getRedemptionStatusIcon(service.redemptionStatus)"></span>
+                    <span class="font-semibold">{{ getRedemptionStatusText(service.redemptionStatus) }}</span>
+                    <span *ngIf="service.redeemedDate" class="text-xs opacity-75 block mt-1">{{ service.redeemedDate }}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -106,18 +82,13 @@
     </div>
 
     <!-- Back Button -->
-    <div class="back-section">
+    <div class="flex justify-center">
       <button 
         (click)="goBack()"
-        class="back-btn">
-        <i class="fas fa-arrow-left"></i>
-        <span>Back to Registration</span>
+        class="px-6 py-3 text-purple-600 hover:text-purple-500 hover:bg-purple-50 rounded-lg transition-colors duration-200 flex items-center space-x-2">
+        <span class="material-icons">arrow_back</span>
+        <span>Back to {{ isLoginFlow ? 'Login' : 'Registration' }}</span>
       </button>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer-section">
-      <p class="footer-text">© 2024 Coupon Hub. All rights reserved.</p>
     </div>
   </div>
 </div>

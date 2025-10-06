@@ -90,14 +90,12 @@ function addCommonHeaders(req: HttpRequest<any>, tokenService: TokenService): Ht
 function handleError(error: HttpErrorResponse, environmentService: EnvironmentService, tokenService: TokenService): Observable<never> {
   let errorMessage = 'An unknown error occurred';
 
-  if (environmentService.isDebugMode()) {
-    console.error('API Error:', {
-      status: error.status,
-      statusText: error.statusText,
-      url: error.url,
-      error: error.error
-    });
-  }
+  console.error('API Error:', {
+    status: error.status,
+    statusText: error.statusText,
+    url: error.url,
+    error: error.error
+  });
 
   if (error.error instanceof ErrorEvent) {
     // Client-side error
@@ -112,8 +110,8 @@ function handleError(error: HttpErrorResponse, environmentService: EnvironmentSe
         errorMessage = 'Unauthorized - Please check your credentials';
         // Clear token and redirect to login on 401
         tokenService.clearAuthData();
-        const router = inject(Router);
-        router.navigate(['/auth/sign-in']);
+        // const router = inject(Router);
+        // router.navigate(['/auth/sign-in']);
         break;
       case 403:
         errorMessage = 'Forbidden - You do not have permission to access this resource';

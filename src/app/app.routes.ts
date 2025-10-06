@@ -20,12 +20,18 @@ export const routes: Routes = [
     loadComponent: () => import('./modules/customer/otp-verification/otp-verification').then(m => m.OtpVerificationComponent)
   },
   {
-    path: 'customer/service-selection',
-    loadComponent: () => import('./modules/customer/service-selection/service-selection').then(m => m.ServiceSelectionComponent)
-  },
-  {
-    path: 'customer/invoice',
-    loadComponent: () => import('./modules/customer/customer-invoice/customer-invoice').then(m => m.CustomerInvoiceComponent)
+    path: 'customer',
+    loadComponent: () => import('./layout/customer-layout/customer-layout.component').then(m => m.CustomerLayoutComponent),
+    children: [
+      {
+        path: 'service-selection',
+        loadComponent: () => import('./modules/customer/service-selection/service-selection').then(m => m.ServiceSelectionComponent)
+      },
+      {
+        path: 'invoice',
+        loadComponent: () => import('./modules/customer/customer-invoice/customer-invoice').then(m => m.CustomerInvoiceComponent)
+      }
+    ]
   },
   {
     path: 'sign-in',
