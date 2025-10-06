@@ -78,7 +78,7 @@ export class AuthService {
    * Login user
    */
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.apiService.post<LoginResponse>('/Auth/login', credentials).pipe(
+    return this.apiService.post<LoginResponse>('/auth/login', credentials).pipe(
       tap(response => {
         // Store JWT token
         this.tokenService.setToken(response.token);
