@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CustomerAuthService } from '../services/customer-auth.service';
 
 @Component({
@@ -17,10 +17,13 @@ export class CustomerLoginComponent implements OnInit {
   isSubmitting = false;
   showError = false;
   errorMessage = '';
+  successMessage = '';
+  showSuccess = false;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private route: ActivatedRoute,
     private customerAuthService: CustomerAuthService
   ) {
     this.loginForm = this.fb.group({
@@ -30,7 +33,25 @@ export class CustomerLoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Component initialization
+    // Check for registration success message
+    this.route.queryParams.subscribe(params => {
+      if (params['message']) {
+        this.successMessage = params['message'];
+        this.showSuccess = true;
+        
+        // Auto-hide success message after 5 seconds
+        setTimeout(() => {
+          this.showSuccess = false;
+        }, 5000);
+      }
+      
+      // Pre-fill email if provided
+      if (params['email']) {
+        this.loginForm.patchValue({
+          emailOrPhone: params['email']
+        });
+      }
+    });
   }
 
   submitLogin(): void {

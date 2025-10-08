@@ -27,22 +27,28 @@ export class CustomerAuthService {
     return new Observable(observer => {
       // Simulate API call
       setTimeout(() => {
-        // Mock validation - in real app, this would call your API
-        if (emailOrPhone && password && password.length >= 6) {
-          // Mock customer data - in real app, this would come from API
+        // Dummy login credentials
+        const dummyCredentials = {
+          email: 'customer@ces.com',
+          password: '12345678'
+        };
+        
+        // Mock validation - check against dummy credentials
+        if (emailOrPhone === dummyCredentials.email && password === dummyCredentials.password) {
+          // Mock customer data for dummy login
           const customerData: CustomerData = {
-            customerName: 'Customer', // This would come from API
-            email: emailOrPhone.includes('@') ? emailOrPhone : 'customer@example.com', // This would come from API
-            phone: emailOrPhone.includes('@') ? '1234567890' : emailOrPhone, // This would come from API
-            couponNumber: '1234567890', // This would come from API
-            address: 'Customer Address', // This would come from API
+            customerName: 'Test Customer',
+            email: dummyCredentials.email,
+            phone: '+971501234567',
+            couponNumber: '4565123212',
+            address: 'Dubai, UAE',
             isLoggedIn: true
           };
           
           this.setCustomer(customerData);
           observer.next({ success: true, customerData, message: 'Login successful' });
         } else {
-          observer.next({ success: false, message: 'Invalid credentials' });
+          observer.next({ success: false, message: 'Invalid credentials. Use email: customer@ces.com, password: 12345678' });
         }
         observer.complete();
       }, 1000);

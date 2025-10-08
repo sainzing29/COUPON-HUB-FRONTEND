@@ -1,45 +1,4 @@
-// Service Selection Component Styles - Purple Theme
-
-// Ensure the component takes full height within the layout
-:host {
-  display: block;
-  height: 100%;
-}
-
-// Animation styles
-.overflow-hidden {
-  overflow: hidden;
-}
-
-// Service Card Status Colors
-.status-available {
-  @apply bg-green-100 text-green-800 border-green-200;
-}
-
-.status-redeemed {
-  @apply bg-purple-100 text-purple-800 border-purple-200;
-}
-
-// Service Card Border Colors
-.service-1 {
-  border-left: 4px solid #3b82f6;
-}
-
-.service-2 {
-  border-left: 4px solid #10b981;
-}
-
-.service-3 {
-  border-left: 4px solid #8b5cf6;
-}
-
-.service-4 {
-  border-left: 4px solid #f59e0b;
-}
-
-.service-5 {
-  border-left: 4px solid #ef4444;
-}
+// Locations Component Styles - Purple Theme
 
 // Location Card Hover Effects
 .location-card {
@@ -48,19 +7,6 @@
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  }
-}
-
-// About Us Section Styling
-.about-section {
-  .contact-info {
-    .icon-wrapper {
-      transition: all 0.2s ease;
-      
-      &:hover {
-        transform: scale(1.1);
-      }
-    }
   }
 }
 
@@ -78,9 +24,9 @@
   }
 }
 
-// Navigation Tabs Styling
-.nav-tabs {
-  .tab-button {
+// Navigation Menu Styling
+.nav-menu {
+  .nav-link {
     transition: all 0.2s ease;
     backdrop-filter: blur(10px);
     
@@ -100,7 +46,7 @@
     @apply grid-cols-1;
   }
   
-  .nav-tabs {
+  .nav-menu {
     flex-direction: column;
     space-x: 0;
     space-y: 2;

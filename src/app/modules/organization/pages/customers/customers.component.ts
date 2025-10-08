@@ -89,30 +89,241 @@ export class CustomersComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadCustomers();
+    // Commented out API integration for dummy data
+    // this.loadCustomers();
+    this.loadDummyCustomers();
     this.setupSearch();
   }
 
-  private loadCustomers(): void {
-    this.customerService.getCustomers().subscribe({
-      next: (customers) => {
-        this.customers = customers;
-        this.filteredCustomers = [...customers];
+  // Commented out API integration - replaced with dummy data
+  // private loadCustomers(): void {
+  //   this.customerService.getCustomers().subscribe({
+  //     next: (customers) => {
+  //       this.customers = customers;
+  //       this.filteredCustomers = [...customers];
+  //       this.updatePagination();
+  //     },
+  //     error: (error) => {
+  //       console.error('Error loading customers:', error);
+  //       this.snackBar.open('Error loading customers', 'Close', {
+  //         duration: 3000,
+  //         horizontalPosition: 'right',
+  //         verticalPosition: 'top'
+  //       });
+  //       // Handle error without fallback data
+  //       this.customers = [];
+  //       this.filteredCustomers = [];
+  //       this.updatePagination();
+  //     }
+  //   });
+  // }
+
+  private loadDummyCustomers(): void {
+    // Simulate API delay
+    setTimeout(() => {
+      this.customers = [
+        {
+          id: 1,
+          firstName: 'Ahmed',
+          lastName: 'Al-Rashid',
+          fullName: 'Ahmed Al-Rashid',
+          email: 'ahmed.rashid@email.com',
+          mobileNumber: '0501234567',
+          isActive: true,
+          createdAt: '2024-01-15T10:30:00Z',
+          couponCount: 5,
+          invoiceCount: 3,
+          googleId: null
+        },
+        {
+          id: 2,
+          firstName: 'Fatima',
+          lastName: 'Hassan',
+          fullName: 'Fatima Hassan',
+          email: 'fatima.hassan@email.com',
+          mobileNumber: '0502345678',
+          isActive: true,
+          createdAt: '2024-01-20T14:15:00Z',
+          couponCount: 8,
+          invoiceCount: 6,
+          googleId: null
+        },
+        {
+          id: 3,
+          firstName: 'Mohammed',
+          lastName: 'Al-Zahra',
+          fullName: 'Mohammed Al-Zahra',
+          email: 'mohammed.zahra@email.com',
+          mobileNumber: '0503456789',
+          isActive: false,
+          createdAt: '2024-02-01T09:45:00Z',
+          couponCount: 2,
+          invoiceCount: 1,
+          googleId: null
+        },
+        {
+          id: 4,
+          firstName: 'Aisha',
+          lastName: 'Al-Mansouri',
+          fullName: 'Aisha Al-Mansouri',
+          email: 'aisha.mansouri@email.com',
+          mobileNumber: '0504567890',
+          isActive: true,
+          createdAt: '2024-02-10T16:20:00Z',
+          couponCount: 12,
+          invoiceCount: 9,
+          googleId: null
+        },
+        {
+          id: 5,
+          firstName: 'Omar',
+          lastName: 'Al-Sabah',
+          fullName: 'Omar Al-Sabah',
+          email: 'omar.sabah@email.com',
+          mobileNumber: '0505678901',
+          isActive: true,
+          createdAt: '2024-02-15T11:30:00Z',
+          couponCount: 3,
+          invoiceCount: 2,
+          googleId: null
+        },
+        {
+          id: 6,
+          firstName: 'Layla',
+          lastName: 'Al-Kuwaiti',
+          fullName: 'Layla Al-Kuwaiti',
+          email: 'layla.kuwaiti@email.com',
+          mobileNumber: '0506789012',
+          isActive: true,
+          createdAt: '2024-02-20T13:45:00Z',
+          couponCount: 7,
+          invoiceCount: 4,
+          googleId: null
+        },
+        {
+          id: 7,
+          firstName: 'Khalid',
+          lastName: 'Al-Dubai',
+          fullName: 'Khalid Al-Dubai',
+          email: 'khalid.dubai@email.com',
+          mobileNumber: '0507890123',
+          isActive: false,
+          createdAt: '2024-03-01T08:15:00Z',
+          couponCount: 1,
+          invoiceCount: 0,
+          googleId: null
+        },
+        {
+          id: 8,
+          firstName: 'Nour',
+          lastName: 'Al-Sharjah',
+          fullName: 'Nour Al-Sharjah',
+          email: 'nour.sharjah@email.com',
+          mobileNumber: '0508901234',
+          isActive: true,
+          createdAt: '2024-03-05T15:30:00Z',
+          couponCount: 9,
+          invoiceCount: 7,
+          googleId: null
+        },
+        {
+          id: 9,
+          firstName: 'Yousef',
+          lastName: 'Al-Ajman',
+          fullName: 'Yousef Al-Ajman',
+          email: 'yousef.ajman@email.com',
+          mobileNumber: '0509012345',
+          isActive: true,
+          createdAt: '2024-03-10T12:00:00Z',
+          couponCount: 4,
+          invoiceCount: 3,
+          googleId: null
+        },
+        {
+          id: 10,
+          firstName: 'Mariam',
+          lastName: 'Al-Fujairah',
+          fullName: 'Mariam Al-Fujairah',
+          email: 'mariam.fujairah@email.com',
+          mobileNumber: '0500123456',
+          isActive: true,
+          createdAt: '2024-03-15T17:45:00Z',
+          couponCount: 6,
+          invoiceCount: 5,
+          googleId: null
+        },
+        {
+          id: 11,
+          firstName: 'Hassan',
+          lastName: 'Al-Ras Al-Khaimah',
+          fullName: 'Hassan Al-Ras Al-Khaimah',
+          email: 'hassan.rak@email.com',
+          mobileNumber: '0501234568',
+          isActive: false,
+          createdAt: '2024-03-20T10:20:00Z',
+          couponCount: 2,
+          invoiceCount: 1,
+          googleId: null
+        },
+        {
+          id: 12,
+          firstName: 'Zainab',
+          lastName: 'Al-Umm Al-Quwain',
+          fullName: 'Zainab Al-Umm Al-Quwain',
+          email: 'zainab.uq@email.com',
+          mobileNumber: '0502345679',
+          isActive: true,
+          createdAt: '2024-03-25T14:10:00Z',
+          couponCount: 11,
+          invoiceCount: 8,
+          googleId: null
+        },
+        {
+          id: 13,
+          firstName: 'Abdullah',
+          lastName: 'Al-Abu Dhabi',
+          fullName: 'Abdullah Al-Abu Dhabi',
+          email: 'abdullah.ad@email.com',
+          mobileNumber: '0503456780',
+          isActive: true,
+          createdAt: '2024-04-01T09:30:00Z',
+          couponCount: 15,
+          invoiceCount: 12,
+          googleId: null
+        },
+        {
+          id: 14,
+          firstName: 'Sara',
+          lastName: 'Al-Dubai Marina',
+          fullName: 'Sara Al-Dubai Marina',
+          email: 'sara.marina@email.com',
+          mobileNumber: '0504567891',
+          isActive: true,
+          createdAt: '2024-04-05T16:45:00Z',
+          couponCount: 8,
+          invoiceCount: 6,
+          googleId: null
+        },
+        {
+          id: 15,
+          firstName: 'Tariq',
+          lastName: 'Al-Jumeirah',
+          fullName: 'Tariq Al-Jumeirah',
+          email: 'tariq.jumeirah@email.com',
+          mobileNumber: '0505678902',
+          isActive: false,
+          createdAt: '2024-04-10T11:15:00Z',
+          couponCount: 3,
+          invoiceCount: 2,
+          googleId: null
+        }
+      ];
+      
+      this.filteredCustomers = [...this.customers];
         this.updatePagination();
-      },
-      error: (error) => {
-        console.error('Error loading customers:', error);
-        this.snackBar.open('Error loading customers', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
-        // Handle error without fallback data
-        this.customers = [];
-        this.filteredCustomers = [];
-        this.updatePagination();
-      }
-    });
+      
+      console.log('Loaded dummy customers:', this.customers.length);
+    }, 500); // Simulate API delay
   }
 
 

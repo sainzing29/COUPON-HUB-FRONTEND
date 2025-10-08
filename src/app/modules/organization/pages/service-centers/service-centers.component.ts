@@ -114,30 +114,154 @@ export class ServiceCentersComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadServiceCenters();
+    // Commented out API integration for dummy data
+    // this.loadServiceCenters();
+    this.loadDummyServiceCenters();
     this.setupSearch();
   }
 
-  private loadServiceCenters(): void {
-    this.serviceCenterService.getServiceCenters().subscribe({
-      next: (serviceCenters) => {
-        this.serviceCenters = serviceCenters;
-        this.filteredServiceCenters = [...serviceCenters];
-        this.updatePagination();
-      },
-      error: (error) => {
-        console.error('Error loading service centers:', error);
-        this.snackBar.open('Error loading service centers', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
-        // Fallback to sample data on error
-        this.serviceCenters = this.sampleServiceCenters;
-        this.filteredServiceCenters = [...this.sampleServiceCenters];
-        this.updatePagination();
-      }
-    });
+  // Commented out API integration - replaced with dummy data
+  // private loadServiceCenters(): void {
+  //   this.serviceCenterService.getServiceCenters().subscribe({
+  //     next: (serviceCenters) => {
+  //       this.serviceCenters = serviceCenters;
+  //       this.filteredServiceCenters = [...serviceCenters];
+  //       this.updatePagination();
+  //     },
+  //     error: (error) => {
+  //       console.error('Error loading service centers:', error);
+  //       this.snackBar.open('Error loading service centers', 'Close', {
+  //         duration: 3000,
+  //         horizontalPosition: 'right',
+  //         verticalPosition: 'top'
+  //       });
+  //       // Fallback to sample data on error
+  //       this.serviceCenters = this.sampleServiceCenters;
+  //       this.filteredServiceCenters = [...this.sampleServiceCenters];
+  //       this.updatePagination();
+  //     }
+  //   });
+  // }
+
+  private loadDummyServiceCenters(): void {
+    // Simulate API delay
+    setTimeout(() => {
+      this.serviceCenters = [
+        {
+          id: 1,
+          name: 'Dubai Downtown Center',
+          address: 'Sheikh Zayed Road, Downtown Dubai',
+          contactNumber: '0501234567',
+          isActive: true,
+          createdAt: '2024-01-15T10:30:00Z',
+          lastUpdated: '2024-04-15T09:15:00Z'
+        },
+        {
+          id: 2,
+          name: 'Abu Dhabi Corniche Center',
+          address: 'Corniche Road, Abu Dhabi',
+          contactNumber: '0502345678',
+          isActive: true,
+          createdAt: '2024-01-20T14:15:00Z',
+          lastUpdated: '2024-04-14T16:30:00Z'
+        },
+        {
+          id: 3,
+          name: 'Sharjah Al Qasba Center',
+          address: 'Al Qasba Area, Sharjah',
+          contactNumber: '0503456789',
+          isActive: true,
+          createdAt: '2024-02-01T09:45:00Z',
+          lastUpdated: '2024-04-13T14:45:00Z'
+        },
+        {
+          id: 4,
+          name: 'Ajman Corniche Center',
+          address: 'Ajman Corniche, Ajman',
+          contactNumber: '0504567890',
+          isActive: true,
+          createdAt: '2024-02-10T16:20:00Z',
+          lastUpdated: '2024-04-12T10:15:00Z'
+        },
+        {
+          id: 5,
+          name: 'Fujairah Port Center',
+          address: 'Fujairah Port Area, Fujairah',
+          contactNumber: '0505678901',
+          isActive: true,
+          createdAt: '2024-02-15T11:30:00Z',
+          lastUpdated: '2024-04-11T15:30:00Z'
+        },
+        {
+          id: 6,
+          name: 'Ras Al Khaimah City Center',
+          address: 'RAK City Center, Ras Al Khaimah',
+          contactNumber: '0506789012',
+          isActive: false,
+          createdAt: '2024-03-01T08:15:00Z',
+          lastUpdated: '2024-03-15T12:00:00Z'
+        },
+        {
+          id: 7,
+          name: 'Umm Al Quwain City Center',
+          address: 'UAQ City Center, Umm Al Quwain',
+          contactNumber: '0507890123',
+          isActive: true,
+          createdAt: '2024-03-05T15:30:00Z',
+          lastUpdated: '2024-04-10T09:45:00Z'
+        },
+        {
+          id: 8,
+          name: 'Dubai Marina Center',
+          address: 'Marina Walk, Dubai Marina',
+          contactNumber: '0508901234',
+          isActive: true,
+          createdAt: '2024-03-10T12:00:00Z',
+          lastUpdated: '2024-04-09T13:20:00Z'
+        },
+        {
+          id: 9,
+          name: 'Abu Dhabi Airport Center',
+          address: 'Abu Dhabi International Airport',
+          contactNumber: '0509012345',
+          isActive: true,
+          createdAt: '2024-03-15T17:45:00Z',
+          lastUpdated: '2024-04-08T11:10:00Z'
+        },
+        {
+          id: 10,
+          name: 'Sharjah Industrial Center',
+          address: 'Industrial Area, Sharjah',
+          contactNumber: '0500123456',
+          isActive: false,
+          createdAt: '2024-03-20T10:20:00Z',
+          lastUpdated: '2024-03-25T14:30:00Z'
+        },
+        {
+          id: 11,
+          name: 'Ajman Free Zone Center',
+          address: 'Ajman Free Zone',
+          contactNumber: '0501234568',
+          isActive: true,
+          createdAt: '2024-03-25T14:10:00Z',
+          lastUpdated: '2024-04-07T16:45:00Z'
+        },
+        {
+          id: 12,
+          name: 'Fujairah Industrial Center',
+          address: 'Fujairah Industrial Area',
+          contactNumber: '0502345679',
+          isActive: true,
+          createdAt: '2024-04-01T09:30:00Z',
+          lastUpdated: '2024-04-06T12:15:00Z'
+        }
+      ];
+      
+      this.filteredServiceCenters = [...this.serviceCenters];
+      this.updatePagination();
+      
+      console.log('Loaded dummy service centers:', this.serviceCenters.length);
+    }, 500); // Simulate API delay
   }
 
   private setupSearch(): void {
@@ -289,29 +413,8 @@ export class ServiceCentersComponent implements OnInit {
         
         this.updatePagination();
         
-        // Uncomment when API is ready:
-        // this.serviceCenterService.updateServiceCenter(this.editingServiceCenter.id, formValue).subscribe({
-        //   next: (updatedServiceCenter) => {
-        //     const index = this.serviceCenters.findIndex(s => s.id === this.editingServiceCenter!.id);
-        //     if (index > -1) {
-        //       this.serviceCenters[index] = updatedServiceCenter;
-        //     }
-        //     this.updatePagination();
-        //     this.snackBar.open('Service Center updated successfully', 'Close', {
-        //       duration: 3000,
-        //       horizontalPosition: 'right',
-        //       verticalPosition: 'top'
-        //     });
-        //   },
-        //   error: (error) => {
-        //     console.error('Error updating service center:', error);
-        //     this.snackBar.open('Error updating service center', 'Close', {
-        //       duration: 3000,
-        //       horizontalPosition: 'right',
-        //       verticalPosition: 'top'
-        //     });
-        //   }
-        // });
+        // Commented out API integration - using local update for dummy data
+        // this.serviceCenterService.updateServiceCenter(this.editingServiceCenter.id, formValue).subscribe({...});
         
         this.snackBar.open('Service Center updated successfully', 'Close', {
           duration: 3000,
@@ -331,27 +434,8 @@ export class ServiceCentersComponent implements OnInit {
         this.filteredServiceCenters.unshift(newServiceCenter);
         this.updatePagination();
         
-        // Uncomment when API is ready:
-        // this.serviceCenterService.createServiceCenter(formValue).subscribe({
-        //   next: (createdServiceCenter) => {
-        //     this.serviceCenters.unshift(createdServiceCenter);
-        //     this.filteredServiceCenters.unshift(createdServiceCenter);
-        //     this.updatePagination();
-        //     this.snackBar.open('Service Center added successfully', 'Close', {
-        //       duration: 3000,
-        //       horizontalPosition: 'right',
-        //       verticalPosition: 'top'
-        //     });
-        //   },
-        //   error: (error) => {
-        //     console.error('Error creating service center:', error);
-        //     this.snackBar.open('Error creating service center', 'Close', {
-        //       duration: 3000,
-        //       horizontalPosition: 'right',
-        //       verticalPosition: 'top'
-        //     });
-        //   }
-        // });
+        // Commented out API integration - using local creation for dummy data
+        // this.serviceCenterService.createServiceCenter(formValue).subscribe({...});
         
         this.snackBar.open('Service Center added successfully', 'Close', {
           duration: 3000,

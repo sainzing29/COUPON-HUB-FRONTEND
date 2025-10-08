@@ -28,6 +28,14 @@ export const routes: Routes = [
         loadComponent: () => import('./modules/customer/service-selection/service-selection').then(m => m.ServiceSelectionComponent)
       },
       {
+        path: 'locations',
+        loadComponent: () => import('./modules/customer/locations/locations.component').then(m => m.LocationsComponent)
+      },
+      {
+        path: 'about-us',
+        loadComponent: () => import('./modules/customer/about-us/about-us.component').then(m => m.AboutUsComponent)
+      },
+      {
         path: 'invoice',
         loadComponent: () => import('./modules/customer/customer-invoice/customer-invoice').then(m => m.CustomerInvoiceComponent)
       }

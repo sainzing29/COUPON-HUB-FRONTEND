@@ -22,6 +22,30 @@ body {
   background-color: #f8fafc;
 }
 
+/* Global scrollbar styling for the entire application */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.6);
+  border-radius: 4px;
+  
+  &:hover {
+    background: rgba(139, 92, 246, 0.8);
+  }
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
 /* Custom Material Form Styling */
 .mat-mdc-form-field {
   width: 100%;

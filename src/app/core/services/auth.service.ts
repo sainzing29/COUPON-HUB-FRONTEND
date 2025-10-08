@@ -78,7 +78,7 @@ export class AuthService {
    * Login user
    */
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.apiService.post<LoginResponse>('/auth/login', credentials).pipe(
+    return this.apiService.post<LoginResponse>('/Auth/login', credentials).pipe(
       tap(response => {
         // Store JWT token
         this.tokenService.setToken(response.token);
@@ -199,6 +199,13 @@ export class AuthService {
 
 
   /**
+   * Public method to reload user from token (useful for dummy login)
+   */
+  public reloadUserFromToken(): void {
+    this.loadUserFromToken();
+  }
+
+  /**
    * Load user from token on app initialization
    */
   private loadUserFromToken(): void {
@@ -207,6 +214,7 @@ export class AuthService {
       if (token) {
         try {
           // Decode token to get fresh user information
+          // NOTE: This works with both real JWT tokens and dummy tokens from sign-in component
           const payload = this.decodeToken(token);
           console.log('JWT Payload:', payload);
           

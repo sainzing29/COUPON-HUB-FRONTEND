@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { CustomerAuthService } from '../services/customer-auth.service';
 
@@ -24,7 +25,7 @@ interface Coupon {
 @Component({
   selector: 'app-service-selection',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './service-selection.html',
   styleUrls: ['./service-selection.scss'],
   animations: [

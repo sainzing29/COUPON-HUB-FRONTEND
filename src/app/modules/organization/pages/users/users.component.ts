@@ -94,8 +94,11 @@ export class UsersComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadUsers();
-    this.loadServiceCenters();
+    // Commented out API integration for dummy data
+    // this.loadUsers();
+    // this.loadServiceCenters();
+    this.loadDummyUsers();
+    this.loadDummyServiceCenters();
     this.setupSearch();
   }
 
@@ -119,42 +122,285 @@ export class UsersComponent implements OnInit {
     }
   }
 
-  private loadUsers(): void {
-    this.userService.getUsers().subscribe({
-      next: (users) => {
-        this.users = users;
-        this.filteredUsers = [...users];
-        this.updatePagination();
-      },
-      error: (error) => {
-        console.error('Error loading users:', error);
-        this.snackBar.open('Error loading users', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
-        this.users = [];
-        this.filteredUsers = [];
-        this.updatePagination();
-      }
-    });
+  // Commented out API integration - replaced with dummy data
+  // private loadUsers(): void {
+  //   this.userService.getUsers().subscribe({
+  //     next: (users) => {
+  //       this.users = users;
+  //       this.filteredUsers = [...users];
+  //       this.updatePagination();
+  //     },
+  //     error: (error) => {
+  //       console.error('Error loading users:', error);
+  //       this.snackBar.open('Error loading users', 'Close', {
+  //         duration: 3000,
+  //         horizontalPosition: 'right',
+  //         verticalPosition: 'top'
+  //       });
+  //       this.users = [];
+  //       this.filteredUsers = [];
+  //       this.updatePagination();
+  //     }
+  //   });
+  // }
+
+  // private loadServiceCenters(): void {
+  //   this.serviceCenterService.getServiceCenters().subscribe({
+  //     next: (serviceCenters) => {
+  //       this.serviceCenters = serviceCenters;
+  //     },
+  //     error: (error) => {
+  //       console.error('Error loading service centers:', error);
+  //       this.snackBar.open('Error loading service centers', 'Close', {
+  //         duration: 3000,
+  //         horizontalPosition: 'right',
+  //         verticalPosition: 'top'
+  //       });
+  //       this.serviceCenters = [];
+  //     }
+  //   });
+  // }
+
+  private loadDummyUsers(): void {
+    // Simulate API delay
+    setTimeout(() => {
+      this.users = [
+        {
+          id: 1,
+          firstName: 'Ahmed',
+          lastName: 'Al-Rashid',
+          email: 'ahmed.rashid@ces.com',
+          mobileNumber: '0501234567',
+          role: 'SuperAdmin',
+          isActive: true,
+          createdAt: '2024-01-15T10:30:00Z',
+          lastLogin: '2024-04-15T09:15:00Z',
+          serviceCenterId: undefined,
+          serviceCenterName: undefined
+        },
+        {
+          id: 2,
+          firstName: 'Fatima',
+          lastName: 'Hassan',
+          email: 'fatima.hassan@ces.com',
+          mobileNumber: '0502345678',
+          role: 'Admin',
+          isActive: true,
+          createdAt: '2024-01-20T14:15:00Z',
+          lastLogin: '2024-04-14T16:30:00Z',
+          serviceCenterId: 1,
+          serviceCenterName: 'Dubai Center'
+        },
+        {
+          id: 3,
+          firstName: 'Mohammed',
+          lastName: 'Al-Zahra',
+          email: 'mohammed.zahra@ces.com',
+          mobileNumber: '0503456789',
+          role: 'Admin',
+          isActive: false,
+          createdAt: '2024-02-01T09:45:00Z',
+          lastLogin: '2024-03-20T11:20:00Z',
+          serviceCenterId: 2,
+          serviceCenterName: 'Abu Dhabi Center'
+        },
+        {
+          id: 4,
+          firstName: 'Aisha',
+          lastName: 'Al-Mansouri',
+          email: 'aisha.mansouri@ces.com',
+          mobileNumber: '0504567890',
+          role: 'Admin',
+          isActive: true,
+          createdAt: '2024-02-10T16:20:00Z',
+          lastLogin: '2024-04-13T14:45:00Z',
+          serviceCenterId: 3,
+          serviceCenterName: 'Sharjah Center'
+        },
+        {
+          id: 5,
+          firstName: 'Omar',
+          lastName: 'Al-Sabah',
+          email: 'omar.sabah@ces.com',
+          mobileNumber: '0505678901',
+          role: 'Admin',
+          isActive: true,
+          createdAt: '2024-02-15T11:30:00Z',
+          lastLogin: '2024-04-12T10:15:00Z',
+          serviceCenterId: 4,
+          serviceCenterName: 'Ajman Center'
+        },
+        {
+          id: 6,
+          firstName: 'Layla',
+          lastName: 'Al-Kuwaiti',
+          email: 'layla.kuwaiti@ces.com',
+          mobileNumber: '0506789012',
+          role: 'Admin',
+          isActive: true,
+          createdAt: '2024-02-20T13:45:00Z',
+          lastLogin: '2024-04-11T15:30:00Z',
+          serviceCenterId: 5,
+          serviceCenterName: 'Fujairah Center'
+        },
+        {
+          id: 7,
+          firstName: 'Khalid',
+          lastName: 'Al-Dubai',
+          email: 'khalid.dubai@ces.com',
+          mobileNumber: '0507890123',
+          role: 'Admin',
+          isActive: false,
+          createdAt: '2024-03-01T08:15:00Z',
+          lastLogin: '2024-03-15T12:00:00Z',
+          serviceCenterId: 1,
+          serviceCenterName: 'Dubai Center'
+        },
+        {
+          id: 8,
+          firstName: 'Nour',
+          lastName: 'Al-Sharjah',
+          email: 'nour.sharjah@ces.com',
+          mobileNumber: '0508901234',
+          role: 'Admin',
+          isActive: true,
+          createdAt: '2024-03-05T15:30:00Z',
+          lastLogin: '2024-04-10T09:45:00Z',
+          serviceCenterId: 3,
+          serviceCenterName: 'Sharjah Center'
+        },
+        {
+          id: 9,
+          firstName: 'Yousef',
+          lastName: 'Al-Ajman',
+          email: 'yousef.ajman@ces.com',
+          mobileNumber: '0509012345',
+          role: 'Admin',
+          isActive: true,
+          createdAt: '2024-03-10T12:00:00Z',
+          lastLogin: '2024-04-09T13:20:00Z',
+          serviceCenterId: 4,
+          serviceCenterName: 'Ajman Center'
+        },
+        {
+          id: 10,
+          firstName: 'Mariam',
+          lastName: 'Al-Fujairah',
+          email: 'mariam.fujairah@ces.com',
+          mobileNumber: '0500123456',
+          role: 'Admin',
+          isActive: true,
+          createdAt: '2024-03-15T17:45:00Z',
+          lastLogin: '2024-04-08T11:10:00Z',
+          serviceCenterId: 5,
+          serviceCenterName: 'Fujairah Center'
+        },
+        {
+          id: 11,
+          firstName: 'Hassan',
+          lastName: 'Al-Ras Al-Khaimah',
+          email: 'hassan.rak@ces.com',
+          mobileNumber: '0501234568',
+          role: 'Admin',
+          isActive: false,
+          createdAt: '2024-03-20T10:20:00Z',
+          lastLogin: '2024-03-25T14:30:00Z',
+          serviceCenterId: 6,
+          serviceCenterName: 'Ras Al Khaimah Center'
+        },
+        {
+          id: 12,
+          firstName: 'Zainab',
+          lastName: 'Al-Umm Al-Quwain',
+          email: 'zainab.uq@ces.com',
+          mobileNumber: '0502345679',
+          role: 'Admin',
+          isActive: true,
+          createdAt: '2024-03-25T14:10:00Z',
+          lastLogin: '2024-04-07T16:45:00Z',
+          serviceCenterId: 7,
+          serviceCenterName: 'Umm Al Quwain Center'
+        }
+      ];
+      
+      this.filteredUsers = [...this.users];
+      this.updatePagination();
+      
+      console.log('Loaded dummy users:', this.users.length);
+    }, 500); // Simulate API delay
   }
 
-  private loadServiceCenters(): void {
-    this.serviceCenterService.getServiceCenters().subscribe({
-      next: (serviceCenters) => {
-        this.serviceCenters = serviceCenters;
-      },
-      error: (error) => {
-        console.error('Error loading service centers:', error);
-        this.snackBar.open('Error loading service centers', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
-        this.serviceCenters = [];
-      }
-    });
+  private loadDummyServiceCenters(): void {
+    // Simulate API delay
+    setTimeout(() => {
+      this.serviceCenters = [
+        {
+          id: 1,
+          name: 'Dubai Center',
+          address: 'Sheikh Zayed Road, Dubai',
+          contactNumber: '0501234567',
+          isActive: true,
+          createdAt: '2024-01-15T10:30:00Z',
+          lastUpdated: '2024-04-15T09:15:00Z'
+        },
+        {
+          id: 2,
+          name: 'Abu Dhabi Center',
+          address: 'Corniche Road, Abu Dhabi',
+          contactNumber: '0502345678',
+          isActive: true,
+          createdAt: '2024-01-20T14:15:00Z',
+          lastUpdated: '2024-04-14T16:30:00Z'
+        },
+        {
+          id: 3,
+          name: 'Sharjah Center',
+          address: 'Al Qasba, Sharjah',
+          contactNumber: '0503456789',
+          isActive: true,
+          createdAt: '2024-02-01T09:45:00Z',
+          lastUpdated: '2024-04-13T14:45:00Z'
+        },
+        {
+          id: 4,
+          name: 'Ajman Center',
+          address: 'Ajman Corniche, Ajman',
+          contactNumber: '0504567890',
+          isActive: true,
+          createdAt: '2024-02-10T16:20:00Z',
+          lastUpdated: '2024-04-12T10:15:00Z'
+        },
+        {
+          id: 5,
+          name: 'Fujairah Center',
+          address: 'Fujairah Port, Fujairah',
+          contactNumber: '0505678901',
+          isActive: true,
+          createdAt: '2024-02-15T11:30:00Z',
+          lastUpdated: '2024-04-11T15:30:00Z'
+        },
+        {
+          id: 6,
+          name: 'Ras Al Khaimah Center',
+          address: 'RAK City, Ras Al Khaimah',
+          contactNumber: '0506789012',
+          isActive: false,
+          createdAt: '2024-03-01T08:15:00Z',
+          lastUpdated: '2024-03-15T12:00:00Z'
+        },
+        {
+          id: 7,
+          name: 'Umm Al Quwain Center',
+          address: 'UAQ City, Umm Al Quwain',
+          contactNumber: '0507890123',
+          isActive: true,
+          createdAt: '2024-03-05T15:30:00Z',
+          lastUpdated: '2024-04-10T09:45:00Z'
+        }
+      ];
+      
+      console.log('Loaded dummy service centers:', this.serviceCenters.length);
+    }, 300); // Simulate API delay
   }
 
   private setupSearch(): void {
@@ -300,84 +546,70 @@ export class UsersComponent implements OnInit {
       console.log('Form values:', formValue); // Debug log
       
       if (this.isEditMode && this.editingUser) {
-        // Update existing user - role is already set from form
-        this.userService.updateUser(this.editingUser.id, formValue).subscribe({
-          next: (updatedUser) => {
-            this.isSubmitting = false;
-            const index = this.users.findIndex(u => u.id === this.editingUser!.id);
-            if (index > -1) {
-              this.users[index] = updatedUser;
-            }
-            
-            const filteredIndex = this.filteredUsers.findIndex(u => u.id === this.editingUser!.id);
-            if (filteredIndex > -1) {
-              this.filteredUsers[filteredIndex] = updatedUser;
-            }
-            
-            this.updatePagination();
-            this.snackBar.open('User updated successfully', 'Close', {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            });
-            
-            // Close popup and reset form on success
-            this.showAddUserForm = false;
-            this.userForm.reset();
-            this.userForm.patchValue({ role: 'Admin' });
-          },
-          error: (error) => {
-            this.isSubmitting = false;
-            console.error('Error updating user:', error);
-            this.snackBar.open('Error updating user', 'Close', {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            });
-            // Don't close popup on error
-          }
+        // Commented out API integration - using local update for dummy data
+        // this.userService.updateUser(this.editingUser.id, formValue).subscribe({...});
+        
+        // Update existing user locally
+        const updatedUser = {
+          ...this.editingUser,
+          ...formValue,
+          serviceCenterName: this.getServiceCenterName(formValue.serviceCenterId)
+        };
+        
+        const index = this.users.findIndex(u => u.id === this.editingUser!.id);
+        if (index > -1) {
+          this.users[index] = updatedUser;
+        }
+        
+        const filteredIndex = this.filteredUsers.findIndex(u => u.id === this.editingUser!.id);
+        if (filteredIndex > -1) {
+          this.filteredUsers[filteredIndex] = updatedUser;
+        }
+        
+        this.updatePagination();
+        this.snackBar.open('User updated successfully', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
         });
+        
+        // Close popup and reset form on success
+        this.showAddUserForm = false;
+        this.userForm.reset();
+        this.userForm.patchValue({ role: 'Admin' });
+        this.isSubmitting = false;
       } else {
-        // Add new user - role is already set from form (defaults to 'Admin')
-        const createData = {
+        // Commented out API integration - using local creation for dummy data
+        // this.userService.createUser(createData).subscribe({...});
+        
+        // Add new user locally
+        const newUser: User = {
+          id: Date.now(), // Simple ID generation
           firstName: formValue.firstName,
           lastName: formValue.lastName,
           email: formValue.email,
           mobileNumber: formValue.mobileNumber,
-          role: formValue.role || 'Admin', // Use role from form, fallback to 'Admin' if null
-          passwordHash: '', // Empty password hash for new users
-          serviceCenterId: formValue.serviceCenterId || null,
-          isActive: true
+          role: formValue.role || 'Admin',
+          isActive: true,
+          createdAt: new Date().toISOString(),
+          serviceCenterId: formValue.serviceCenterId || undefined,
+          serviceCenterName: this.getServiceCenterName(formValue.serviceCenterId)
         };
         
-        this.userService.createUser(createData).subscribe({
-          next: (createdUser) => {
-            this.isSubmitting = false;
-            this.users.unshift(createdUser);
-            this.filteredUsers.unshift(createdUser);
-            this.updatePagination();
-            this.snackBar.open('User added successfully', 'Close', {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            });
-            
-            // Close popup and reset form on success
-            this.showAddUserForm = false;
-            this.userForm.reset();
-            this.userForm.patchValue({ role: 'Admin' });
-          },
-          error: (error) => {
-            this.isSubmitting = false;
-            console.error('Error creating user:', error);
-            this.snackBar.open('Error creating user', 'Close', {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            });
-            // Don't close popup on error
-          }
+        this.users.unshift(newUser);
+        this.filteredUsers.unshift(newUser);
+        this.updatePagination();
+        this.snackBar.open('User added successfully', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
         });
+        
+        // Close popup and reset form on success
+        this.showAddUserForm = false;
+        this.userForm.reset();
+        this.userForm.patchValue({ role: 'Admin' });
+        this.isSubmitting = false;
       }
     } else {
       this.markFormGroupTouched();

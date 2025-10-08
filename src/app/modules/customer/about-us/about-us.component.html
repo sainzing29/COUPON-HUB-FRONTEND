@@ -1,0 +1,147 @@
+<div class="min-h-full bg-cover bg-center bg-no-repeat py-12 px-4 sm:px-6 lg:px-8 relative" style="background-image: url('assets/images/background1.png')">
+  <!-- Gradient Overlay with Lower Opacity -->
+  <div class="absolute inset-0" style="background: linear-gradient(-45deg, rgba(91, 207, 242, 0.6) 20%, rgba(65, 125, 210, 0.6) 50%, rgba(0, 169, 224, 0.6) 100%);"></div>
+  
+  <div class="max-w-6xl mx-auto w-full space-y-8 relative z-10">
+    <!-- Header -->
+    <div class="text-center">
+      <h2 class="text-3xl font-semibold text-white mb-2">About {{ aboutUsInfo.companyName }}</h2>
+      <p class="text-sm text-gray-100 mb-6">{{ aboutUsInfo.description }}</p>
+      
+      <!-- Navigation Menu -->
+      <nav class="flex justify-center space-x-6 mb-8">
+        <a 
+          routerLink="/customer/service-selection"
+          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2 bg-white/20 text-white hover:bg-white/30">
+          <span class="material-icons text-sm">home</span>
+          <span>Service Status</span>
+        </a>
+        <a 
+          routerLink="/customer/locations"
+          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2 bg-white/20 text-white hover:bg-white/30">
+          <span class="material-icons text-sm">location_on</span>
+          <span>Our Locations</span>
+        </a>
+        <a 
+          routerLink="/customer/about-us"
+          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2 bg-white text-purple-600">
+          <span class="material-icons text-sm">info</span>
+          <span>About Us</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- About Us Content -->
+    <div class="bg-white rounded-lg shadow-lg p-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Contact Information -->
+        <div>
+          <h4 class="text-xl font-semibold text-gray-900 mb-6 flex items-center space-x-2">
+            <span class="material-icons text-purple-600">contact_phone</span>
+            <span>Contact Information</span>
+          </h4>
+          
+          <div class="space-y-4">
+            <div class="flex items-start space-x-3">
+              <span class="material-icons text-purple-600 text-sm mt-1">location_on</span>
+              <div>
+                <p class="text-sm font-medium text-gray-900">Address</p>
+                <p class="text-sm text-gray-700">{{ aboutUsInfo.address }}</p>
+                <p class="text-sm text-gray-600">P.O Box: {{ aboutUsInfo.poBox }}</p>
+              </div>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+              <span class="material-icons text-purple-600 text-sm">phone</span>
+              <div>
+                <p class="text-sm font-medium text-gray-900">Phone</p>
+                <p class="text-sm text-gray-700">{{ aboutUsInfo.phone }}</p>
+              </div>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+              <span class="material-icons text-purple-600 text-sm">email</span>
+              <div>
+                <p class="text-sm font-medium text-gray-900">Email</p>
+                <p class="text-sm text-gray-700">{{ aboutUsInfo.email }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Map View -->
+        <div>
+          <h4 class="text-xl font-semibold text-gray-900 mb-6 flex items-center space-x-2">
+            <span class="material-icons text-purple-600">map</span>
+            <span>Find Us</span>
+          </h4>
+          
+          <div class="bg-gray-100 rounded-lg p-6 text-center">
+            <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="material-icons text-purple-600 text-2xl">location_on</span>
+            </div>
+            <h5 class="text-lg font-semibold text-gray-900 mb-2">Main Office Location</h5>
+            <p class="text-sm text-gray-600 mb-4">{{ aboutUsInfo.address }}</p>
+            <button 
+              (click)="getDirections(mainOffice)"
+              class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition-colors duration-200 flex items-center space-x-2 mx-auto">
+              <span class="material-icons text-sm">directions</span>
+              <span>Get Directions</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Company Description -->
+      <div class="mt-8 pt-6 border-t border-gray-200">
+        <h4 class="text-lg font-semibold text-gray-900 mb-3">About Our Services</h4>
+        <p class="text-sm text-gray-700 leading-relaxed">
+          {{ aboutUsInfo.companyName }} is a leading provider of mobile device services and warranty solutions across the United Arab Emirates. 
+          We specialize in comprehensive device protection, repair services, and customer support to ensure your mobile devices 
+          are always in optimal condition. With multiple service centers across the UAE, we're committed to providing 
+          convenient and reliable service to all our customers.
+        </p>
+      </div>
+
+      <!-- Services Overview -->
+      <div class="mt-8 pt-6 border-t border-gray-200">
+        <h4 class="text-lg font-semibold text-gray-900 mb-4">Our Services</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="bg-purple-50 rounded-lg p-4">
+            <div class="flex items-center space-x-3 mb-2">
+              <span class="material-icons text-purple-600">build</span>
+              <h5 class="font-semibold text-gray-900">Device Repair</h5>
+            </div>
+            <p class="text-sm text-gray-600">Professional repair services for all mobile devices with genuine parts and expert technicians.</p>
+          </div>
+          
+          <div class="bg-purple-50 rounded-lg p-4">
+            <div class="flex items-center space-x-3 mb-2">
+              <span class="material-icons text-purple-600">security</span>
+              <h5 class="font-semibold text-gray-900">Warranty Protection</h5>
+            </div>
+            <p class="text-sm text-gray-600">Comprehensive warranty solutions to protect your devices against unexpected damages.</p>
+          </div>
+          
+          <div class="bg-purple-50 rounded-lg p-4">
+            <div class="flex items-center space-x-3 mb-2">
+              <span class="material-icons text-purple-600">support_agent</span>
+              <h5 class="font-semibold text-gray-900">Customer Support</h5>
+            </div>
+            <p class="text-sm text-gray-600">24/7 customer support to assist you with any queries or service requests.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="flex justify-center">
+      <button 
+        (click)="goBack()"
+        class="px-6 py-3 text-purple-600 hover:text-purple-500 hover:bg-purple-50 rounded-lg transition-colors duration-200 flex items-center space-x-2">
+        <span class="material-icons">arrow_back</span>
+        <span>Back to Service Status</span>
+      </button>
+    </div>
+  </div>
+</div>

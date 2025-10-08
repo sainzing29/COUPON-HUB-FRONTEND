@@ -1,0 +1,73 @@
+// About Us Component Styles - Purple Theme
+
+// About Us Section Styling
+.about-section {
+  .contact-info {
+    .icon-wrapper {
+      transition: all 0.2s ease;
+      
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
+// Map Section Styling
+.map-section {
+  .map-placeholder {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    border: 2px dashed #d1d5db;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      border-color: #8b5cf6;
+      background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+    }
+  }
+}
+
+// Navigation Menu Styling
+.nav-menu {
+  .nav-link {
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+    
+    &:hover {
+      transform: translateY(-1px);
+    }
+    
+    &.active {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+// Services Grid Styling
+.services-grid {
+  .service-card {
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .grid {
+    @apply grid-cols-1;
+  }
+  
+  .nav-menu {
+    flex-direction: column;
+    space-x: 0;
+    space-y: 2;
+  }
+  
+  .services-grid {
+    @apply grid-cols-1;
+  }
+}

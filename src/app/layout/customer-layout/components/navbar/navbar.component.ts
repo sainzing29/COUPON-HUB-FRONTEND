@@ -39,26 +39,6 @@ export class CustomerNavbarComponent implements OnInit {
     this.showUserDropdown = false;
   }
 
-  navigateToHome(): void {
-    this.router.navigate(['/customer/service-selection'], {
-      queryParams: {
-        customerName: this.customerName,
-        email: this.customerEmail,
-        phone: this.customerPhone
-      }
-    });
-  }
-
-  navigateToAbout(): void {
-    // Navigate to about us page
-    console.log('Navigate to About Us');
-  }
-
-  navigateToLocations(): void {
-    // Navigate to locations page
-    console.log('Navigate to Locations');
-  }
-
   viewProfile(): void {
     // Navigate to profile page
     console.log('View Profile');

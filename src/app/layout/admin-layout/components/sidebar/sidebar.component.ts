@@ -1,8 +1,9 @@
-import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { AuthService } from '../../../../core/services/auth.service';
+import { Subscription } from 'rxjs';
 
 interface MenuItem {
   id: string;
@@ -36,10 +37,12 @@ interface MenuItem {
     ])
   ]
 })
-export class SidebarComponent implements OnInit, OnChanges {
+export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
   @Input() sidebarOpen = true;
   @Input() activeMenuItem = 'dashboard';
   @Output() menuItemClick = new EventEmitter<string>();
+
+  private userSubscription: Subscription = new Subscription();
 
   allMenuItems: MenuItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: 'grid_view', route: '/dashboard', active: true, hasSubmenu: false },
@@ -88,6 +91,12 @@ export class SidebarComponent implements OnInit, OnChanges {
     this.filterMenuItemsByRole();
     this.updateActiveState();
     this.ensureSubmenuExpanded();
+
+    // Subscribe to user changes to update menu items when user logs in/out
+    this.userSubscription = this.authService.currentUser$.subscribe(user => {
+      console.log('Sidebar: User changed, filtering menu items', user);
+      this.filterMenuItemsByRole();
+    });
   }
 
   private filterMenuItemsByRole(): void {
@@ -122,6 +131,10 @@ export class SidebarComponent implements OnInit, OnChanges {
       this.updateActiveState();
       this.ensureSubmenuExpanded();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.userSubscription.unsubscribe();
   }
 
   private updateActiveState(): void {
