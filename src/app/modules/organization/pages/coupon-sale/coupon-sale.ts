@@ -14,15 +14,25 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class CouponSaleComponent implements OnInit {
   saleForm: FormGroup;
+  otpForm: FormGroup;
   couponCode: string = '';
   isSubmitting = false;
   showToast = false;
+  currentStep: 'otp' | 'sale' = 'otp';
+  otpSent = false;
+  otpVerified = false;
+  mobileNumber: string = '';
 
   constructor(
     private fb: FormBuilder,
     private location: Location,
     private route: ActivatedRoute
   ) {
+    this.otpForm = this.fb.group({
+      mobile: ['', [Validators.required, Validators.pattern(/^[0-9+\-\s()]+$/)]],
+      otp: ['', [Validators.required, Validators.pattern(/^[0-9]{6}$/)]]
+    });
+
     this.saleForm = this.fb.group({
       customerName: ['', [Validators.required, Validators.minLength(2)]],
       customerEmail: ['', [Validators.required, Validators.email]],
@@ -77,6 +87,48 @@ export class CouponSaleComponent implements OnInit {
     this.location.back();
   }
 
+  // OTP Verification Methods
+  sendOtp(): void {
+    if (this.otpForm.get('mobile')?.valid) {
+      this.mobileNumber = this.otpForm.get('mobile')?.value;
+      this.otpSent = true;
+      
+      // Simulate OTP sending
+      console.log(`OTP sent to ${this.mobileNumber}`);
+    } else {
+      this.otpForm.get('mobile')?.markAsTouched();
+    }
+  }
+
+  verifyOtp(): void {
+    if (this.otpForm.get('otp')?.valid) {
+      // Accept any 6-digit number for verification
+      this.otpVerified = true;
+      this.currentStep = 'sale';
+      
+      // Pre-fill mobile number in sale form
+      this.saleForm.patchValue({
+        mobile: this.mobileNumber
+      });
+    } else {
+      this.otpForm.get('otp')?.markAsTouched();
+    }
+  }
+
+  resendOtp(): void {
+    this.otpForm.get('otp')?.setValue('');
+    
+    // Simulate OTP resending
+    console.log(`OTP resent to ${this.mobileNumber}`);
+  }
+
+  goBackToOtp(): void {
+    this.currentStep = 'otp';
+    this.otpSent = false;
+    this.otpVerified = false;
+    this.otpForm.get('otp')?.setValue('');
+  }
+
   // Getter for form validation
   get customerNameControl() {
     return this.saleForm.get('customerName');
@@ -88,5 +140,14 @@ export class CouponSaleComponent implements OnInit {
 
   get mobileControl() {
     return this.saleForm.get('mobile');
+  }
+
+  // OTP Form Controls
+  get otpMobileControl() {
+    return this.otpForm.get('mobile');
+  }
+
+  get otpCodeControl() {
+    return this.otpForm.get('otp');
   }
 }

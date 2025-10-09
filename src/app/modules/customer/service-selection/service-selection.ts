@@ -19,6 +19,7 @@ interface Coupon {
   id: number;
   couponNumber: string;
   isActive: boolean;
+  expirationDate: string;
   services: Service[];
 }
 
@@ -70,6 +71,7 @@ export class ServiceSelectionComponent implements OnInit {
       id: 1,
       couponNumber: '1234567890',
       isActive: true,
+      expirationDate: '2025-12-31',
       services: [
         {
           id: 1,
@@ -120,6 +122,7 @@ export class ServiceSelectionComponent implements OnInit {
       id: 2,
       couponNumber: '0987654321',
       isActive: true,
+      expirationDate: '2026-03-20',
       services: [
         {
           id: 6,
@@ -137,6 +140,22 @@ export class ServiceSelectionComponent implements OnInit {
           isSelected: false,
           redemptionStatus: 'redeemed',
           redeemedDate: '2024-01-25'
+        }
+      ]
+    },
+    {
+      id: 3,
+      couponNumber: '5555555555',
+      isActive: true,
+      expirationDate: '2025-02-15',
+      services: [
+        {
+          id: 8,
+          name: 'Quick Service',
+          description: 'Fast service for urgent repairs',
+          value: 'AED 60',
+          isSelected: false,
+          redemptionStatus: 'available'
         }
       ]
     }
@@ -234,5 +253,13 @@ export class ServiceSelectionComponent implements OnInit {
 
   getAnimationState(couponId: number): string {
     return this.selectedCouponId === couponId && this.showServices ? 'in' : 'out';
+  }
+
+  getRemainingDays(expirationDate: string): number {
+    const today = new Date();
+    const expiry = new Date(expirationDate);
+    const timeDiff = expiry.getTime() - today.getTime();
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    return Math.max(0, daysDiff);
   }
 }

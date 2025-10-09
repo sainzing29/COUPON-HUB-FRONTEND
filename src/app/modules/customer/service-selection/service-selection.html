@@ -44,6 +44,7 @@
               <div>
                 <h4 class="font-semibold text-gray-900">Coupon #{{ coupon.couponNumber }}</h4>
                 <p class="text-sm text-gray-600">{{ coupon.services.length }} services available</p>
+                <p class="text-xs text-orange-600 font-medium">{{getRemainingDays(coupon.expirationDate)}} days remaining</p>
               </div>
             </div>
             <div class="flex items-center space-x-3">
