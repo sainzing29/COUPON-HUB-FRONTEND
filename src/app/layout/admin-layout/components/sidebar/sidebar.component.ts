@@ -50,7 +50,18 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
     { id: 'customers', label: 'Customers', icon: 'people', route: '/organization/customers', active: false, hasSubmenu: false },
     { id: 'service-centers', label: 'Service Centers', icon: 'business', route: '/organization/service-centers', active: false, hasSubmenu: false },
     { id: 'service-redemption', label: 'Service Redemption', icon: 'local_offer', route: '/organization/service-redemption', active: false, hasSubmenu: false },
-    { id: 'new-coupons', label: 'New Coupons', icon: 'add_circle', route: '/organization/new-coupons', active: false, hasSubmenu: false },
+    { 
+      id: 'coupons',
+      label: 'Coupons',
+      icon: 'confirmation_number',
+      route: '',
+      active: false,
+      hasSubmenu: true,
+      expanded: false,
+      submenu: [
+        { id: 'generate-coupons', label: 'Generate Coupons', icon: 'add_circle', route: '/organization/coupons/generate-coupons', active: false, hasSubmenu: false }
+      ]
+    },
     { id: 'invoices', label: 'Invoices & Payments', icon: 'receipt', route: '/organization/invoices', active: false, hasSubmenu: false },
     { 
       id: 'configuration', 
@@ -104,25 +115,30 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
     const userRole = currentUser?.role;
 
     if (userRole === 'Admin') {
-      // For Admin users, hide users, service-centers, reports, and configuration
-      // Show customers, service-redemption, new-coupons, invoices
       this.menuItems = this.allMenuItems.filter(item => 
         item.id !== 'users' && 
         item.id !== 'service-centers' && 
         item.id !== 'reports' &&
-        item.id !== 'configuration'
+        item.id !== 'configuration' &&
+        item.id !== 'coupons' &&
+        item.id !== 'dashboard'
       );
     } else if (userRole === 'SuperAdmin') {
-      // For SuperAdmin users, hide customers, service-redemption, new-coupons, invoices
       this.menuItems = this.allMenuItems.filter(item => 
         item.id !== 'customers' && 
         item.id !== 'service-redemption' && 
-        item.id !== 'new-coupons' &&
-        item.id !== 'invoices'
+        item.id !== 'invoices' &&
+        item.id !== 'dashboard' &&
+        item.id !== 'configuration' &&
+        item.id !== 'reports'
       );
     } else {
-      // For other roles, show all menu items
-      this.menuItems = [...this.allMenuItems];
+      this.menuItems = this.allMenuItems.filter(item => 
+        item.id !== 'coupons' &&
+        item.id !== 'dashboard' &&
+        item.id !== 'configuration' &&
+        item.id !== 'reports'
+      );
     }
   }
 

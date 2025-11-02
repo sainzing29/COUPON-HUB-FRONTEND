@@ -89,34 +89,31 @@ export class CustomersComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Commented out API integration for dummy data
-    // this.loadCustomers();
-    this.loadDummyCustomers();
+    this.loadCustomers();
     this.setupSearch();
   }
 
-  // Commented out API integration - replaced with dummy data
-  // private loadCustomers(): void {
-  //   this.customerService.getCustomers().subscribe({
-  //     next: (customers) => {
-  //       this.customers = customers;
-  //       this.filteredCustomers = [...customers];
-  //       this.updatePagination();
-  //     },
-  //     error: (error) => {
-  //       console.error('Error loading customers:', error);
-  //       this.snackBar.open('Error loading customers', 'Close', {
-  //         duration: 3000,
-  //         horizontalPosition: 'right',
-  //         verticalPosition: 'top'
-  //       });
-  //       // Handle error without fallback data
-  //       this.customers = [];
-  //       this.filteredCustomers = [];
-  //       this.updatePagination();
-  //     }
-  //   });
-  // }
+  private loadCustomers(): void {
+    this.customerService.getCustomers().subscribe({
+      next: (customers) => {
+        this.customers = customers;
+        this.filteredCustomers = [...customers];
+        this.updatePagination();
+      },
+      error: (error) => {
+        console.error('Error loading customers:', error);
+        this.snackBar.open('Error loading customers', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        });
+        // Handle error without fallback data
+        this.customers = [];
+        this.filteredCustomers = [];
+        this.updatePagination();
+      }
+    });
+  }
 
   private loadDummyCustomers(): void {
     // Simulate API delay
@@ -320,7 +317,7 @@ export class CustomersComponent implements OnInit {
       ];
       
       this.filteredCustomers = [...this.customers];
-        this.updatePagination();
+      this.updatePagination();
       
       console.log('Loaded dummy customers:', this.customers.length);
     }, 500); // Simulate API delay

@@ -33,6 +33,15 @@ export interface SetPasswordResponse {
   message: string;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  success: boolean;
+  message: string;
+}
+
 export interface JwtPayload {
   sub: string;                    // User ID
   name: string;                   // First Name
@@ -195,6 +204,19 @@ export class AuthService {
    */
   setPassword(request: SetPasswordRequest): Observable<SetPasswordResponse> {
     return this.apiService.post<SetPasswordResponse>('/Auth/set-password', request);
+  }
+
+  /**
+   * Forgot password - send reset email
+   */
+  forgotPassword(email: string): Observable<ForgotPasswordResponse> {
+    const request: ForgotPasswordRequest = { email };
+    return this.apiService.post<ForgotPasswordResponse>('/Auth/forgot-password', request).pipe(
+      catchError(error => {
+        console.error('Forgot password error:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
 

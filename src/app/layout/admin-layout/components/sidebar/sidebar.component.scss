@@ -35,3 +35,18 @@
     opacity: 1;
   }
 }
+
+// Submenu item active state with curved black border
+.sidebar-submenu-item {
+  transition: all 0.2s ease-in-out;
+  
+  &.active {
+    border: 2px solid #000000;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  &:hover:not(.active) {
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+}

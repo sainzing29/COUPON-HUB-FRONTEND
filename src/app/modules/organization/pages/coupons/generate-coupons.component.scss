@@ -1,0 +1,168 @@
+.generate-coupons-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Form styling
+input[type="text"],
+input[type="number"],
+input[type="month"],
+select,
+textarea {
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+  &:focus {
+    outline: none;
+    border-color: #9333ea;
+    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+  }
+
+  &:disabled,
+  &[readonly] {
+    cursor: not-allowed;
+  }
+}
+
+// Remove spinner arrows from number input
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+// Button focus states
+button {
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.3);
+  }
+}
+
+// Modal overlay animation
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Card animations
+.bg-white.rounded-lg {
+  animation: slideUp 0.3s ease-in-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .generate-coupons-container {
+    padding: 1rem;
+  }
+
+  .grid-cols-1.md\\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .flex.flex-wrap {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+// Accessibility: High contrast focus states
+@media (prefers-contrast: high) {
+  input:focus,
+  select:focus,
+  textarea:focus,
+  button:focus {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+// Print styles for batch summary
+@media print {
+  .generate-coupons-container {
+    .flex.items-center.justify-end,
+    button {
+      display: none;
+    }
+  }
+
+  .bg-white.rounded-lg {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+}
+
+// Loading spinner positioning
+.relative .mat-spinner {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+// Code display styling
+.font-mono {
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 0.5px;
+}
+
+// Info banner
+.bg-blue-50 {
+  i {
+    vertical-align: middle;
+  }
+}
+
+// Badge styling
+.text-red-500 {
+  font-weight: 600;
+}
+
+// Smooth transitions
+* {
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+

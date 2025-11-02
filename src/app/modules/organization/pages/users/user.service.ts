@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { ApiService } from '../../../core/services/api.service';
+import { ApiService } from '../../../../core/services/api.service';
 
 export interface User {
   id: number;
@@ -10,7 +10,7 @@ export interface User {
   email: string;
   mobileNumber: string;
   role: string;
-  isActive: boolean;
+  status: number; // 0 = Deactivated, 1 = Invited, 2 = Active, 3 = Deleted
   createdAt: string;
   lastLogin?: string;
   passwordHash?: string;
@@ -43,7 +43,7 @@ export interface UserUpdateRequest {
   mobileNumber?: string;
   role?: string;
   serviceCenterId?: number;
-  isActive?: boolean;
+  status?: number;
 }
 
 export interface UsersResponse {
@@ -63,7 +63,10 @@ export class UserService {
   /**
    * Get all users
    */
-  getUsers(): Observable<User[]> {
+  getUsers(allUsers: boolean = false): Observable<User[]> {
+    if (allUsers) {
+      return this.apiService.getWithParams<User[]>('/users', { allUsers: 'true' });
+    }
     return this.apiService.get<User[]>('/users');
   }
 
@@ -78,7 +81,7 @@ export class UserService {
       email: user.email,
       mobileNumber: user.mobileNumber,
       role: user.role,
-      isActive: user.isActive,
+      status: user.status,
       createdAt: user.createdAt,
       lastLogin: user.lastLogin,
       passwordHash: user.passwordHash,
@@ -191,8 +194,8 @@ export class UserService {
   /**
    * Toggle user status
    */
-  toggleUserStatus(id: number, isActive: boolean): Observable<User> {
-    return this.apiService.patch<any>(`/users/${id}/status`, { isActive }).pipe(
+  toggleUserStatus(id: number, status: number): Observable<User> {
+    return this.apiService.patch<any>(`/users/${id}/status`, { status }).pipe(
       map(response => this.breakCircularReferences(response) as User),
       catchError(error => {
         console.error('Error toggling user status:', error);
@@ -275,4 +278,12 @@ export class UserService {
       })
     );
   }
+
+  /**
+   * Resend password setup email to user
+   */
+  resendPasswordEmail(userId: number): Observable<void> {
+    return this.apiService.post<void>(`/users/${userId}/resend-password-setup`, {});
+  }
 }
+

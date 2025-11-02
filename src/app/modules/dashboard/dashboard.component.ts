@@ -212,12 +212,8 @@ export class DashboardComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // DUMMY DATA - Commented out API integrations
-    // this.getDashboardStats();
-    // this.getDashboardChartData();
-    
-    // Load dummy data instead
-    this.loadDummyData();
+    this.getDashboardStats();
+    this.getDashboardChartData();
   }
 
   /**
@@ -268,49 +264,49 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
-   * Get dashboard statistics from API - COMMENTED OUT FOR DUMMY DATA
+   * Get dashboard statistics from API
    */
-  // getDashboardStats(): void {
-  //   this.isLoading = true;
-  //   this.errorMessage = '';
+  getDashboardStats(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
 
-  //   this.dashboardService.getDashboardStats().subscribe({
-  //     next: (stats: DashboardStats) => {
-  //       this.dashboardStats = stats;
-  //       this.couponSoldGrowth = ((this.dashboardStats.couponsSoldThisMonth - this.dashboardStats.couponsSoldLastMonth)
-  //        / (this.dashboardStats.couponsSoldLastMonth == 0 ? 1 : this.dashboardStats.couponsSoldLastMonth)) * 100
-  //       this.revenueGrowth = ((this.dashboardStats.revenueThisMonth - this.dashboardStats.revenueLastMonth)
-  //        / (this.dashboardStats.revenueLastMonth == 0 ? 1 : this.dashboardStats.revenueLastMonth)) * 100
+    this.dashboardService.getDashboardStats().subscribe({
+      next: (stats: DashboardStats) => {
+        this.dashboardStats = stats;
+        this.couponSoldGrowth = ((this.dashboardStats.couponsSoldThisMonth - this.dashboardStats.couponsSoldLastMonth)
+         / (this.dashboardStats.couponsSoldLastMonth == 0 ? 1 : this.dashboardStats.couponsSoldLastMonth)) * 100
+        this.revenueGrowth = ((this.dashboardStats.revenueThisMonth - this.dashboardStats.revenueLastMonth)
+         / (this.dashboardStats.revenueLastMonth == 0 ? 1 : this.dashboardStats.revenueLastMonth)) * 100
 
-  //       this.isLoading = false;
-  //       console.log('Dashboard stats loaded:', stats);
-  //     },
-  //     error: (error) => {
-  //       console.error('Error fetching dashboard stats:', error);
-  //       this.errorMessage = 'Failed to load dashboard statistics. Please try again.';
-  //       this.isLoading = false;
-  //     }
-  //   });
-  // }
+        this.isLoading = false;
+        console.log('Dashboard stats loaded:', stats);
+      },
+      error: (error) => {
+        console.error('Error fetching dashboard stats:', error);
+        this.errorMessage = 'Failed to load dashboard statistics. Please try again.';
+        this.isLoading = false;
+      }
+    });
+  }
 
   /**
-   * Get dashboard chart data - COMMENTED OUT FOR DUMMY DATA
+   * Get dashboard chart data
    */
-  // getDashboardChartData(): void {
-  //   this.dashboardService.getDashboardChartData(6).subscribe({
-  //     next: (data: DashboardChartData) => {
-  //       this.chartData = data;
-  //       this.updateChartsWithData();
-  //       console.log('Chart data loaded:', data);
-  //     },
-  //     error: (error) => {
-  //       console.error('Error fetching chart data:', error);
-  //       this.errorMessage = 'Failed to load chart data. Please try again.';
-  //       // Only show sample data if API fails
-  //       this.initializeSampleData();
-  //     }
-  //   });
-  // }
+  getDashboardChartData(): void {
+    this.dashboardService.getDashboardChartData(6).subscribe({
+      next: (data: DashboardChartData) => {
+        this.chartData = data;
+        this.updateChartsWithData();
+        console.log('Chart data loaded:', data);
+      },
+      error: (error) => {
+        console.error('Error fetching chart data:', error);
+        this.errorMessage = 'Failed to load chart data. Please try again.';
+        // Only show sample data if API fails
+        this.initializeSampleData();
+      }
+    });
+  }
 
   /**
    * Update charts with new data
@@ -382,97 +378,12 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
-   * Refresh chart data from API - COMMENTED OUT FOR DUMMY DATA
-   */
-  // refreshChartData(): void {
-  //   this.getDashboardChartData();
-  // }
-
-  /**
-   * Load dummy data for dashboard - replaces API calls
-   */
-  loadDummyData(): void {
-    this.isLoading = true;
-    
-    // Simulate API delay
-    setTimeout(() => {
-      // Load dummy dashboard stats
-      this.dashboardStats = {
-        totalCouponsSold: 1250,
-        couponsSoldThisMonth: 180,
-        couponsSoldLastMonth: 150,
-        activeCoupons: 95,
-        servicesCompleted: 420,
-        servicesCompletedThisMonth: 65,
-        totalRevenue: 125000,
-        revenueThisMonth: 18500,
-        revenueLastMonth: 15200
-      };
-
-      // Calculate growth percentages
-      this.couponSoldGrowth = ((this.dashboardStats.couponsSoldThisMonth - this.dashboardStats.couponsSoldLastMonth)
-       / (this.dashboardStats.couponsSoldLastMonth == 0 ? 1 : this.dashboardStats.couponsSoldLastMonth)) * 100;
-      this.revenueGrowth = ((this.dashboardStats.revenueThisMonth - this.dashboardStats.revenueLastMonth)
-       / (this.dashboardStats.revenueLastMonth == 0 ? 1 : this.dashboardStats.revenueLastMonth)) * 100;
-
-      // Load dummy chart data
-      this.chartData = {
-        salesTrends: {
-          title: 'Sales Trends',
-          description: 'Monthly revenue performance',
-          footer: 'Last updated: Today',
-          data: [
-            { month: 'Jan', year: 2024, revenue: 12000, couponsSold: 45 },
-            { month: 'Feb', year: 2024, revenue: 15000, couponsSold: 52 },
-            { month: 'Mar', year: 2024, revenue: 18000, couponsSold: 68 },
-            { month: 'Apr', year: 2024, revenue: 14000, couponsSold: 48 },
-            { month: 'May', year: 2024, revenue: 16000, couponsSold: 55 },
-            { month: 'Jun', year: 2024, revenue: 20000, couponsSold: 72 }
-          ]
-        },
-        serviceCenterDistribution: {
-          title: 'Monthly Services Performance',
-          description: 'Services completed by month',
-          footer: 'Monthly analysis',
-          data: [
-            { serviceCenterId: 1, serviceCenterName: 'Jan', servicesCompleted: 45, couponsRedeemed: 120, revenue: 15000 },
-            { serviceCenterId: 2, serviceCenterName: 'Feb', servicesCompleted: 38, couponsRedeemed: 95, revenue: 12000 },
-            { serviceCenterId: 3, serviceCenterName: 'Mar', servicesCompleted: 52, couponsRedeemed: 140, revenue: 18000 },
-            { serviceCenterId: 4, serviceCenterName: 'Apr', servicesCompleted: 41, couponsRedeemed: 110, revenue: 14000 },
-            { serviceCenterId: 5, serviceCenterName: 'May', servicesCompleted: 35, couponsRedeemed: 85, revenue: 11000 }
-          ]
-        },
-        couponUsage: {
-          title: 'Coupon Usage',
-          description: 'Usage patterns and redemption rates',
-          footer: 'Weekly analysis',
-          data: [
-            { period: 'Week 1', year: 2024, totalCoupons: 120, redeemedCoupons: 95, redemptionRate: 79.2, activeCoupons: 25, expiredCoupons: 5, unassignedCoupons: 10, completedCoupons: 80 },
-            { period: 'Week 2', year: 2024, totalCoupons: 150, redeemedCoupons: 120, redemptionRate: 80.0, activeCoupons: 30, expiredCoupons: 8, unassignedCoupons: 12, completedCoupons: 100 },
-            { period: 'Week 3', year: 2024, totalCoupons: 180, redeemedCoupons: 145, redemptionRate: 80.6, activeCoupons: 35, expiredCoupons: 10, unassignedCoupons: 15, completedCoupons: 120 },
-            { period: 'Week 4', year: 2024, totalCoupons: 140, redeemedCoupons: 110, redemptionRate: 78.6, activeCoupons: 30, expiredCoupons: 7, unassignedCoupons: 13, completedCoupons: 90 }
-          ]
-        }
-      };
-
-      // Update charts with dummy data
-      this.updateChartsWithData();
-      
-      this.isLoading = false;
-      console.log('Dummy dashboard data loaded:', {
-        stats: this.dashboardStats,
-        chartData: this.chartData
-      });
-    }, 1000); // 1 second delay to simulate API call
-  }
-
-  /**
-   * Refresh dummy data (simulates API refresh)
+   * Refresh chart data from API
    */
   refreshChartData(): void {
-    console.log('Refreshing dummy data...');
-    this.loadDummyData();
+    this.getDashboardChartData();
   }
+
 
   /**
    * Convert date string to short format (e.g., "Oct 2024" -> "oct-24")

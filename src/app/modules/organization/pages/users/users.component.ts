@@ -11,9 +11,11 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UserService, User } from '../../services/user.service';
-import { ServiceCenterService, ServiceCenter } from '../../services/service-center.service';
+import { UserService, User } from './user.service';
+import { ServiceCenterService, ServiceCenter } from '../service-centers/service-center.service';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { CamelCasePipe } from '../../../../core/pipes/camel-case.pipe';
+import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 
 // User interface is now imported from the service
 
@@ -33,7 +35,9 @@ import { trigger, transition, style, animate } from '@angular/animations';
     MatSelectModule,
     MatTooltipModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CamelCasePipe,
+    NgxSkeletonLoaderModule
   ],
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss'],
@@ -58,6 +62,12 @@ export class UsersComponent implements OnInit {
   paginatedUsers: User[] = [];
   serviceCenters: ServiceCenter[] = [];
   
+  // Status constants
+  readonly STATUS_DEACTIVATED = 0;
+  readonly STATUS_INVITED = 1;
+  readonly STATUS_ACTIVE = 2;
+  readonly STATUS_DELETED = 3;
+  
   // Pagination properties
   currentPage = 1;
   pageSize = 10;
@@ -70,6 +80,9 @@ export class UsersComponent implements OnInit {
   isEditMode = false;
   editingUser: User | null = null;
   isSubmitting = false;
+  showDeletedUsers = false;
+  allowEmailChange = false;
+  isLoading = false;
 
 
   constructor(
@@ -94,11 +107,8 @@ export class UsersComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Commented out API integration for dummy data
-    // this.loadUsers();
-    // this.loadServiceCenters();
-    this.loadDummyUsers();
-    this.loadDummyServiceCenters();
+    this.loadUsers(false);
+    this.loadServiceCenters();
     this.setupSearch();
   }
 
@@ -122,286 +132,51 @@ export class UsersComponent implements OnInit {
     }
   }
 
-  // Commented out API integration - replaced with dummy data
-  // private loadUsers(): void {
-  //   this.userService.getUsers().subscribe({
-  //     next: (users) => {
-  //       this.users = users;
-  //       this.filteredUsers = [...users];
-  //       this.updatePagination();
-  //     },
-  //     error: (error) => {
-  //       console.error('Error loading users:', error);
-  //       this.snackBar.open('Error loading users', 'Close', {
-  //         duration: 3000,
-  //         horizontalPosition: 'right',
-  //         verticalPosition: 'top'
-  //       });
-  //       this.users = [];
-  //       this.filteredUsers = [];
-  //       this.updatePagination();
-  //     }
-  //   });
-  // }
-
-  // private loadServiceCenters(): void {
-  //   this.serviceCenterService.getServiceCenters().subscribe({
-  //     next: (serviceCenters) => {
-  //       this.serviceCenters = serviceCenters;
-  //     },
-  //     error: (error) => {
-  //       console.error('Error loading service centers:', error);
-  //       this.snackBar.open('Error loading service centers', 'Close', {
-  //         duration: 3000,
-  //         horizontalPosition: 'right',
-  //         verticalPosition: 'top'
-  //       });
-  //       this.serviceCenters = [];
-  //     }
-  //   });
-  // }
-
-  private loadDummyUsers(): void {
-    // Simulate API delay
-    setTimeout(() => {
-      this.users = [
-        {
-          id: 1,
-          firstName: 'Ahmed',
-          lastName: 'Al-Rashid',
-          email: 'ahmed.rashid@ces.com',
-          mobileNumber: '0501234567',
-          role: 'SuperAdmin',
-          isActive: true,
-          createdAt: '2024-01-15T10:30:00Z',
-          lastLogin: '2024-04-15T09:15:00Z',
-          serviceCenterId: undefined,
-          serviceCenterName: undefined
-        },
-        {
-          id: 2,
-          firstName: 'Fatima',
-          lastName: 'Hassan',
-          email: 'fatima.hassan@ces.com',
-          mobileNumber: '0502345678',
-          role: 'Admin',
-          isActive: true,
-          createdAt: '2024-01-20T14:15:00Z',
-          lastLogin: '2024-04-14T16:30:00Z',
-          serviceCenterId: 1,
-          serviceCenterName: 'Dubai Center'
-        },
-        {
-          id: 3,
-          firstName: 'Mohammed',
-          lastName: 'Al-Zahra',
-          email: 'mohammed.zahra@ces.com',
-          mobileNumber: '0503456789',
-          role: 'Admin',
-          isActive: false,
-          createdAt: '2024-02-01T09:45:00Z',
-          lastLogin: '2024-03-20T11:20:00Z',
-          serviceCenterId: 2,
-          serviceCenterName: 'Abu Dhabi Center'
-        },
-        {
-          id: 4,
-          firstName: 'Aisha',
-          lastName: 'Al-Mansouri',
-          email: 'aisha.mansouri@ces.com',
-          mobileNumber: '0504567890',
-          role: 'Admin',
-          isActive: true,
-          createdAt: '2024-02-10T16:20:00Z',
-          lastLogin: '2024-04-13T14:45:00Z',
-          serviceCenterId: 3,
-          serviceCenterName: 'Sharjah Center'
-        },
-        {
-          id: 5,
-          firstName: 'Omar',
-          lastName: 'Al-Sabah',
-          email: 'omar.sabah@ces.com',
-          mobileNumber: '0505678901',
-          role: 'Admin',
-          isActive: true,
-          createdAt: '2024-02-15T11:30:00Z',
-          lastLogin: '2024-04-12T10:15:00Z',
-          serviceCenterId: 4,
-          serviceCenterName: 'Ajman Center'
-        },
-        {
-          id: 6,
-          firstName: 'Layla',
-          lastName: 'Al-Kuwaiti',
-          email: 'layla.kuwaiti@ces.com',
-          mobileNumber: '0506789012',
-          role: 'Admin',
-          isActive: true,
-          createdAt: '2024-02-20T13:45:00Z',
-          lastLogin: '2024-04-11T15:30:00Z',
-          serviceCenterId: 5,
-          serviceCenterName: 'Fujairah Center'
-        },
-        {
-          id: 7,
-          firstName: 'Khalid',
-          lastName: 'Al-Dubai',
-          email: 'khalid.dubai@ces.com',
-          mobileNumber: '0507890123',
-          role: 'Admin',
-          isActive: false,
-          createdAt: '2024-03-01T08:15:00Z',
-          lastLogin: '2024-03-15T12:00:00Z',
-          serviceCenterId: 1,
-          serviceCenterName: 'Dubai Center'
-        },
-        {
-          id: 8,
-          firstName: 'Nour',
-          lastName: 'Al-Sharjah',
-          email: 'nour.sharjah@ces.com',
-          mobileNumber: '0508901234',
-          role: 'Admin',
-          isActive: true,
-          createdAt: '2024-03-05T15:30:00Z',
-          lastLogin: '2024-04-10T09:45:00Z',
-          serviceCenterId: 3,
-          serviceCenterName: 'Sharjah Center'
-        },
-        {
-          id: 9,
-          firstName: 'Yousef',
-          lastName: 'Al-Ajman',
-          email: 'yousef.ajman@ces.com',
-          mobileNumber: '0509012345',
-          role: 'Admin',
-          isActive: true,
-          createdAt: '2024-03-10T12:00:00Z',
-          lastLogin: '2024-04-09T13:20:00Z',
-          serviceCenterId: 4,
-          serviceCenterName: 'Ajman Center'
-        },
-        {
-          id: 10,
-          firstName: 'Mariam',
-          lastName: 'Al-Fujairah',
-          email: 'mariam.fujairah@ces.com',
-          mobileNumber: '0500123456',
-          role: 'Admin',
-          isActive: true,
-          createdAt: '2024-03-15T17:45:00Z',
-          lastLogin: '2024-04-08T11:10:00Z',
-          serviceCenterId: 5,
-          serviceCenterName: 'Fujairah Center'
-        },
-        {
-          id: 11,
-          firstName: 'Hassan',
-          lastName: 'Al-Ras Al-Khaimah',
-          email: 'hassan.rak@ces.com',
-          mobileNumber: '0501234568',
-          role: 'Admin',
-          isActive: false,
-          createdAt: '2024-03-20T10:20:00Z',
-          lastLogin: '2024-03-25T14:30:00Z',
-          serviceCenterId: 6,
-          serviceCenterName: 'Ras Al Khaimah Center'
-        },
-        {
-          id: 12,
-          firstName: 'Zainab',
-          lastName: 'Al-Umm Al-Quwain',
-          email: 'zainab.uq@ces.com',
-          mobileNumber: '0502345679',
-          role: 'Admin',
-          isActive: true,
-          createdAt: '2024-03-25T14:10:00Z',
-          lastLogin: '2024-04-07T16:45:00Z',
-          serviceCenterId: 7,
-          serviceCenterName: 'Umm Al Quwain Center'
-        }
-      ];
-      
-      this.filteredUsers = [...this.users];
-      this.updatePagination();
-      
-      console.log('Loaded dummy users:', this.users.length);
-    }, 500); // Simulate API delay
+  private loadUsers(allUsers: boolean = false): void {
+    this.isLoading = true;
+    this.userService.getUsers(allUsers).subscribe({
+      next: (users) => {
+        this.users = users;
+        this.filteredUsers = [...users];
+        this.updatePagination();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading users:', error);
+        this.snackBar.open('Error loading users', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        });
+        this.users = [];
+        this.filteredUsers = [];
+        this.updatePagination();
+        this.isLoading = false;
+      }
+    });
   }
 
-  private loadDummyServiceCenters(): void {
-    // Simulate API delay
-    setTimeout(() => {
-      this.serviceCenters = [
-        {
-          id: 1,
-          name: 'Dubai Center',
-          address: 'Sheikh Zayed Road, Dubai',
-          contactNumber: '0501234567',
-          isActive: true,
-          createdAt: '2024-01-15T10:30:00Z',
-          lastUpdated: '2024-04-15T09:15:00Z'
-        },
-        {
-          id: 2,
-          name: 'Abu Dhabi Center',
-          address: 'Corniche Road, Abu Dhabi',
-          contactNumber: '0502345678',
-          isActive: true,
-          createdAt: '2024-01-20T14:15:00Z',
-          lastUpdated: '2024-04-14T16:30:00Z'
-        },
-        {
-          id: 3,
-          name: 'Sharjah Center',
-          address: 'Al Qasba, Sharjah',
-          contactNumber: '0503456789',
-          isActive: true,
-          createdAt: '2024-02-01T09:45:00Z',
-          lastUpdated: '2024-04-13T14:45:00Z'
-        },
-        {
-          id: 4,
-          name: 'Ajman Center',
-          address: 'Ajman Corniche, Ajman',
-          contactNumber: '0504567890',
-          isActive: true,
-          createdAt: '2024-02-10T16:20:00Z',
-          lastUpdated: '2024-04-12T10:15:00Z'
-        },
-        {
-          id: 5,
-          name: 'Fujairah Center',
-          address: 'Fujairah Port, Fujairah',
-          contactNumber: '0505678901',
-          isActive: true,
-          createdAt: '2024-02-15T11:30:00Z',
-          lastUpdated: '2024-04-11T15:30:00Z'
-        },
-        {
-          id: 6,
-          name: 'Ras Al Khaimah Center',
-          address: 'RAK City, Ras Al Khaimah',
-          contactNumber: '0506789012',
-          isActive: false,
-          createdAt: '2024-03-01T08:15:00Z',
-          lastUpdated: '2024-03-15T12:00:00Z'
-        },
-        {
-          id: 7,
-          name: 'Umm Al Quwain Center',
-          address: 'UAQ City, Umm Al Quwain',
-          contactNumber: '0507890123',
-          isActive: true,
-          createdAt: '2024-03-05T15:30:00Z',
-          lastUpdated: '2024-04-10T09:45:00Z'
-        }
-      ];
-      
-      console.log('Loaded dummy service centers:', this.serviceCenters.length);
-    }, 300); // Simulate API delay
+  onShowDeletedUsersChange(): void {
+    this.loadUsers(this.showDeletedUsers);
   }
+
+  private loadServiceCenters(): void {
+    this.serviceCenterService.getServiceCenters().subscribe({
+      next: (serviceCenters) => {
+        this.serviceCenters = serviceCenters;
+      },
+      error: (error) => {
+        console.error('Error loading service centers:', error);
+        this.snackBar.open('Error loading service centers', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        });
+        this.serviceCenters = [];
+      }
+    });
+  }
+
 
   private setupSearch(): void {
     this.searchForm.get('search')?.valueChanges.subscribe(value => {
@@ -424,6 +199,7 @@ export class UsersComponent implements OnInit {
   onAddUser(): void {
     this.isEditMode = false;
     this.editingUser = null;
+    this.allowEmailChange = false;
     this.userForm.reset();
     // Explicitly set role to 'Admin' for new users
     this.userForm.patchValue({
@@ -435,6 +211,7 @@ export class UsersComponent implements OnInit {
   onEditUser(user: User): void {
     this.isEditMode = true;
     this.editingUser = user;
+    this.allowEmailChange = false;
     this.userForm.patchValue({
       firstName: user.firstName,
       lastName: user.lastName,
@@ -443,98 +220,126 @@ export class UsersComponent implements OnInit {
       role: user.role, // Set role from selected user
       serviceCenterId: user.serviceCenterId || ''
     });
+    // Disable email field initially
+    this.userForm.get('email')?.disable();
     // Update validation after setting role
     this.updateServiceCenterValidation();
     this.showAddUserForm = true;
   }
 
+  onAllowEmailChangeToggle(): void {
+    if (this.allowEmailChange) {
+      this.userForm.get('email')?.enable();
+    } else {
+      this.userForm.get('email')?.disable();
+    }
+  }
+
   onDeactivateUser(user: User): void {
-    const action = user.isActive ? 'deactivate' : 'activate';
+    // Determine action and new status
+    let action: string;
+    let newStatus: number;
+    
+    if (user.status === this.STATUS_ACTIVE) {
+      action = 'deactivate';
+      newStatus = this.STATUS_DEACTIVATED;
+    } else {
+      action = 'activate';
+      newStatus = this.STATUS_ACTIVE;
+    }
+    
     const message = `Are you sure you want to ${action} ${user.firstName} ${user.lastName}?`;
     
     if (confirm(message)) {
-      // For now, update locally. Replace with API call when backend is ready
-      user.isActive = !user.isActive;
-      
-      // Update the users array
-      const index = this.users.findIndex(u => u.id === user.id);
-      if (index > -1) {
-        this.users[index] = user;
-      }
-      
-      // Update filtered users
-      const filteredIndex = this.filteredUsers.findIndex(u => u.id === user.id);
-      if (filteredIndex > -1) {
-        this.filteredUsers[filteredIndex] = user;
-      }
-      
-      this.updatePagination();
-      
-      // Uncomment when API is ready:
-      // this.userService.toggleUserStatus(user.id, !user.isActive).subscribe({
-      //   next: (updatedUser) => {
-      //     const index = this.users.findIndex(u => u.id === user.id);
-      //     if (index > -1) {
-      //       this.users[index] = updatedUser;
-      //     }
-      //     this.updatePagination();
-      //     this.snackBar.open(`User ${action}d successfully`, 'Close', {
-      //       duration: 3000,
-      //       horizontalPosition: 'right',
-      //       verticalPosition: 'top'
-      //     });
-      //   },
-      //   error: (error) => {
-      //     console.error('Error updating user status:', error);
-      //     this.snackBar.open('Error updating user status', 'Close', {
-      //       duration: 3000,
-      //       horizontalPosition: 'right',
-      //       verticalPosition: 'top'
-      //     });
-      //   }
-      // });
-      
-      this.snackBar.open(`User ${action}d successfully`, 'Close', {
-        duration: 3000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top'
+      this.userService.toggleUserStatus(user.id, newStatus).subscribe({
+        next: (updatedUser) => {
+          // Merge updated data with existing user data to preserve all fields
+          const mergedUser = { ...user, ...updatedUser, status: newStatus };
+          
+          // Update in main users array - create new array reference
+          const index = this.users.findIndex(u => u.id === user.id);
+          if (index > -1) {
+            this.users[index] = mergedUser;
+            this.users = [...this.users]; // Create new array reference
+          }
+          
+          // Update in filtered users array - create new array reference
+          const filteredIndex = this.filteredUsers.findIndex(u => u.id === user.id);
+          if (filteredIndex > -1) {
+            this.filteredUsers[filteredIndex] = mergedUser;
+            this.filteredUsers = [...this.filteredUsers]; // Create new array reference
+          }
+          
+          // Update in paginated users array for immediate UI update - create new array reference
+          const paginatedIndex = this.paginatedUsers.findIndex(u => u.id === user.id);
+          if (paginatedIndex > -1) {
+            this.paginatedUsers[paginatedIndex] = mergedUser;
+            this.paginatedUsers = [...this.paginatedUsers]; // Create new array reference
+          }
+          
+          this.snackBar.open(`User ${action}d successfully`, 'Close', {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+          });
+        },
+        error: (error) => {
+          console.error('Error updating user status:', error);
+          this.snackBar.open('Error updating user status', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+          });
+        }
       });
     }
   }
 
   onDeleteUser(user: User): void {
     if (confirm(`Are you sure you want to delete ${user.firstName} ${user.lastName}?`)) {
-      // For now, delete locally. Replace with API call when backend is ready
-      this.users = this.users.filter(u => u.id !== user.id);
-      this.filteredUsers = this.filteredUsers.filter(u => u.id !== user.id);
-      this.updatePagination();
-      
-      // Uncomment when API is ready:
-      // this.userService.deleteUser(user.id).subscribe({
-      //   next: () => {
-      //     this.users = this.users.filter(u => u.id !== user.id);
-      //     this.filteredUsers = this.filteredUsers.filter(u => u.id !== user.id);
-      //     this.updatePagination();
-      //     this.snackBar.open('User deleted successfully', 'Close', {
-      //       duration: 3000,
-      //       horizontalPosition: 'right',
-      //       verticalPosition: 'top'
-      //     });
-      //   },
-      //   error: (error) => {
-      //     console.error('Error deleting user:', error);
-      //     this.snackBar.open('Error deleting user', 'Close', {
-      //       duration: 3000,
-      //       horizontalPosition: 'right',
-      //       verticalPosition: 'top'
-      //     });
-      //   }
-      // });
-      
-      this.snackBar.open('User deleted successfully', 'Close', {
-        duration: 3000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top'
+      this.userService.deleteUser(user.id).subscribe({
+        next: () => {
+          this.users = this.users.filter(u => u.id !== user.id);
+          this.filteredUsers = this.filteredUsers.filter(u => u.id !== user.id);
+          this.updatePagination();
+          this.snackBar.open('User deleted successfully', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+          });
+        },
+        error: (error) => {
+          console.error('Error deleting user:', error);
+          this.snackBar.open('Error deleting user', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+          });
+        }
+      });
+    }
+  }
+
+  onResendPasswordEmail(user: User): void {
+    const message = `Resend password setup email to ${user.email}?`;
+    
+    if (confirm(message)) {
+      this.userService.resendPasswordEmail(user.id).subscribe({
+        next: () => {
+          this.snackBar.open('Email sent successfully', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+          });
+        },
+        error: (error) => {
+          console.error('Error sending password email:', error);
+          this.snackBar.open('Error sending email', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+          });
+        }
       });
     }
   }
@@ -542,74 +347,77 @@ export class UsersComponent implements OnInit {
   onSaveUser(): void {
     if (this.userForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
+      // Re-enable email field before getting form value if it's disabled
+      const emailControl = this.userForm.get('email');
+      const wasDisabled = emailControl?.disabled;
+      if (wasDisabled) {
+        emailControl?.enable();
+      }
+      
       const formValue = this.userForm.value;
-      console.log('Form values:', formValue); // Debug log
       
       if (this.isEditMode && this.editingUser) {
-        // Commented out API integration - using local update for dummy data
-        // this.userService.updateUser(this.editingUser.id, formValue).subscribe({...});
-        
-        // Update existing user locally
-        const updatedUser = {
-          ...this.editingUser,
-          ...formValue,
-          serviceCenterName: this.getServiceCenterName(formValue.serviceCenterId)
-        };
-        
-        const index = this.users.findIndex(u => u.id === this.editingUser!.id);
-        if (index > -1) {
-          this.users[index] = updatedUser;
-        }
-        
-        const filteredIndex = this.filteredUsers.findIndex(u => u.id === this.editingUser!.id);
-        if (filteredIndex > -1) {
-          this.filteredUsers[filteredIndex] = updatedUser;
-        }
-        
-        this.updatePagination();
-        this.snackBar.open('User updated successfully', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
+        this.userService.updateUser(this.editingUser.id, formValue).subscribe({
+          next: (updatedUser) => {
+            const index = this.users.findIndex(u => u.id === this.editingUser!.id);
+            if (index > -1) {
+              this.users[index] = updatedUser;
+            }
+            
+            const filteredIndex = this.filteredUsers.findIndex(u => u.id === this.editingUser!.id);
+            if (filteredIndex > -1) {
+              this.filteredUsers[filteredIndex] = updatedUser;
+            }
+            
+            this.updatePagination();
+            this.snackBar.open('User updated successfully', 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+            
+            // Close popup and reset form on success
+            this.showAddUserForm = false;
+            this.userForm.reset();
+            this.userForm.patchValue({ role: 'Admin' });
+            this.isSubmitting = false;
+          },
+          error: (error) => {
+            this.snackBar.open(error, 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+            this.isSubmitting = false;
+          }
         });
-        
-        // Close popup and reset form on success
-        this.showAddUserForm = false;
-        this.userForm.reset();
-        this.userForm.patchValue({ role: 'Admin' });
-        this.isSubmitting = false;
       } else {
-        // Commented out API integration - using local creation for dummy data
-        // this.userService.createUser(createData).subscribe({...});
-        
-        // Add new user locally
-        const newUser: User = {
-          id: Date.now(), // Simple ID generation
-          firstName: formValue.firstName,
-          lastName: formValue.lastName,
-          email: formValue.email,
-          mobileNumber: formValue.mobileNumber,
-          role: formValue.role || 'Admin',
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          serviceCenterId: formValue.serviceCenterId || undefined,
-          serviceCenterName: this.getServiceCenterName(formValue.serviceCenterId)
-        };
-        
-        this.users.unshift(newUser);
-        this.filteredUsers.unshift(newUser);
-        this.updatePagination();
-        this.snackBar.open('User added successfully', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
+        this.userService.createUser(formValue).subscribe({
+          next: (newUser) => {
+            this.users.unshift(newUser);
+            this.filteredUsers.unshift(newUser);
+            this.updatePagination();
+            this.snackBar.open('User added successfully', 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+            
+            // Close popup and reset form on success
+            this.showAddUserForm = false;
+            this.userForm.reset();
+            this.userForm.patchValue({ role: 'Admin' });
+            this.isSubmitting = false;
+          },
+          error: (error) => {
+              this.snackBar.open(error, 'Close', {
+                duration: 3000,
+                horizontalPosition: 'right',
+                verticalPosition: 'top'
+              });
+            this.isSubmitting = false;
+          }
         });
-        
-        // Close popup and reset form on success
-        this.showAddUserForm = false;
-        this.userForm.reset();
-        this.userForm.patchValue({ role: 'Admin' });
-        this.isSubmitting = false;
       }
     } else {
       this.markFormGroupTouched();
@@ -623,9 +431,12 @@ export class UsersComponent implements OnInit {
     this.userForm.patchValue({
       role: 'Admin'
     });
+    // Re-enable email field
+    this.userForm.get('email')?.enable();
     this.isEditMode = false;
     this.editingUser = null;
     this.isSubmitting = false; // Reset submitting state
+    this.allowEmailChange = false;
   }
 
   private markFormGroupTouched(): void {
@@ -683,6 +494,75 @@ export class UsersComponent implements OnInit {
 
   formatDate(dateString: string): string {
     return new Date(dateString).toLocaleDateString();
+  }
+
+  // Status helper methods
+  getStatusText(status: number): string {
+    switch (status) {
+      case this.STATUS_DEACTIVATED:
+        return 'Deactivated';
+      case this.STATUS_INVITED:
+        return 'Invited';
+      case this.STATUS_ACTIVE:
+        return 'Active';
+      case this.STATUS_DELETED:
+        return 'Deleted';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  getStatusBadgeClass(status: number): string {
+    switch (status) {
+      case this.STATUS_DEACTIVATED:
+        return 'bg-red-100 text-red-800';
+      case this.STATUS_INVITED:
+        return 'bg-yellow-100 text-yellow-800';
+      case this.STATUS_ACTIVE:
+        return 'bg-green-100 text-green-800';
+      case this.STATUS_DELETED:
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  }
+
+  getStatusIcon(status: number): string {
+    switch (status) {
+      case this.STATUS_DEACTIVATED:
+        return 'bi-x-circle-fill';
+      case this.STATUS_INVITED:
+        return 'bi-envelope-fill';
+      case this.STATUS_ACTIVE:
+        return 'bi-check-circle-fill';
+      case this.STATUS_DELETED:
+        return 'bi-trash-fill';
+      default:
+        return 'bi-circle-fill';
+    }
+  }
+
+  isUserActive(user: User): boolean {
+    return user.status === this.STATUS_ACTIVE;
+  }
+
+  canToggleUserStatus(user: User): boolean {
+    // Can toggle between Active/Deactivated/Deleted (not Invited)
+    return user.status === this.STATUS_ACTIVE || user.status === this.STATUS_DEACTIVATED || user.status === this.STATUS_DELETED;
+  }
+
+  getToggleStatusIcon(user: User): string {
+    return user.status === this.STATUS_ACTIVE ? 'bi-person-x' : 'bi-person-check';
+  }
+
+  getToggleStatusTitle(user: User): string {
+    return user.status === this.STATUS_ACTIVE ? 'Deactivate User' : 'Activate User';
+  }
+
+  getToggleStatusButtonClass(user: User): string {
+    return user.status === this.STATUS_ACTIVE 
+      ? 'text-orange-600 hover:text-orange-800' 
+      : 'text-green-600 hover:text-green-800';
   }
 
   // Pagination methods

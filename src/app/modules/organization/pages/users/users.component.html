@@ -15,11 +15,19 @@
           <i class="bi bi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
         </div>
         
-        <!-- Filters Button -->
-        <button class="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-2">
-          <i class="bi bi-funnel"></i>
-          <span>Filters</span>
-        </button>
+        <!-- Show Deleted Users Checkbox -->
+        <div class="flex items-center gap-2">
+          <input 
+            type="checkbox" 
+            id="showDeletedUsers"
+            [(ngModel)]="showDeletedUsers"
+            [ngModelOptions]="{standalone: true}"
+            (change)="onShowDeletedUsersChange()"
+            class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+          <label for="showDeletedUsers" class="text-sm text-gray-700 cursor-pointer">
+            Show deleted
+          </label>
+        </div>
       </div>
 
       <!-- Add User Button -->
@@ -67,29 +75,68 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let user of paginatedUsers" class="hover:bg-gray-50">
+          <!-- Skeleton Loaders -->
+          <ng-container *ngIf="isLoading">
+            <tr *ngFor="let item of [1,2,3,4]; let i = index" class="hover:bg-gray-50">
+              <td class="px-4 py-3 whitespace-nowrap">
+                <div class="flex items-center">
+                  <ngx-skeleton-loader count="1" appearance="circle" [theme]="{ 'width': '32px', 'height': '32px', 'margin-right': '12px' }"></ngx-skeleton-loader>
+                  <div class="flex-1">
+                    <ngx-skeleton-loader count="1" [theme]="{ 'width': '120px', 'height': '14px', 'margin-bottom': '4px' }"></ngx-skeleton-loader>
+                    <ngx-skeleton-loader count="1" [theme]="{ 'width': '90px', 'height': '12px' }"></ngx-skeleton-loader>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3 whitespace-nowrap">
+                <ngx-skeleton-loader count="1" [theme]="{ 'width': '150px', 'height': '14px' }"></ngx-skeleton-loader>
+              </td>
+              <td class="px-4 py-3 whitespace-nowrap">
+                <ngx-skeleton-loader count="1" [theme]="{ 'width': '80px', 'height': '20px', 'border-radius': '12px' }"></ngx-skeleton-loader>
+              </td>
+              <td class="px-4 py-3 whitespace-nowrap">
+                <ngx-skeleton-loader count="1" [theme]="{ 'width': '100px', 'height': '14px' }"></ngx-skeleton-loader>
+              </td>
+              <td class="px-4 py-3 whitespace-nowrap">
+                <ngx-skeleton-loader count="1" [theme]="{ 'width': '70px', 'height': '20px', 'border-radius': '12px' }"></ngx-skeleton-loader>
+              </td>
+              <td class="px-4 py-3 whitespace-nowrap">
+                <ngx-skeleton-loader count="1" [theme]="{ 'width': '90px', 'height': '14px', 'margin-bottom': '4px' }"></ngx-skeleton-loader>
+                <ngx-skeleton-loader count="1" [theme]="{ 'width': '110px', 'height': '12px' }"></ngx-skeleton-loader>
+              </td>
+              <td class="px-4 py-3 whitespace-nowrap">
+                <div class="flex items-center space-x-2">
+                  <ngx-skeleton-loader count="1" appearance="circle" [theme]="{ 'width': '24px', 'height': '24px' }"></ngx-skeleton-loader>
+                  <ngx-skeleton-loader count="1" appearance="circle" [theme]="{ 'width': '24px', 'height': '24px' }"></ngx-skeleton-loader>
+                  <ngx-skeleton-loader count="1" appearance="circle" [theme]="{ 'width': '24px', 'height': '24px' }"></ngx-skeleton-loader>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+
+          <!-- Actual Data -->
+          <tr *ngFor="let user of paginatedUsers" class="hover:bg-gray-50" [hidden]="isLoading">
             <!-- Name Column -->
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-4 py-1 whitespace-nowrap">
               <div class="flex items-center">
-                <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
                   <span class="text-gray-600 font-medium text-sm">
-                    {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
+                    {{ (user.firstName | camelCase).charAt(0) }}{{ (user.lastName | camelCase).charAt(0) }}
                   </span>
                 </div>
                 <div>
-                  <div class="text-sm font-medium text-gray-900">{{ user.firstName }} {{ user.lastName }}</div>
+                  <div class="text-sm font-medium text-gray-900">{{ user.firstName | camelCase }} {{ user.lastName | camelCase }}</div>
                   <div class="text-sm text-gray-500">{{ user.mobileNumber }}</div>
                 </div>
               </div>
             </td>
 
             <!-- Email Column -->
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-4 py-1 whitespace-nowrap">
               <div class="text-sm text-gray-900">{{ user.email }}</div>
             </td>
 
             <!-- Role Column -->
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-4 py-1 whitespace-nowrap">
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                     [class]="getRoleBadgeClass(user.role)">
                 {{ user.role }}
@@ -97,23 +144,26 @@
             </td>
 
             <!-- Service Center Column -->
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-4 py-1 whitespace-nowrap">
               <div class="text-sm text-gray-900">
                 {{ getServiceCenterName(user.serviceCenterId) }}
               </div>
            </td>
 
             <!-- Status Column -->
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                    [class]="user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-                <i class="bi bi-circle-fill text-xs mr-1"></i>
-                {{ user.isActive ? 'Active' : 'Inactive' }}
+            <td class="px-4 py-1 whitespace-nowrap">
+              <span *ngIf="user.role !== 'SuperAdmin'" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    [class]="getStatusBadgeClass(user.status)">
+                <i class="bi text-xs mr-1" [class]="getStatusIcon(user.status)"></i>
+                {{ getStatusText(user.status) }}
+              </span>
+              <span *ngIf="user.role === 'SuperAdmin'" class="text-sm text-gray-500">
+                N/A
               </span>
             </td>
 
             <!-- Created Date Column -->
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-4 py-1 whitespace-nowrap">
               <div class="text-sm text-gray-900">{{ formatDate(user.createdAt) }}</div>
               <div class="text-sm text-gray-500" *ngIf="user.lastLogin">
                 Last login: {{ formatDate(user.lastLogin) }}
@@ -121,9 +171,10 @@
             </td>
 
             <!-- Actions Column -->
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            <td class="px-4 py- whitespace-nowrap text-sm font-medium">
               <div class="flex items-center space-x-2">
                 <button 
+                  *ngIf="user.status !== 0"
                   (click)="onEditUser(user)"
                   class="text-blue-600 hover:text-blue-800 p-1 rounded"
                   title="Edit User">
@@ -131,16 +182,24 @@
                 </button>
                 
                 <button 
-                  *ngIf="user.role !== 'SuperAdmin'"
-                  (click)="onDeactivateUser(user)"
-                  [class]="user.isActive ? 'text-orange-600 hover:text-orange-800' : 'text-green-600 hover:text-green-800'"
-                  class="p-1 rounded"
-                  [title]="user.isActive ? 'Deactivate User' : 'Activate User'">
-                  <i class="bi" [class]="user.isActive ? 'bi-person-x' : 'bi-person-check'"></i>
+                  *ngIf="user.role !== 'SuperAdmin' && user.status === 1"
+                  (click)="onResendPasswordEmail(user)"
+                  class="text-purple-600 hover:text-purple-800 p-1 rounded"
+                  title="Resend Invitation Email">
+                  <i class="bi bi-envelope-paper"></i>
                 </button>
                 
                 <button 
-                  *ngIf="user.role !== 'SuperAdmin'"
+                  *ngIf="user.role !== 'SuperAdmin' && canToggleUserStatus(user)"
+                  (click)="onDeactivateUser(user)"
+                  [class]="getToggleStatusButtonClass(user)"
+                  class="p-1 rounded"
+                  [title]="getToggleStatusTitle(user)">
+                  <i class="bi" [class]="getToggleStatusIcon(user)"></i>
+                </button>
+                
+                <button 
+                  *ngIf="user.role !== 'SuperAdmin' && user.status !== 3 && user.status !== 1"
                   (click)="onDeleteUser(user)"
                   class="text-red-600 hover:text-red-800 p-1 rounded"
                   title="Delete User">
@@ -281,10 +340,24 @@
               id="email"
               formControlName="email" 
               placeholder="Enter email address"
-              class="form-input"
+              class="form-input disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
               [class.error]="getFieldError('email')">
             <div *ngIf="getFieldError('email')" class="form-error">
               {{ getFieldError('email') }}
+            </div>
+            
+            <!-- Change Email Checkbox (only in edit mode) -->
+            <div *ngIf="isEditMode" class="mt-2 flex items-center gap-2">
+              <input 
+                type="checkbox" 
+                id="allowEmailChange"
+                [(ngModel)]="allowEmailChange"
+                [ngModelOptions]="{standalone: true}"
+                (change)="onAllowEmailChangeToggle()"
+                class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+              <label for="allowEmailChange" class="text-sm text-gray-700 cursor-pointer">
+                Change email
+              </label>
             </div>
           </div>
 

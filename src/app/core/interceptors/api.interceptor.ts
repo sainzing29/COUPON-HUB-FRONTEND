@@ -104,10 +104,14 @@ function handleError(error: HttpErrorResponse, environmentService: EnvironmentSe
     // Server-side error
     switch (error.status) {
       case 400:
-        errorMessage = 'Bad Request - Please check your input';
+        if (error.error.message) {
+          errorMessage = error.error.message;
+        } else {
+          errorMessage = 'Bad Request - Please check your input';
+        }
         break;
       case 401:
-        errorMessage = 'Unauthorized - Please check your credentials';
+        errorMessage =  error.error;
         // Clear token and redirect to login on 401
         tokenService.clearAuthData();
         // const router = inject(Router);

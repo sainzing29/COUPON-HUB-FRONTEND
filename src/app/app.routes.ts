@@ -46,6 +46,10 @@ export const routes: Routes = [
     loadComponent: () => import('./modules/auth/pages/sign-in/sign-in.component').then(m => m.SignInComponent)
   },
   {
+    path: 'forgot-password',
+    loadComponent: () => import('./modules/auth/pages/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
+  },
+  {
     path: 'sign-up',
     loadComponent: () => import('./modules/auth/pages/sign-up/sign-up.component').then(m => m.SignUpComponent)
   },
@@ -94,6 +98,10 @@ export const routes: Routes = [
       {
         path: 'new-coupons/sale',
         loadComponent: () => import('./modules/organization/pages/coupon-sale/coupon-sale').then(m => m.CouponSaleComponent)
+      },
+      {
+        path: 'coupons/generate-coupons',
+        loadComponent: () => import('./modules/organization/pages/coupons/generate-coupons.component').then(m => m.GenerateCouponsComponent)
       },
       {
         path: 'invoices',

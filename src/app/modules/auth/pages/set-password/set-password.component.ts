@@ -37,6 +37,7 @@ export class SetPasswordComponent implements OnInit {
   showPassword = false;
   showConfirmPassword = false;
   setPasswordForm: FormGroup;
+  isReset = false; // Flag to determine if this is a password reset or initial setup
 
   constructor(
     private fb: FormBuilder,
@@ -54,11 +55,45 @@ export class SetPasswordComponent implements OnInit {
     // Get token from URL query params
     this.token = this.route.snapshot.queryParams['token'];
     
+    // Get isReset flag from query params
+    this.isReset = this.route.snapshot.queryParams['isReset'] === 'true';
+    
     if (this.token) {
       this.validateToken();
     } else {
       this.errorMessage = 'Invalid or missing token. Please check your email link.';
     }
+  }
+
+  // Helper methods to get dynamic text based on isReset flag
+  getTitle(): string {
+    return this.isReset ? 'Reset Your Password' : 'Set Your Password';
+  }
+
+  getDescription(): string {
+    return this.isReset 
+      ? 'Enter a new password for your account' 
+      : 'Create a secure password for your account';
+  }
+
+  getWelcomeMessage(): string {
+    return this.isReset 
+      ? 'Please enter your new password to continue.' 
+      : 'Welcome. Please set your password to continue.';
+  }
+
+  getButtonText(): string {
+    return this.isReset ? 'Reset Password' : 'Set Password';
+  }
+
+  getLoadingText(): string {
+    return this.isReset ? 'Resetting Password...' : 'Setting Password...';
+  }
+
+  getSuccessMessage(): string {
+    return this.isReset 
+      ? 'Password reset successfully! Redirecting to login...' 
+      : 'Password set successfully! Redirecting to login...';
   }
 
   validateToken() {
@@ -69,9 +104,11 @@ export class SetPasswordComponent implements OnInit {
       next: (response) => {
         if (response.isValid) {
           this.user = response.user;
-          this.successMessage = `Welcome. Please set your password to continue.`;
+          this.successMessage = this.getWelcomeMessage();
         } else {
-          this.errorMessage = 'Invalid or expired token. Please request a new password setup link.';
+          this.errorMessage = this.isReset 
+            ? 'Invalid or expired token. Please request a new password reset link.' 
+            : 'Invalid or expired token. Please request a new password setup link.';
         }
         this.loading = false;
       },
@@ -96,7 +133,7 @@ export class SetPasswordComponent implements OnInit {
       this.authService.setPassword(passwordData).subscribe({
         next: (response) => {
           this.loading = false;
-          this.successMessage = 'Password set successfully! Redirecting to login...';
+          this.successMessage = this.getSuccessMessage();
           
           // Redirect to login page after 2 seconds
           setTimeout(() => {
@@ -105,7 +142,7 @@ export class SetPasswordComponent implements OnInit {
         },
         error: (error) => {
           console.error('Set password error:', error);
-          this.errorMessage = error.message || 'Failed to set password. Please try again.';
+          this.errorMessage = error.message || `Failed to ${this.isReset ? 'reset' : 'set'} password. Please try again.`;
           this.loading = false;
         }
       });
