@@ -36,13 +36,21 @@ export interface GenerateRequest {
   notes?: string;
 }
 
+export interface CouponItem {
+  id: number;
+  couponCode: string;
+  prefix: string;
+  period: string;
+  sequenceNumber: number;
+  status: string;
+  printBatchId: number;
+  createdAt: string;
+}
+
 export interface GenerateResponse {
-  batchId: number;
-  codes: string[];
+  printBatchId: number;
   quantity: number;
-  range: string;
-  exportedBy: string;
-  exportedAt: string;
+  coupons: CouponItem[];
 }
 
 export interface MarkPrintedRequest {

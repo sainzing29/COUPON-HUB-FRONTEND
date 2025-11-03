@@ -272,23 +272,19 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
       <div>
         <p class="text-sm text-gray-600">Batch ID</p>
-        <p class="text-lg font-semibold text-gray-900">{{ generatedBatch.batchId }}</p>
+        <p class="text-lg font-semibold text-gray-900">{{ generatedBatch.printBatchId }}</p>
       </div>
       <div>
         <p class="text-sm text-gray-600">Range</p>
-        <p class="text-lg font-semibold text-gray-900">{{ generatedBatch.range }}</p>
+        <p class="text-lg font-semibold text-gray-900">{{ getBatchRange() }}</p>
       </div>
       <div>
         <p class="text-sm text-gray-600">Quantity</p>
         <p class="text-lg font-semibold text-gray-900">{{ generatedBatch.quantity }}</p>
       </div>
       <div>
-        <p class="text-sm text-gray-600">Exported By</p>
-        <p class="text-lg font-semibold text-gray-900">{{ generatedBatch.exportedBy }}</p>
-      </div>
-      <div class="md:col-span-2">
-        <p class="text-sm text-gray-600">Exported At</p>
-        <p class="text-lg font-semibold text-gray-900">{{ generatedBatch.exportedAt }}</p>
+        <p class="text-sm text-gray-600">Created At</p>
+        <p class="text-lg font-semibold text-gray-900">{{ getBatchCreatedAt() | date:'medium' }}</p>
       </div>
     </div>
 

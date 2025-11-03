@@ -87,6 +87,14 @@ export class GenerateCouponsComponent implements OnInit {
     return `Batch_${year}${month}${day}_${hours}${minutes}${seconds}`;
   }
 
+  private formatPeriod(period: string): string {
+    // Convert "YYYY-MM" to "MMYY" format
+    // Example: "2025-11" becomes "1125"
+    const [year, month] = period.split('-');
+    const yearLastTwo = year.slice(-2);
+    return `${month}${yearLastTwo}`;
+  }
+
   private setupFormListeners(): void {
     // Reload next sequence when period changes
     this.couponForm.get('period')?.valueChanges.subscribe(() => {
@@ -102,8 +110,9 @@ export class GenerateCouponsComponent implements OnInit {
       return;
     }
 
+    const formattedPeriod = this.formatPeriod(period);
     this.isLoadingNextSequence = true;
-    this.couponService.getNextSequence(prefix, period).subscribe({
+    this.couponService.getNextSequence(prefix, formattedPeriod).subscribe({
       next: (response) => {
         this.couponForm.patchValue({
           startFrom: response.nextSequence
@@ -144,7 +153,7 @@ export class GenerateCouponsComponent implements OnInit {
 
     // Generate preview codes locally
     const prefix = 'CES';
-    const period = this.couponForm.get('period')?.value.replace('-', '').substring(2); // Convert "2025-11" to "2511"
+    const period = this.formatPeriod(this.couponForm.get('period')?.value); // Convert "2025-11" to "1125"
     const startFrom = this.couponForm.get('startFrom')?.value;
     
     // Extract the numeric sequence from startFrom (last 4 digits)
@@ -190,7 +199,7 @@ export class GenerateCouponsComponent implements OnInit {
     this.isGenerating = true;
     const request = {
       prefix: 'CES',
-      period: this.couponForm.get('period')?.value,
+      period: this.formatPeriod(this.couponForm.get('period')?.value),
       sequenceWidth: 4,
       quantity: this.couponForm.get('quantity')?.value,
       startFrom: this.couponForm.get('startFrom')?.value,
@@ -200,6 +209,7 @@ export class GenerateCouponsComponent implements OnInit {
 
     this.couponService.generateCoupons(request).subscribe({
       next: (response) => {
+        console.log('Generate coupons response:', response);
         this.generatedBatch = response;
         this.isGenerating = false;
         this.showPreview = false;
@@ -208,9 +218,8 @@ export class GenerateCouponsComponent implements OnInit {
           horizontalPosition: 'right',
           verticalPosition: 'top'
         });
-        // Reset form for next generation
-        this.initializeForm();
-        this.loadNextSequence();
+        // Don't reset form here - let user download/copy codes first
+        // Form will be reset when they close the batch summary
       },
       error: (error) => {
         console.error('Error generating coupons:', error);
@@ -225,53 +234,144 @@ export class GenerateCouponsComponent implements OnInit {
   }
 
   onDownloadCSV(): void {
-    if (!this.generatedBatch) return;
+    console.log('onDownloadCSV called');
+    console.log('generatedBatch:', this.generatedBatch);
+    
+    if (!this.generatedBatch) {
+      console.log('No generated batch available');
+      return;
+    }
 
     const csvContent = this.generateCSVContent();
+    console.log('CSV Content generated, length:', csvContent.length);
+    console.log('CSV Content:', csvContent);
+    
+    if (!csvContent) {
+      console.log('CSV content is empty');
+      this.snackBar.open('No coupon codes available to download', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top'
+      });
+      return;
+    }
+
+    console.log('Creating blob and downloading file...');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `coupons_batch_${this.generatedBatch.batchId}.csv`);
+    link.setAttribute('download', `coupons_batch_${this.generatedBatch.printBatchId}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    console.log('Download initiated successfully');
   }
 
   onDownloadExcel(): void {
-    if (!this.generatedBatch) return;
+    console.log('onDownloadExcel called');
+    console.log('generatedBatch:', this.generatedBatch);
+    
+    if (!this.generatedBatch) {
+      console.log('No generated batch available');
+      return;
+    }
 
-    // For Excel, we'll use CSV format with .xlsx extension
-    // In a real application, you might want to use a library like xlsx
+    // Excel can open CSV files directly
+    // For true .xlsx format, consider using a library like xlsx or exceljs
     const csvContent = this.generateCSVContent();
-    const blob = new Blob([csvContent], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    console.log('CSV Content generated, length:', csvContent.length);
+    console.log('CSV Content:', csvContent);
+    
+    if (!csvContent) {
+      console.log('CSV content is empty');
+      this.snackBar.open('No coupon codes available to download', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top'
+      });
+      return;
+    }
+
+    console.log('Creating blob and downloading file...');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `coupons_batch_${this.generatedBatch.batchId}.xlsx`);
+    link.setAttribute('download', `coupons_batch_${this.generatedBatch.printBatchId}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    console.log('Download initiated successfully');
   }
 
   private generateCSVContent(): string {
-    if (!this.generatedBatch) return '';
+    console.log('generateCSVContent called');
+    console.log('generatedBatch in generateCSVContent:', this.generatedBatch);
+    
+    if (!this.generatedBatch) {
+      console.log('No generatedBatch, returning empty string');
+      return '';
+    }
+    
+    console.log('generatedBatch.coupons:', this.generatedBatch.coupons);
+    console.log('Is coupons an array?', Array.isArray(this.generatedBatch.coupons));
+    
+    // Check if coupons array exists
+    if (!this.generatedBatch.coupons || !Array.isArray(this.generatedBatch.coupons)) {
+      console.error('Generated batch does not contain coupons array:', this.generatedBatch);
+      console.error('coupons value:', this.generatedBatch.coupons);
+      console.error('typeof coupons:', typeof this.generatedBatch.coupons);
+      return '';
+    }
 
-    let csv = 'Batch ID,Coupon Code,Range,Quantity,Exported By,Exported At\n';
-    this.generatedBatch.codes.forEach(code => {
-      csv += `${this.generatedBatch!.batchId},${code},${this.generatedBatch!.range},${this.generatedBatch!.quantity},${this.generatedBatch!.exportedBy},${this.generatedBatch!.exportedAt}\n`;
+    if (this.generatedBatch.coupons.length === 0) {
+      console.warn('Coupons array is empty');
+      return '';
+    }
+
+    console.log('Number of coupons:', this.generatedBatch.coupons.length);
+    
+    // Calculate range from first and last coupon
+    const firstCoupon = this.generatedBatch.coupons[0].couponCode;
+    const lastCoupon = this.generatedBatch.coupons[this.generatedBatch.coupons.length - 1].couponCode;
+    const range = `${firstCoupon} - ${lastCoupon}`;
+    
+    // Get timestamp from first coupon or use current time
+    const exportedAt = this.generatedBatch.coupons[0].createdAt || new Date().toISOString();
+    const exportedBy = 'Admin'; // You can get this from auth service if available
+    
+    let csv = 'Batch ID,Coupon Code,Quantity,Created At\n';
+    this.generatedBatch.coupons.forEach((coupon, index) => {
+      console.log(`Processing coupon ${index + 1}:`, coupon);
+      csv += `${this.generatedBatch!.printBatchId},${coupon.couponCode},${this.generatedBatch!.quantity},${coupon.createdAt}\n`;
     });
+    console.log('CSV generation complete');
     return csv;
   }
 
   onCopyCodes(): void {
     if (!this.generatedBatch) return;
 
-    const codesText = this.generatedBatch.codes.join('\n');
+    // Check if coupons array exists
+    if (!this.generatedBatch.coupons || !Array.isArray(this.generatedBatch.coupons)) {
+      console.error('Generated batch does not contain coupons array:', this.generatedBatch);
+      this.snackBar.open('No coupon codes available to copy', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top'
+      });
+      return;
+    }
+
+    // Extract coupon codes from coupon objects
+    const codesText = this.generatedBatch.coupons.map(c => c.couponCode).join('\n');
     navigator.clipboard.writeText(codesText).then(() => {
-      this.snackBar.open('Coupon codes copied to clipboard!', 'Close', {
+      this.snackBar.open(`${this.generatedBatch!.coupons.length} coupon codes copied to clipboard!`, 'Close', {
         duration: 2000,
         horizontalPosition: 'right',
         verticalPosition: 'top'
@@ -289,7 +389,7 @@ export class GenerateCouponsComponent implements OnInit {
   onMarkPrinted(): void {
     if (!this.generatedBatch) return;
 
-    const request = { batchId: this.generatedBatch.batchId };
+    const request = { batchId: this.generatedBatch.printBatchId };
     this.couponService.markPrinted(request).subscribe({
       next: () => {
         this.isPrintedMarked = true;
@@ -320,6 +420,26 @@ export class GenerateCouponsComponent implements OnInit {
   closeBatchSummary(): void {
     this.generatedBatch = null;
     this.isPrintedMarked = false;
+    // Reset form for next generation
+    this.initializeForm();
+    this.loadNextSequence();
+  }
+
+  // Helper methods for displaying batch summary
+  getBatchRange(): string {
+    if (!this.generatedBatch || !this.generatedBatch.coupons || this.generatedBatch.coupons.length === 0) {
+      return 'N/A';
+    }
+    const firstCoupon = this.generatedBatch.coupons[0].couponCode;
+    const lastCoupon = this.generatedBatch.coupons[this.generatedBatch.coupons.length - 1].couponCode;
+    return `${firstCoupon} - ${lastCoupon}`;
+  }
+
+  getBatchCreatedAt(): string {
+    if (!this.generatedBatch || !this.generatedBatch.coupons || this.generatedBatch.coupons.length === 0) {
+      return 'N/A';
+    }
+    return this.generatedBatch.coupons[0].createdAt || new Date().toISOString();
   }
 
   private markFormGroupTouched(): void {
