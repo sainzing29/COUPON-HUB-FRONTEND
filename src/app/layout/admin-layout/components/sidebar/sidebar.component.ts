@@ -59,7 +59,8 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
       hasSubmenu: true,
       expanded: false,
       submenu: [
-        { id: 'generate-coupons', label: 'Generate Coupons', icon: 'add_circle', route: '/organization/coupons/generate-coupons', active: false, hasSubmenu: false }
+        { id: 'generate-coupons', label: 'Generate Coupons', icon: 'add_circle', route: '/organization/coupons/generate-coupons', active: false, hasSubmenu: false },
+        { id: 'batches', label: 'Batch History', icon: 'history', route: '/organization/coupons/batches', active: false, hasSubmenu: false }
       ]
     },
     { id: 'invoices', label: 'Invoices & Payments', icon: 'receipt', route: '/organization/invoices', active: false, hasSubmenu: false },

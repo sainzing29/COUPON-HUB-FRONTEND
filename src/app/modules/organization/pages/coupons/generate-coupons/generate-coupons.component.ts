@@ -8,7 +8,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { CouponService, GenerateResponse } from './coupon.service';
+import { CouponService, GenerateResponse } from '../service/coupon.service';
+import { BatchService } from '../service/batch.service';
 
 @Component({
   selector: 'app-generate-coupons',
@@ -30,7 +31,6 @@ import { CouponService, GenerateResponse } from './coupon.service';
 export class GenerateCouponsComponent implements OnInit {
   couponForm!: FormGroup;
   isLoading = false;
-  isLoadingNextSequence = false;
   generatedBatch: GenerateResponse | null = null;
   showPreview = false;
   previewCodes: string[] = [];
@@ -51,26 +51,26 @@ export class GenerateCouponsComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private couponService: CouponService,
+    private batchService: BatchService,
     private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
-    this.loadNextSequence();
-    this.setupFormListeners();
   }
 
   private initializeForm(): void {
     const currentDate = new Date();
-    const defaultPeriod = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const yearLastTwo = String(currentDate.getFullYear()).slice(-2);
+    const defaultPeriod = `${month}${yearLastTwo}`; // Format: MMYY (e.g., "1225")
     const defaultBatchName = this.generateDefaultBatchName();
 
     this.couponForm = this.fb.group({
       prefix: [{ value: 'CES', disabled: true }, Validators.required],
-      period: [defaultPeriod, Validators.required],
-      sequenceWidth: [{ value: 4, disabled: true }, Validators.required],
+      period: [{ value: defaultPeriod, disabled: true }, Validators.required],
+      sequenceWidth: [{ value: 6, disabled: true }, Validators.required],
       quantity: [10, [Validators.required, Validators.min(10), Validators.max(5000)]],
-      startFrom: [{ value: '', disabled: true }],
       batchName: [defaultBatchName, [Validators.maxLength(100)]],
       notes: ['']
     });
@@ -87,49 +87,16 @@ export class GenerateCouponsComponent implements OnInit {
     return `Batch_${year}${month}${day}_${hours}${minutes}${seconds}`;
   }
 
-  private formatPeriod(period: string): string {
-    // Convert "YYYY-MM" to "MMYY" format
-    // Example: "2025-11" becomes "1125"
-    const [year, month] = period.split('-');
-    const yearLastTwo = year.slice(-2);
-    return `${month}${yearLastTwo}`;
-  }
-
-  private setupFormListeners(): void {
-    // Reload next sequence when period changes
-    this.couponForm.get('period')?.valueChanges.subscribe(() => {
-      this.loadNextSequence();
-    });
-  }
-
-  private loadNextSequence(): void {
-    const prefix = 'CES';
-    const period = this.couponForm.get('period')?.value;
-
-    if (!period) {
-      return;
+  private generateRandomAlphanumeric(length: number): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-
-    const formattedPeriod = this.formatPeriod(period);
-    this.isLoadingNextSequence = true;
-    this.couponService.getNextSequence(prefix, formattedPeriod).subscribe({
-      next: (response) => {
-        this.couponForm.patchValue({
-          startFrom: response.nextSequence
-        });
-        this.isLoadingNextSequence = false;
-      },
-      error: (error) => {
-        console.error('Error loading next sequence:', error);
-        this.snackBar.open('Error loading next sequence', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
-        this.isLoadingNextSequence = false;
-      }
-    });
+    return result;
   }
+
+
 
   onPreview(): void {
     if (this.couponForm.invalid) {
@@ -153,26 +120,24 @@ export class GenerateCouponsComponent implements OnInit {
 
     // Generate preview codes locally
     const prefix = 'CES';
-    const period = this.formatPeriod(this.couponForm.get('period')?.value); // Convert "2025-11" to "1125"
-    const startFrom = this.couponForm.get('startFrom')?.value;
+    const period = this.couponForm.get('period')?.value; // Already in MMYY format (e.g., "1225")
+    const sequenceWidth = this.couponForm.get('sequenceWidth')?.value || 6;
     
-    // Extract the numeric sequence from startFrom (last 4 digits)
-    const startSequence = parseInt(startFrom.toString().slice(-4), 10);
-    
-    // Generate codes
+    // Generate random alphanumeric codes
     const codesToShow = Math.min(10, quantity);
     this.previewCodes = [];
     
     for (let i = 0; i < codesToShow; i++) {
-      const sequence = (startSequence + i).toString().padStart(4, '0');
-      const couponCode = `${prefix}${period}${sequence}`;
+      const randomSuffix = this.generateRandomAlphanumeric(sequenceWidth);
+      const couponCode = `${prefix}${period}${randomSuffix}`;
       this.previewCodes.push(couponCode);
     }
     
-    // Set preview range
-    const lastSequence = (startSequence + quantity - 1).toString().padStart(4, '0');
-    this.previewFrom = `${prefix}${period}${startSequence.toString().padStart(4, '0')}`;
-    this.previewTo = `${prefix}${period}${lastSequence}`;
+    // Set preview range examples (showing format, not actual range since codes are random)
+    const exampleSuffix1 = this.generateRandomAlphanumeric(sequenceWidth);
+    const exampleSuffix2 = this.generateRandomAlphanumeric(sequenceWidth);
+    this.previewFrom = `${prefix}${period}${exampleSuffix1}`;
+    this.previewTo = `${prefix}${period}${exampleSuffix2}`;
     
     this.showPreview = true;
   }
@@ -199,10 +164,9 @@ export class GenerateCouponsComponent implements OnInit {
     this.isGenerating = true;
     const request = {
       prefix: 'CES',
-      period: this.formatPeriod(this.couponForm.get('period')?.value),
-      sequenceWidth: 4,
+      period: this.couponForm.get('period')?.value, // Already in MMYY format (e.g., "1225")
+      sequenceWidth: this.couponForm.get('sequenceWidth')?.value || 6,
       quantity: this.couponForm.get('quantity')?.value,
-      startFrom: this.couponForm.get('startFrom')?.value,
       batchName: this.couponForm.get('batchName')?.value,
       notes: this.couponForm.get('notes')?.value
     };
@@ -386,30 +350,6 @@ export class GenerateCouponsComponent implements OnInit {
     });
   }
 
-  onMarkPrinted(): void {
-    if (!this.generatedBatch) return;
-
-    const request = { batchId: this.generatedBatch.printBatchId };
-    this.couponService.markPrinted(request).subscribe({
-      next: () => {
-        this.isPrintedMarked = true;
-        this.snackBar.open('Batch marked as printed successfully!', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
-      },
-      error: (error) => {
-        console.error('Error marking as printed:', error);
-        this.snackBar.open('Error marking batch as printed', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
-      }
-    });
-  }
-
   closePreview(): void {
     this.showPreview = false;
     this.previewCodes = [];
@@ -422,7 +362,6 @@ export class GenerateCouponsComponent implements OnInit {
     this.isPrintedMarked = false;
     // Reset form for next generation
     this.initializeForm();
-    this.loadNextSequence();
   }
 
   // Helper methods for displaying batch summary
@@ -449,4 +388,5 @@ export class GenerateCouponsComponent implements OnInit {
     });
   }
 }
+
 

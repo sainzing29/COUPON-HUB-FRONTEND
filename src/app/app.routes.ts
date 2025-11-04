@@ -101,7 +101,11 @@ export const routes: Routes = [
       },
       {
         path: 'coupons/generate-coupons',
-        loadComponent: () => import('./modules/organization/pages/coupons/generate-coupons.component').then(m => m.GenerateCouponsComponent)
+        loadComponent: () => import('./modules/organization/pages/coupons/generate-coupons/generate-coupons.component').then(m => m.GenerateCouponsComponent)
+      },
+      {
+        path: 'coupons/batches',
+        loadComponent: () => import('./modules/organization/pages/coupons/batches/batches.component').then(m => m.BatchesComponent)
       },
       {
         path: 'invoices',

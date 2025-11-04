@@ -89,6 +89,8 @@ export class SignInComponent implements OnInit {
   private navigateBasedOnRole(role: string): void {
     switch (role) {
       case 'SuperAdmin':
+        this.router.navigate(['/organization/users']);
+        break;
       case 'Admin':
         this.router.navigate(['/dashboard']);
         break;

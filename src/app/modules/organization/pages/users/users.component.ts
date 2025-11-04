@@ -84,6 +84,26 @@ export class UsersComponent implements OnInit {
   allowEmailChange = false;
   isLoading = false;
 
+  // Country codes list (UAE first as default, then others)
+  countryCodes = [
+    { code: '+971', country: 'UAE', flag: '🇦🇪' },
+    { code: '+966', country: 'Saudi Arabia', flag: '🇸🇦' },
+    { code: '+974', country: 'Qatar', flag: '🇶🇦' },
+    { code: '+965', country: 'Kuwait', flag: '🇰🇼' },
+    { code: '+973', country: 'Bahrain', flag: '🇧🇭' },
+    { code: '+968', country: 'Oman', flag: '🇴🇲' },
+    { code: '+1', country: 'USA/Canada', flag: '🇺🇸' },
+    { code: '+44', country: 'UK', flag: '🇬🇧' },
+    { code: '+91', country: 'India', flag: '🇮🇳' },
+    { code: '+86', country: 'China', flag: '🇨🇳' },
+    { code: '+33', country: 'France', flag: '🇫🇷' },
+    { code: '+49', country: 'Germany', flag: '🇩🇪' },
+    { code: '+39', country: 'Italy', flag: '🇮🇹' },
+    { code: '+34', country: 'Spain', flag: '🇪🇸' },
+    { code: '+61', country: 'Australia', flag: '🇦🇺' }
+  ];
+
+  selectedCountryCode = '+971'; // Default to UAE
 
   constructor(
     private fb: FormBuilder,
@@ -100,7 +120,8 @@ export class UsersComponent implements OnInit {
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      mobileNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
+      countryCode: ['+971', [Validators.required]], // Default to UAE
+      mobileNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{7,15}$/)]],
       role: ['Admin'], // Hidden field with default value
       serviceCenterId: ['', [this.serviceCenterRequiredValidator.bind(this)]]
     });
@@ -200,10 +221,12 @@ export class UsersComponent implements OnInit {
     this.isEditMode = false;
     this.editingUser = null;
     this.allowEmailChange = false;
+    this.selectedCountryCode = '+971'; // Reset to UAE default
     this.userForm.reset();
-    // Explicitly set role to 'Admin' for new users
+    // Explicitly set role and country code to defaults for new users
     this.userForm.patchValue({
-      role: 'Admin'
+      role: 'Admin',
+      countryCode: '+971'
     });
     this.showAddUserForm = true;
   }
@@ -212,11 +235,26 @@ export class UsersComponent implements OnInit {
     this.isEditMode = true;
     this.editingUser = user;
     this.allowEmailChange = false;
+    
+    // Extract country code and phone number from mobileNumber if it includes country code
+    let countryCode = '+971'; // Default
+    let mobileNumber = user.mobileNumber || '';
+    
+    // Check if mobileNumber starts with a country code
+    const matchedCountry = this.countryCodes.find(cc => mobileNumber.startsWith(cc.code));
+    if (matchedCountry) {
+      countryCode = matchedCountry.code;
+      mobileNumber = mobileNumber.substring(matchedCountry.code.length).trim();
+    }
+    
+    this.selectedCountryCode = countryCode;
+    
     this.userForm.patchValue({
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      mobileNumber: user.mobileNumber,
+      countryCode: countryCode,
+      mobileNumber: mobileNumber,
       role: user.role, // Set role from selected user
       serviceCenterId: user.serviceCenterId || ''
     });
@@ -356,6 +394,14 @@ export class UsersComponent implements OnInit {
       
       const formValue = this.userForm.value;
       
+      // Combine country code with mobile number
+      if (formValue.countryCode && formValue.mobileNumber) {
+        formValue.mobileNumber = `${formValue.countryCode}${formValue.mobileNumber}`;
+      }
+      
+      // Remove countryCode from formValue as backend might not expect it
+      delete formValue.countryCode;
+      
       if (this.isEditMode && this.editingUser) {
         this.userService.updateUser(this.editingUser.id, formValue).subscribe({
           next: (updatedUser) => {
@@ -426,10 +472,12 @@ export class UsersComponent implements OnInit {
 
   onCancel(): void {
     this.showAddUserForm = false;
+    this.selectedCountryCode = '+971'; // Reset to UAE default
     this.userForm.reset();
-    // Ensure role is set to 'Admin' after reset
+    // Ensure role and country code are set to defaults after reset
     this.userForm.patchValue({
-      role: 'Admin'
+      role: 'Admin',
+      countryCode: '+971'
     });
     // Re-enable email field
     this.userForm.get('email')?.enable();
@@ -459,7 +507,7 @@ export class UsersComponent implements OnInit {
         return `${this.getFieldLabel(fieldName)} must be at least ${field.errors['minlength'].requiredLength} characters`;
       }
       if (field.errors['pattern']) {
-        return 'Please enter a valid 10-digit mobile number';
+        return 'Please enter a valid mobile number (7-15 digits)';
       }
     }
     return '';

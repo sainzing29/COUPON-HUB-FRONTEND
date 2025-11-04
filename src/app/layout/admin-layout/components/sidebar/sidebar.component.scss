@@ -1,4 +1,4 @@
-// Sidebar specific styles
+// Material Icons Styling
 .material-icons {
   font-family: 'Material Icons';
   font-weight: normal;
@@ -13,14 +13,253 @@
   direction: ltr;
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
+  user-select: none;
 }
 
-// Sidebar background pattern
-.sidebar-bg {
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23f1f5f9" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="%23f1f5f9" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="%23f1f5f9" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="%23f1f5f9" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="%23f1f5f9" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+// Sidebar Container
+.sidebar {
+  // Background color is maintained via themes.scss - no override needed
+  
+  // Standard spacing and typography
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  
+  // Smooth transitions
+  transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
+  
+  // Ensure proper scrolling
+  overflow: hidden;
 }
 
-// Animation classes
+// Sidebar Brand Section
+.sidebar-brand {
+  // Background color maintained via themes.scss
+  
+  // Standard padding and alignment
+  padding: 1rem;
+  min-height: 7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  overflow: visible;
+  
+  // Logo styling
+  img {
+    display: block;
+    object-fit: contain;
+    transition: all 0.3s ease-in-out;
+    transition-property: width, height, opacity, transform;
+    
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+  
+  // Expanded logo (when sidebar is open)
+  .logo-expanded {
+    height: 5rem;
+    width: auto;
+    max-width: 100%;
+  }
+  
+  // Collapsed logo (when sidebar is closed)
+  .logo-collapsed {
+    height: 3rem;
+    width: auto;
+    max-width: 100%;
+  }
+}
+
+// Navigation Menu Container
+nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.5rem;
+  
+  // Custom scrollbar styling
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  // Menu list styling
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  li {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+// Main Menu Items
+.sidebar-menu-item {
+  // Colors maintained via themes.scss
+  // Background color not changed - using existing variables
+  
+  // Standard spacing and layout
+  padding: 0.75rem;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  
+  // Typography
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  
+  // Smooth transitions
+  transition: all 0.2s ease-in-out;
+  transition-property: background-color, color, transform, box-shadow;
+  
+  // Icon styling
+  .material-icons {
+    font-size: 1.25rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  
+  // Text styling
+  span:not(.material-icons) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    margin-left: 0.75rem;
+  }
+  
+  // Hover state (background maintained via themes.scss)
+  &:hover {
+    transform: translateX(2px);
+  }
+  
+  // Active state (background maintained via themes.scss)
+  &.active {
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    
+    .material-icons {
+      font-weight: 500;
+    }
+  }
+  
+  // Focus state for accessibility
+  &:focus {
+    outline: 2px solid rgba(0, 0, 0, 0.1);
+    outline-offset: 2px;
+  }
+  
+  // Chevron arrow styling
+  .material-icons:last-child {
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
+    margin-left: auto;
+    transition: transform 0.2s ease-in-out;
+    
+    &.rotate-90 {
+      transform: rotate(90deg);
+    }
+  }
+}
+
+// Submenu Items
+.sidebar-submenu-item {
+  // Colors maintained via themes.scss
+  
+  // Standard spacing and layout
+  padding: 0.625rem 0.75rem;
+  margin-bottom: 0.125rem;
+  margin-left: 1rem;
+  display: flex;
+  align-items: center;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  
+  // Typography
+  font-weight: 400;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  
+  // Smooth transitions
+  transition: all 0.2s ease-in-out;
+  transition-property: background-color, color, border, transform;
+  
+  // Icon styling
+  .material-icons {
+    font-size: 1.125rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    opacity: 0.8;
+  }
+  
+  // Text styling
+  span:not(.material-icons) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    margin-left: 0.625rem;
+  }
+  
+  // Hover state
+  &:hover:not(.active) {
+    transform: translateX(2px);
+  }
+  
+  // Active state - standard styling without changing background
+  &.active {
+    font-weight: 600;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    
+    .material-icons {
+      opacity: 1;
+      font-weight: 500;
+    }
+  }
+  
+  // Focus state for accessibility
+  &:focus {
+    outline: 2px solid rgba(0, 0, 0, 0.1);
+    outline-offset: 2px;
+  }
+}
+
+// Animation Classes
 .slide-in-left {
   animation: slideInLeft 0.3s ease-out;
 }
@@ -36,17 +275,50 @@
   }
 }
 
-// Submenu item active state with curved black border
-.sidebar-submenu-item {
-  transition: all 0.2s ease-in-out;
-  
-  &.active {
-    border: 2px solid #000000;
-    border-radius: 8px;
-    background-color: rgba(0, 0, 0, 0.05);
+// Utility: Sidebar background pattern (optional, can be removed if not needed)
+.sidebar-bg {
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23f1f5f9" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="%23f1f5f9" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="%23f1f5f9" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="%23f1f5f9" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="%23f1f5f9" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .sidebar {
+    // Maintain responsive behavior
   }
   
-  &:hover:not(.active) {
-    background-color: rgba(0, 0, 0, 0.03);
+  .sidebar-brand {
+    min-height: 5rem;
+    padding: 0.75rem;
+    
+    img {
+      height: 3rem;
+    }
+  }
+  
+  .sidebar-menu-item {
+    padding: 0.625rem;
+    font-size: 0.8125rem;
+  }
+  
+  .sidebar-submenu-item {
+    padding: 0.5rem 0.625rem;
+    font-size: 0.75rem;
+  }
+}
+
+// Accessibility improvements
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .sidebar-menu-item,
+  .sidebar-submenu-item {
+    transition: none;
+    animation: none;
+  }
+}
+
+// Print styles
+@media print {
+  .sidebar {
+    display: none;
   }
 }

@@ -361,19 +361,38 @@
             </div>
           </div>
 
-          <!-- Mobile Number -->
+          <!-- Mobile Number with Country Code -->
           <div class="form-group">
             <label for="mobileNumber" class="form-label">Mobile Number *</label>
-            <input 
-              type="tel" 
-              id="mobileNumber"
-              formControlName="mobileNumber" 
-              placeholder="Enter mobile number"
-              class="form-input"
-              [class.error]="getFieldError('mobileNumber')">
+            <div class="flex gap-2">
+              <!-- Country Code Selector -->
+              <div class="w-36">
+                <select
+                  id="countryCode"
+                  formControlName="countryCode"
+                  (change)="selectedCountryCode = userForm.get('countryCode')?.value"
+                  class="form-select"
+                >
+                  <option *ngFor="let country of countryCodes" [value]="country.code">
+                    {{ country.flag }} {{ country.code }}
+                  </option>
+                </select>
+              </div>
+              <!-- Mobile Number Input -->
+              <div class="flex-1">
+                <input 
+                  type="tel" 
+                  id="mobileNumber"
+                  formControlName="mobileNumber" 
+                  placeholder="Enter mobile number"
+                  class="form-input"
+                  [class.error]="getFieldError('mobileNumber')">
+              </div>
+            </div>
             <div *ngIf="getFieldError('mobileNumber')" class="form-error">
               {{ getFieldError('mobileNumber') }}
             </div>
+            <p class="text-xs text-gray-500 mt-1">Enter your phone number without the country code</p>
           </div>
 
           <!-- Service Center -->

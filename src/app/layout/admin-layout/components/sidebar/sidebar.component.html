@@ -6,13 +6,11 @@
   [@slideInOut]="sidebarOpen ? 'in' : 'out'"
 >
   <!-- Brand Section -->
-  <div class="sidebar-brand flex items-center justify-center h-28 px-4 py-4">
-    <div class="flex items-center justify-center">
-      <img 
-        src="assets/images/ces-logo.svg" 
-        alt="CES Warranty Logo" 
-        class="h-20 w-auto object-contain">
-    </div>
+  <div class="sidebar-brand">
+    <img 
+      src="assets/images/ces-logo.svg" 
+      alt="CES Warranty Logo" 
+      [class]="sidebarOpen ? 'logo-expanded' : 'logo-collapsed'">
   </div>
 
   <!-- Navigation Menu -->
@@ -28,7 +26,7 @@
           [class.justify-between]="item.hasSubmenu && sidebarOpen">
           <div class="flex items-center space-x-3">
             <span class="material-icons text-xl">{{ item.icon }}</span>
-            <span *ngIf="sidebarOpen" class="font-medium whitespace-nowrap">{{ item.label }}</span>
+            <span *ngIf="sidebarOpen" class="font-medium text-base whitespace-nowrap">{{ item.label }}</span>
           </div>
           <!-- Submenu Toggle Arrow -->
           <span *ngIf="item.hasSubmenu && sidebarOpen" 
@@ -47,7 +45,7 @@
               class="sidebar-submenu-item cursor-pointer rounded-lg p-2 flex items-center space-x-3"
               [class.active]="subItem.active">
               <span class="material-icons text-sm">{{ subItem.icon }}</span>
-              <span class="font-medium whitespace-nowrap">{{ subItem.label }}</span>
+              <span class="font-medium text-base whitespace-nowrap">{{ subItem.label }}</span>
             </div>
           </li>
         </ul>

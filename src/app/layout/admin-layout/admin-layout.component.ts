@@ -101,6 +101,14 @@ export class AdminLayoutComponent implements OnInit {
       this.activeMenuItem = 'new-coupons';
       this.pageTitle = 'New Coupons';
       this.pageDescription = 'Create and manage new coupon batches';
+    } else if (url.includes('/organization/coupons/generate-coupons')) {
+      this.activeMenuItem = 'generate-coupons';
+      this.pageTitle = 'Generate Coupons';
+      this.pageDescription = 'Create and reserve coupon codes in batches';
+    } else if (url.includes('/organization/coupons/batches')) {
+      this.activeMenuItem = 'batches';
+      this.pageTitle = 'Batch History';
+      this.pageDescription = 'View and manage all coupon batches';
     } else if (url.includes('/organization/settings')) {
       this.activeMenuItem = 'settings';
       this.pageTitle = 'Settings';

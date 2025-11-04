@@ -1,0 +1,230 @@
+.batches-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+// Table styling
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background-color: #f9fafb;
+  z-index: 10;
+}
+
+tbody tr {
+  &:hover {
+    background-color: #f9fafb;
+  }
+}
+
+// Form styling
+input[type="text"],
+select {
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+  &:focus {
+    outline: none;
+    border-color: #9333ea;
+    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+  }
+}
+
+// Status badge styling
+select.text-xs {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.25rem center;
+  background-repeat: no-repeat;
+  background-size: 1.25em 1.25em;
+  padding-right: 1.75rem;
+  
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(147, 51, 234, 0.5);
+  }
+}
+
+// Button styling
+button {
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.3);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+// Empty state styling
+.bi-inbox {
+  display: inline-block;
+}
+
+// Loading spinner center
+.flex.items-center.justify-center {
+  min-height: 300px;
+}
+
+// Card animations
+.bg-white.rounded-lg {
+  animation: slideUp 0.3s ease-in-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .batches-container {
+    padding: 1rem;
+  }
+
+  .overflow-x-auto {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    min-width: 800px;
+  }
+
+  .grid-cols-2.md\:grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .flex.items-center.justify-between {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
+
+// Accessibility: High contrast focus states
+@media (prefers-contrast: high) {
+  input:focus,
+  select:focus,
+  button:focus {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+// Print styles
+@media print {
+  .batches-container {
+    button {
+      display: none;
+    }
+  }
+
+  .bg-white.rounded-lg {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+
+  thead {
+    background-color: #f3f4f6 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+// Smooth transitions
+* {
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+// Truncate text with ellipsis
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Status color classes
+.bg-blue-100 {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.bg-green-100 {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.bg-purple-100 {
+  background-color: #f3e8ff;
+  color: #6b21a8;
+}
+
+.bg-red-100 {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.bg-gray-100 {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+// Summary card styling
+.bg-blue-50 {
+  background-color: #eff6ff;
+}
+
+.bg-green-50 {
+  background-color: #f0fdf4;
+}
+
+.bg-purple-50 {
+  background-color: #faf5ff;
+}
+
+.bg-red-50 {
+  background-color: #fef2f2;
+}
+
+.text-blue-600 {
+  color: #2563eb;
+}
+
+.text-green-600 {
+  color: #16a34a;
+}
+
+.text-purple-600 {
+  color: #9333ea;
+}
+
+.text-red-600 {
+  color: #dc2626;
+}
+

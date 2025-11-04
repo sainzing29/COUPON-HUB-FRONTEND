@@ -96,7 +96,7 @@ button {
     padding: 1rem;
   }
 
-  .grid-cols-1.md\\:grid-cols-2 {
+  .grid-cols-1.md\:grid-cols-2 {
     grid-template-columns: 1fr;
   }
 
@@ -165,4 +165,5 @@ button {
 * {
   transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
 }
+
 
