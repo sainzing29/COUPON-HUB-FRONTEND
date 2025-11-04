@@ -364,7 +364,7 @@ export class UsersComponent implements OnInit {
     if (confirm(message)) {
       this.userService.resendPasswordEmail(user.id).subscribe({
         next: () => {
-          this.snackBar.open('Email sent successfully', 'Close', {
+          this.snackBar.open('Password setup email sent successfully', 'Close', {
             duration: 3000,
             horizontalPosition: 'right',
             verticalPosition: 'top'
@@ -372,11 +372,16 @@ export class UsersComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error sending password email:', error);
-          this.snackBar.open('Error sending email', 'Close', {
-            duration: 3000,
+          const errorMessage = error?.message || error?.error?.message || 'Failed to send password setup email';
+          this.snackBar.open(errorMessage, 'Close', {
+            duration: 5000,
             horizontalPosition: 'right',
-            verticalPosition: 'top'
+            verticalPosition: 'top',
+            panelClass: ['error-snackbar']
           });
+        },
+        complete: () => {
+          console.log('Resend password email request completed');
         }
       });
     }

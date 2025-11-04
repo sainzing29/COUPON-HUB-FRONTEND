@@ -283,7 +283,13 @@ export class UserService {
    * Resend password setup email to user
    */
   resendPasswordEmail(userId: number): Observable<void> {
-    return this.apiService.post<void>(`/users/${userId}/resend-password-setup`, {});
+    return this.apiService.post<any>(`/users/${userId}/resend-password-setup`, {}).pipe(
+      map(() => undefined as void),
+      catchError(error => {
+        console.error('Error in resendPasswordEmail service:', error);
+        return throwError(() => error);
+      })
+    );
   }
 }
 
