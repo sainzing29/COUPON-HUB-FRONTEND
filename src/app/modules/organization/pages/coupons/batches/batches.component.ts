@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,7 +16,6 @@ import { Batch, BatchStatus, BATCH_STATUS_COLORS, BATCH_STATUS_LABELS } from '..
   standalone: true,
   imports: [
     CommonModule,
-    MatSnackBarModule,
     MatButtonModule,
     MatProgressSpinnerModule,
     MatIconModule,
@@ -49,13 +49,14 @@ export class BatchesComponent implements OnInit {
     { value: 'all', label: 'All Statuses' },
     { value: BatchStatus.Generated, label: 'Generated' },
     { value: BatchStatus.Exported, label: 'Exported' },
-    { value: BatchStatus.Delivered, label: 'Delivered' },
+    { value: BatchStatus.Printed, label: 'Printed' },
     { value: BatchStatus.Cancelled, label: 'Cancelled' }
   ];
 
   constructor(
     private batchService: BatchService,
-    private snackBar: MatSnackBar
+    private toastr: ToastrService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -73,11 +74,7 @@ export class BatchesComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading batches:', error);
-        this.snackBar.open('Error loading batches', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
+        this.toastr.error('Error loading batches', 'Error');
         this.batches = [];
         this.filteredBatches = [];
         this.updatePagination();
@@ -129,22 +126,14 @@ export class BatchesComponent implements OnInit {
     this.batchService.updateBatchStatus(batch.id, statusValue).subscribe({
       next: () => {
         batch.status = statusValue;
-        this.snackBar.open('Batch status updated successfully', 'Close', {
-          duration: 2000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
+        this.toastr.success('Batch status updated successfully', 'Success');
         // Note: Don't call applyFilters() here as it would reset filters
         // Just update pagination to reflect the change
         this.updatePagination();
       },
       error: (error) => {
         console.error('Error updating batch status:', error);
-        this.snackBar.open('Error updating batch status', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
+        this.toastr.error('Error updating batch status', 'Error');
       }
     });
   }
@@ -158,19 +147,11 @@ export class BatchesComponent implements OnInit {
         this.batches = this.batches.filter(b => b.id !== batch.id);
         this.filteredBatches = this.filteredBatches.filter(b => b.id !== batch.id);
         this.updatePagination();
-        this.snackBar.open('Batch deleted successfully', 'Close', {
-          duration: 2000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
+        this.toastr.success('Batch deleted successfully', 'Success');
       },
       error: (error) => {
         console.error('Error deleting batch:', error);
-        this.snackBar.open('Error deleting batch', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
+        this.toastr.error('Error deleting batch', 'Error');
       }
     });
   }
@@ -200,8 +181,8 @@ export class BatchesComponent implements OnInit {
     return this.batches.filter(b => b.status === BatchStatus.Exported).length;
   }
 
-  getDeliveredCount(): number {
-    return this.batches.filter(b => b.status === BatchStatus.Delivered).length;
+  getPrintedCount(): number {
+    return this.batches.filter(b => b.status === BatchStatus.Printed).length;
   }
 
   getCancelledCount(): number {
@@ -258,6 +239,10 @@ export class BatchesComponent implements OnInit {
   // Expose Math for template
   get Math() {
     return Math;
+  }
+
+  viewBatchDetails(batchId: number): void {
+    this.router.navigate(['/organization/coupons/batches', batchId]);
   }
 }
 

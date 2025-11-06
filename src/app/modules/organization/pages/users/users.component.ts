@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { ToastrService } from 'ngx-toastr';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -31,7 +31,6 @@ import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
     MatChipsModule,
     MatMenuModule,
     MatDialogModule,
-    MatSnackBarModule,
     MatSelectModule,
     MatTooltipModule,
     FormsModule,
@@ -108,7 +107,7 @@ export class UsersComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar,
+    private toastr: ToastrService,
     private userService: UserService,
     private serviceCenterService: ServiceCenterService
   ) {
@@ -164,11 +163,7 @@ export class UsersComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading users:', error);
-        this.snackBar.open('Error loading users', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
+        this.toastr.error('Error loading users', 'Error');
         this.users = [];
         this.filteredUsers = [];
         this.updatePagination();
@@ -188,11 +183,7 @@ export class UsersComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading service centers:', error);
-        this.snackBar.open('Error loading service centers', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
+        this.toastr.error('Error loading service centers', 'Error');
         this.serviceCenters = [];
       }
     });
@@ -315,19 +306,11 @@ export class UsersComponent implements OnInit {
             this.paginatedUsers = [...this.paginatedUsers]; // Create new array reference
           }
           
-          this.snackBar.open(`User ${action}d successfully`, 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          });
+          this.toastr.success(`User ${action}d successfully`, 'Success');
         },
         error: (error) => {
           console.error('Error updating user status:', error);
-          this.snackBar.open('Error updating user status', 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          });
+          this.toastr.error('Error updating user status', 'Error');
         }
       });
     }
@@ -340,19 +323,11 @@ export class UsersComponent implements OnInit {
           this.users = this.users.filter(u => u.id !== user.id);
           this.filteredUsers = this.filteredUsers.filter(u => u.id !== user.id);
           this.updatePagination();
-          this.snackBar.open('User deleted successfully', 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          });
+          this.toastr.success('User deleted successfully', 'Success');
         },
         error: (error) => {
           console.error('Error deleting user:', error);
-          this.snackBar.open('Error deleting user', 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          });
+          this.toastr.error('Error deleting user', 'Error');
         }
       });
     }
@@ -364,21 +339,12 @@ export class UsersComponent implements OnInit {
     if (confirm(message)) {
       this.userService.resendPasswordEmail(user.id).subscribe({
         next: () => {
-          this.snackBar.open('Password setup email sent successfully', 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          });
+          this.toastr.success('Password setup email sent successfully', 'Success');
         },
         error: (error) => {
           console.error('Error sending password email:', error);
           const errorMessage = error?.message || error?.error?.message || 'Failed to send password setup email';
-          this.snackBar.open(errorMessage, 'Close', {
-            duration: 5000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top',
-            panelClass: ['error-snackbar']
-          });
+          this.toastr.error(errorMessage, 'Error');
         },
         complete: () => {
           console.log('Resend password email request completed');
@@ -421,11 +387,7 @@ export class UsersComponent implements OnInit {
             }
             
             this.updatePagination();
-            this.snackBar.open('User updated successfully', 'Close', {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            });
+            this.toastr.success('User updated successfully', 'Success');
             
             // Close popup and reset form on success
             this.showAddUserForm = false;
@@ -434,11 +396,7 @@ export class UsersComponent implements OnInit {
             this.isSubmitting = false;
           },
           error: (error) => {
-            this.snackBar.open(error, 'Close', {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            });
+            this.toastr.error(error, 'Error');
             this.isSubmitting = false;
           }
         });
@@ -448,11 +406,7 @@ export class UsersComponent implements OnInit {
             this.users.unshift(newUser);
             this.filteredUsers.unshift(newUser);
             this.updatePagination();
-            this.snackBar.open('User added successfully', 'Close', {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            });
+            this.toastr.success('User added successfully', 'Success');
             
             // Close popup and reset form on success
             this.showAddUserForm = false;
@@ -461,11 +415,7 @@ export class UsersComponent implements OnInit {
             this.isSubmitting = false;
           },
           error: (error) => {
-              this.snackBar.open(error, 'Close', {
-                duration: 3000,
-                horizontalPosition: 'right',
-                verticalPosition: 'top'
-              });
+              this.toastr.error(error, 'Error');
             this.isSubmitting = false;
           }
         });
@@ -663,5 +613,11 @@ export class UsersComponent implements OnInit {
   // Expose Math for template
   get Math() {
     return Math;
+  }
+
+  getSelectedCountryFlag(): string {
+    const selectedCode = this.userForm.get('countryCode')?.value || this.selectedCountryCode;
+    const country = this.countryCodes.find(cc => cc.code === selectedCode);
+    return country?.flag || '🇦🇪';
   }
 }

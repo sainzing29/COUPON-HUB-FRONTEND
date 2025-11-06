@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../../../../core/services/api.service';
 import { environment } from '../../../../../../environments/environment';
+import { Coupon } from '../model/coupon.model';
 
 export interface NextSequenceResponse {
   prefix: string;
@@ -28,7 +29,6 @@ export interface PreviewResponse {
 
 export interface GenerateRequest {
   prefix: string;
-  period: string;
   sequenceWidth: number;
   quantity: number;
   batchName?: string;
@@ -70,6 +70,10 @@ export class CouponService {
 
   generateCoupons(request: GenerateRequest): Observable<GenerateResponse> {
     return this.apiService.post<GenerateResponse>('/coupons/generate', request);
+  }
+
+  getCoupons(): Observable<Coupon[]> {
+    return this.apiService.get<Coupon[]>('/coupons');
   }
 }
 

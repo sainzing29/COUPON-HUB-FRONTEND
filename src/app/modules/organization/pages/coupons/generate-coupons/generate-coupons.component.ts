@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ToastrService } from 'ngx-toastr';
 import { CouponService, GenerateResponse } from '../service/coupon.service';
 import { BatchService } from '../service/batch.service';
 
@@ -17,7 +17,6 @@ import { BatchService } from '../service/batch.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatSnackBarModule,
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
@@ -52,7 +51,7 @@ export class GenerateCouponsComponent implements OnInit {
     private fb: FormBuilder,
     private couponService: CouponService,
     private batchService: BatchService,
-    private snackBar: MatSnackBar
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -101,21 +100,13 @@ export class GenerateCouponsComponent implements OnInit {
   onPreview(): void {
     if (this.couponForm.invalid) {
       this.markFormGroupTouched();
-      this.snackBar.open('Please fill all required fields correctly', 'Close', {
-        duration: 3000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top'
-      });
+      this.toastr.error('Please fill all required fields correctly', 'Validation Error');
       return;
     }
 
     const quantity = this.couponForm.get('quantity')?.value;
     if (quantity > 2000) {
-      this.snackBar.open('For quantities > 2000, consider generating in multiple batches for better performance', 'Close', {
-        duration: 5000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top'
-      });
+      this.toastr.warning('For quantities > 2000, consider generating in multiple batches for better performance', 'Performance Warning');
     }
 
     // Generate preview codes locally
@@ -145,11 +136,7 @@ export class GenerateCouponsComponent implements OnInit {
   onGenerate(): void {
     if (this.couponForm.invalid) {
       this.markFormGroupTouched();
-      this.snackBar.open('Please fill all required fields correctly', 'Close', {
-        duration: 3000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top'
-      });
+      this.toastr.error('Please fill all required fields correctly', 'Validation Error');
       return;
     }
 
@@ -177,21 +164,13 @@ export class GenerateCouponsComponent implements OnInit {
         this.generatedBatch = response;
         this.isGenerating = false;
         this.showPreview = false;
-        this.snackBar.open('Coupons generated successfully!', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
+        this.toastr.success('Coupons generated successfully!', 'Success');
         // Don't reset form here - let user download/copy codes first
         // Form will be reset when they close the batch summary
       },
       error: (error) => {
         console.error('Error generating coupons:', error);
-        this.snackBar.open(error.message || 'Error generating coupons', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
+        this.toastr.error(error.message || 'Error generating coupons', 'Error');
         this.isGenerating = false;
       }
     });
@@ -212,11 +191,7 @@ export class GenerateCouponsComponent implements OnInit {
     
     if (!csvContent) {
       console.log('CSV content is empty');
-      this.snackBar.open('No coupon codes available to download', 'Close', {
-        duration: 3000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top'
-      });
+      this.toastr.warning('No coupon codes available to download', 'Warning');
       return;
     }
 
@@ -232,6 +207,9 @@ export class GenerateCouponsComponent implements OnInit {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
     console.log('Download initiated successfully');
+
+    // Update batch status to 1 (Exported)
+    this.updateBatchStatus(1);
   }
 
   onDownloadExcel(): void {
@@ -251,11 +229,7 @@ export class GenerateCouponsComponent implements OnInit {
     
     if (!csvContent) {
       console.log('CSV content is empty');
-      this.snackBar.open('No coupon codes available to download', 'Close', {
-        duration: 3000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top'
-      });
+      this.toastr.warning('No coupon codes available to download', 'Warning');
       return;
     }
 
@@ -271,6 +245,9 @@ export class GenerateCouponsComponent implements OnInit {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
     console.log('Download initiated successfully');
+
+    // Update batch status to 1 (Exported)
+    this.updateBatchStatus(1);
   }
 
   private generateCSVContent(): string {
@@ -324,29 +301,20 @@ export class GenerateCouponsComponent implements OnInit {
     // Check if coupons array exists
     if (!this.generatedBatch.coupons || !Array.isArray(this.generatedBatch.coupons)) {
       console.error('Generated batch does not contain coupons array:', this.generatedBatch);
-      this.snackBar.open('No coupon codes available to copy', 'Close', {
-        duration: 3000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top'
-      });
+      this.toastr.warning('No coupon codes available to copy', 'Warning');
       return;
     }
 
     // Extract coupon codes from coupon objects
     const codesText = this.generatedBatch.coupons.map(c => c.couponCode).join('\n');
     navigator.clipboard.writeText(codesText).then(() => {
-      this.snackBar.open(`${this.generatedBatch!.coupons.length} coupon codes copied to clipboard!`, 'Close', {
-        duration: 2000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top'
-      });
+      this.toastr.success(`${this.generatedBatch!.coupons.length} coupon codes copied to clipboard!`, 'Success');
+
+      // Update batch status to 1 (Exported)
+      this.updateBatchStatus(1);
     }).catch(err => {
       console.error('Error copying to clipboard:', err);
-      this.snackBar.open('Error copying to clipboard', 'Close', {
-        duration: 3000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top'
-      });
+      this.toastr.error('Error copying to clipboard', 'Error');
     });
   }
 
@@ -385,6 +353,30 @@ export class GenerateCouponsComponent implements OnInit {
     Object.keys(this.couponForm.controls).forEach(key => {
       const control = this.couponForm.get(key);
       control?.markAsTouched();
+    });
+  }
+
+  private updateBatchStatus(status: number): void {
+    if (!this.generatedBatch || !this.generatedBatch.printBatchId) {
+      this.toastr.error('No batch ID available to update status', 'Error');
+      return;
+    }
+
+    // Only update if not already marked
+    if (this.isPrintedMarked) {
+      return;
+    }
+
+    this.batchService.updateBatchStatus(this.generatedBatch.printBatchId, status).subscribe({
+      next: () => {
+        this.isPrintedMarked = true;
+      },
+      error: (error) => {
+        this.toastr.error(
+          error?.error?.message || error?.message || 'Failed to update batch status',
+          'Error'
+        );
+      }
     });
   }
 }

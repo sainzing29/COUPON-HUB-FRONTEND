@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { ToastrService } from 'ngx-toastr';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -26,7 +26,6 @@ import { trigger, transition, style, animate } from '@angular/animations';
     MatChipsModule,
     MatMenuModule,
     MatDialogModule,
-    MatSnackBarModule,
     MatSelectModule,
     MatTooltipModule,
     FormsModule,
@@ -70,7 +69,7 @@ export class ServiceCentersComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar,
+    private toastr: ToastrService,
     private serviceCenterService: ServiceCenterService
   ) {
     this.searchForm = this.fb.group({
@@ -98,11 +97,7 @@ export class ServiceCentersComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading service centers:', error);
-        this.snackBar.open('Error loading service centers', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
+        this.toastr.error('Error loading service centers', 'Error');
       }
     });
   }
@@ -165,19 +160,11 @@ export class ServiceCentersComponent implements OnInit {
           }
           
           this.updatePagination();
-          this.snackBar.open(`Service Center ${action}d successfully`, 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          });
+          this.toastr.success(`Service Center ${action}d successfully`, 'Success');
         },
         error: (error) => {
           console.error('Error updating service center status:', error);
-          this.snackBar.open('Error updating service center status', 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          });
+          this.toastr.error('Error updating service center status', 'Error');
         }
       });
     }
@@ -190,19 +177,11 @@ export class ServiceCentersComponent implements OnInit {
           this.serviceCenters = this.serviceCenters.filter(s => s.id !== serviceCenter.id);
           this.filteredServiceCenters = this.filteredServiceCenters.filter(s => s.id !== serviceCenter.id);
           this.updatePagination();
-          this.snackBar.open('Service Center deleted successfully', 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          });
+          this.toastr.success('Service Center deleted successfully', 'Success');
         },
         error: (error) => {
           console.error('Error deleting service center:', error);
-          this.snackBar.open('Error deleting service center', 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          });
+          this.toastr.error('Error deleting service center', 'Error');
         }
       });
     }
@@ -223,19 +202,11 @@ export class ServiceCentersComponent implements OnInit {
           }
           
           this.updatePagination();
-          this.snackBar.open('Service Center restored successfully', 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          });
+          this.toastr.success('Service Center restored successfully', 'Success');
         },
         error: (error) => {
           console.error('Error restoring service center:', error);
-          this.snackBar.open('Error restoring service center', 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          });
+          this.toastr.error('Error restoring service center', 'Error');
         }
       });
     }
@@ -265,22 +236,14 @@ export class ServiceCentersComponent implements OnInit {
             }
             
             this.updatePagination();
-            this.snackBar.open('Service Center updated successfully', 'Close', {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            });
+            this.toastr.success('Service Center updated successfully', 'Success');
             
             this.showAddServiceCenterForm = false;
             this.serviceCenterForm.reset();
           },
           error: (error) => {
             console.error('Error updating service center:', error);
-            this.snackBar.open('Error updating service center', 'Close', {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            });
+            this.toastr.error('Error updating service center', 'Error');
           }
         });
       } else {
@@ -291,22 +254,14 @@ export class ServiceCentersComponent implements OnInit {
             this.filteredServiceCenters.unshift(newServiceCenter);
             this.updatePagination();
             
-            this.snackBar.open('Service Center added successfully', 'Close', {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            });
+            this.toastr.success('Service Center added successfully', 'Success');
             
             this.showAddServiceCenterForm = false;
             this.serviceCenterForm.reset();
           },
           error: (error) => {
             console.error('Error creating service center:', error);
-            this.snackBar.open('Error creating service center', 'Close', {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            });
+            this.toastr.error('Error creating service center', 'Error');
           }
         });
       }

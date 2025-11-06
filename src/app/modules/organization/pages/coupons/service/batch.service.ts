@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../../../../core/services/api.service';
-import { Batch } from '../model/batch.model';
+import { Batch, BatchDetails } from '../model/batch.model';
 
 export interface MarkPrintedRequest {
   batchId: number;
@@ -21,8 +21,8 @@ export class BatchService {
     return this.apiService.get<Batch[]>('/coupons/batches');
   }
 
-  getBatchById(id: number): Observable<Batch> {
-    return this.apiService.get<Batch>(`/batches/${id}`);
+  getBatchById(id: number): Observable<BatchDetails> {
+    return this.apiService.get<BatchDetails>(`/coupons/batches/${id}`);
   }
 
   updateBatchStatus(id: number, status: number): Observable<void> {

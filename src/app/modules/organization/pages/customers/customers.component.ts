@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { ToastrService } from 'ngx-toastr';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -27,7 +27,6 @@ import { trigger, transition, style, animate } from '@angular/animations';
     MatChipsModule,
     MatMenuModule,
     MatDialogModule,
-    MatSnackBarModule,
     MatSelectModule,
     MatTooltipModule,
     FormsModule,
@@ -72,7 +71,7 @@ export class CustomersComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar,
+    private toastr: ToastrService,
     private customerService: CustomerService,
     private router: Router
   ) {
@@ -102,11 +101,7 @@ export class CustomersComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading customers:', error);
-        this.snackBar.open('Error loading customers', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
+        this.toastr.error('Error loading customers', 'Error');
         // Handle error without fallback data
         this.customers = [];
         this.filteredCustomers = [];
@@ -383,11 +378,7 @@ export class CustomersComponent implements OnInit {
       
       this.updatePagination();
       
-      this.snackBar.open(`Customer ${action}d successfully`, 'Close', {
-        duration: 3000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top'
-      });
+      this.toastr.success(`Customer ${action}d successfully`, 'Success');
     }
   }
 
@@ -398,11 +389,7 @@ export class CustomersComponent implements OnInit {
       this.filteredCustomers = this.filteredCustomers.filter(c => c.id !== customer.id);
       this.updatePagination();
       
-      this.snackBar.open('Customer deleted successfully', 'Close', {
-        duration: 3000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top'
-      });
+      this.toastr.success('Customer deleted successfully', 'Success');
     }
   }
 
@@ -430,11 +417,7 @@ export class CustomersComponent implements OnInit {
         
         this.updatePagination();
         
-        this.snackBar.open('Customer updated successfully', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
+        this.toastr.success('Customer updated successfully', 'Success');
       } else {
         // Add new customer
         const newCustomer: Customer = {
@@ -452,11 +435,7 @@ export class CustomersComponent implements OnInit {
         this.filteredCustomers.unshift(newCustomer);
         this.updatePagination();
         
-        this.snackBar.open('Customer added successfully', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
+        this.toastr.success('Customer added successfully', 'Success');
       }
       
       this.showAddCustomerForm = false;

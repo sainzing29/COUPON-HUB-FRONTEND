@@ -6,7 +6,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { ToastrService } from 'ngx-toastr';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CustomerService, Customer } from '../../services/customer.service';
@@ -64,7 +64,6 @@ interface InvoiceItem {
     MatCardModule,
     MatChipsModule,
     MatTooltipModule,
-    MatSnackBarModule,
     FormsModule,
     ReactiveFormsModule
   ],
@@ -105,7 +104,7 @@ export class CustomerProfileComponent implements OnInit {
     private router: Router,
     private customerService: CustomerService,
     private fb: FormBuilder,
-    private snackBar: MatSnackBar
+    private toastr: ToastrService
   ) {
     this.editForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
@@ -132,11 +131,7 @@ export class CustomerProfileComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading customer:', error);
-        this.snackBar.open('Error loading customer details', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
-        });
+        this.toastr.error('Error loading customer details', 'Error');
         // Fallback to sample data
         this.loadSampleCustomer();
       }
@@ -301,11 +296,7 @@ export class CustomerProfileComponent implements OnInit {
       this.customer = updatedCustomer;
       this.isEditMode = false;
       
-      this.snackBar.open('Customer updated successfully', 'Close', {
-        duration: 3000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top'
-      });
+      this.toastr.success('Customer updated successfully', 'Success');
     } else {
       this.markFormGroupTouched();
     }

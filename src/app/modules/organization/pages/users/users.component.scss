@@ -1,5 +1,14 @@
 // Custom styles for the users component
 
+// Country code selector with flag
+.w-40 select.form-select {
+  padding-left: 2.75rem; // Make room for flag icon
+}
+
+.w-40 select.form-select option {
+  padding-left: 0.5rem;
+}
+
 .mat-table {
   width: 100%;
 }

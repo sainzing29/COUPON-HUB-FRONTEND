@@ -1,35 +1,4 @@
-<div class="batches-container p-6">
-  <!-- Summary Card -->
-  <div *ngIf="!isLoading && batches.length > 0" class="mb-6 bg-white rounded-lg shadow-sm p-6">
-    <h3 class="text-lg font-semibold text-gray-900 mb-4">Summary</h3>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="text-center p-4 bg-amber-50 rounded-lg">
-        <div class="text-2xl font-bold text-amber-600">
-          {{ getGeneratedCount() }}
-        </div>
-        <div class="text-sm text-gray-600 mt-1">Generated</div>
-      </div>
-      <div class="text-center p-4 bg-blue-50 rounded-lg">
-        <div class="text-2xl font-bold text-blue-600">
-          {{ getExportedCount() }}
-        </div>
-        <div class="text-sm text-gray-600 mt-1">Exported</div>
-      </div>
-      <div class="text-center p-4 bg-purple-50 rounded-lg">
-        <div class="text-2xl font-bold text-purple-600">
-          {{ getPrintedCount() }}
-        </div>
-        <div class="text-sm text-gray-600 mt-1">Printed</div>
-      </div>
-      <div class="text-center p-4 bg-red-50 rounded-lg">
-        <div class="text-2xl font-bold text-red-600">
-          {{ getCancelledCount() }}
-        </div>
-        <div class="text-sm text-gray-600 mt-1">Cancelled</div>
-      </div>
-    </div>
-  </div>
-
+<div class="coupons-container p-6">
   <!-- Filters Section -->
   <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -43,7 +12,7 @@
           id="search"
           [(ngModel)]="searchTerm"
           (ngModelChange)="onSearchChange()"
-          placeholder="Search by ID, prefix, period..."
+          placeholder="Search by code, prefix, period, ID..."
           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
         />
       </div>
@@ -59,14 +28,12 @@
           (ngModelChange)="onStatusFilterChange()"
           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
         >
-          <option *ngFor="let option of statusOptions" [value]="option.value === 'all' ? 'all' : option.value">
+          <option *ngFor="let option of statusOptions" [value]="option.value">
             {{ option.label }}
           </option>
         </select>
       </div>
     </div>
-
-
   </div>
 
   <!-- Loading State -->
@@ -75,14 +42,14 @@
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!isLoading && filteredBatches.length === 0" class="bg-white rounded-lg shadow-sm p-12 text-center">
+  <div *ngIf="!isLoading && filteredCoupons.length === 0" class="bg-white rounded-lg shadow-sm p-12 text-center">
     <i class="bi bi-inbox text-6xl text-gray-400 mb-4"></i>
-    <h3 class="text-lg font-semibold text-gray-900 mb-2">No batches found</h3>
+    <h3 class="text-lg font-semibold text-gray-900 mb-2">No coupons found</h3>
     <p class="text-gray-600 mb-4">
-      {{ batches.length === 0 ? 'No batches have been created yet.' : 'No batches match your filters.' }}
+      {{ coupons.length === 0 ? 'No coupons have been generated yet.' : 'No coupons match your filters.' }}
     </p>
     <button
-      *ngIf="batches.length > 0"
+      *ngIf="coupons.length > 0"
       (click)="selectedStatus = 'all'; searchTerm = ''; applyFilters()"
       class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
     >
@@ -90,14 +57,14 @@
     </button>
   </div>
 
-  <!-- Batches Table -->
-  <div *ngIf="!isLoading && filteredBatches.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+  <!-- Coupons Table -->
+  <div *ngIf="!isLoading && filteredCoupons.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Batch ID
+              Coupon Code
             </th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Prefix
@@ -106,46 +73,64 @@
               Period
             </th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Quantity
+              Services
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Used
             </th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Status
             </th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Actions
+              Printed
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Batch ID
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Created At
             </th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let batch of paginatedBatches" class="hover:bg-gray-50">
-            <td class="px-4 py-1 whitespace-nowrap text-sm font-medium text-gray-900">
-              #{{ batch.id }}
+          <tr *ngFor="let coupon of paginatedCoupons" class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
+              {{ coupon.couponCode }}
             </td>
-            <td class="px-4 py-1 whitespace-nowrap text-sm text-gray-900 font-mono">
-              {{ batch.prefix }}
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">
+              {{ coupon.prefix }}
             </td>
-            <td class="px-4 py-1 whitespace-nowrap text-sm text-gray-900">
-              {{ formatPeriod(batch.period) }}
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ formatPeriod(coupon.period) }}
             </td>
-            <td class="px-4 py-1 whitespace-nowrap text-sm text-gray-900">
-              {{ batch.quantity }}
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ coupon.totalServices }}
             </td>
-            <td class="px-4 py-1 whitespace-nowrap">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ coupon.usedServices }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
               <span
                 class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold"
-                [ngClass]="getStatusColorClass(batch.status)"
+                [ngClass]="getStatusColorClass(coupon.status)"
               >
-                {{ getStatusLabel(batch.status) }}
+                {{ coupon.status }}
               </span>
             </td>
-            <td class="px-4 py-1 whitespace-nowrap text-sm font-medium">
-              <button
-                (click)="viewBatchDetails(batch.id)"
-                class="text-purple-600 hover:text-purple-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded p-1"
-                matTooltip="View Batch Details"
-              >
-                <i class="bi bi-eye text-lg"></i>
-              </button>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <span *ngIf="coupon.printed" class="text-green-600">
+                <i class="bi bi-check-circle"></i> Yes
+              </span>
+              <span *ngIf="!coupon.printed" class="text-gray-400">
+                <i class="bi bi-x-circle"></i> No
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <span *ngIf="coupon.printBatchId">#{{ coupon.printBatchId }}</span>
+              <span *ngIf="!coupon.printBatchId" class="text-gray-400">-</span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ formatDate(coupon.createdAt) }}
             </td>
           </tr>
         </tbody>
