@@ -1,0 +1,104 @@
+<div class="container mx-auto px-4 py-6" [@pageFadeIn]>
+  <!-- Page Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Role Permissions</h1>
+    <p class="text-gray-600 mt-1">Manage permissions for different roles in the system</p>
+  </div>
+
+  <!-- Role Selection Card -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-2 mb-4">
+    <form [formGroup]="roleForm">
+      <div class="form-group">
+        <label for="roleId" class="form-label">Select Role</label>
+        <select 
+          id="roleId"
+          formControlName="roleId" 
+          (change)="onRoleChange()"
+          class="form-select role-selector">
+          <option [ngValue]="null">-- Select a role --</option>
+          <option *ngFor="let role of roles" [ngValue]="role.id">
+            {{ role.name }}
+          </option>
+        </select>
+      </div>
+    </form>
+  </div>
+
+  <!-- Permissions List Card -->
+  <div *ngIf="selectedRoleId" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+
+    
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold text-gray-800">Permissions</h2>
+      <button
+        *ngIf="hasChanges()"
+        (click)="savePermissions()"
+        [disabled]="isSaving"
+        class="text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        style="background-color: var(--button-primary-bg);"
+        onmouseover="this.style.backgroundColor='var(--button-primary-hover)'"
+        onmouseout="this.style.backgroundColor='var(--button-primary-bg)'">
+        <i *ngIf="!isSaving" class="bi bi-save"></i>
+        <span *ngIf="!isSaving">Save Changes</span>
+        <span *ngIf="isSaving">Saving...</span>
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoadingPermissions" class="text-center py-8">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <p class="text-gray-600 mt-2">Loading permissions...</p>
+    </div>
+
+    <!-- Permissions List -->
+    <div *ngIf="!isLoadingPermissions && permissions.length > 0" class="permissions-grid">
+      <div
+        *ngFor="let permission of permissions"
+        [class.opacity-60]="isPermissionDisabled(permission)"
+        [class.cursor-not-allowed]="isPermissionDisabled(permission)"
+        class="permission-item flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+        <mat-checkbox
+          [checked]="permission.isAssigned"
+          [disabled]="isPermissionDisabled(permission)"
+          (change)="onPermissionChange(permission, $event)"
+          class="mr-3 mt-1">
+        </mat-checkbox>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-1">
+            <h3 class="text-base font-semibold text-gray-800">{{ permission.key }}</h3>
+            <span
+              *ngIf="isPermissionDisabled(permission)"
+              class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded">
+              Protected
+            </span>
+            <span
+              *ngIf="permission.isAssigned && !isPermissionDisabled(permission)"
+              class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">
+              Assigned
+            </span>
+            <span
+              *ngIf="!permission.isAssigned && !isPermissionDisabled(permission)"
+              class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded">
+              Not Assigned
+            </span>
+          </div>
+          <p class="text-sm text-gray-600">{{ permission.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoadingPermissions && permissions.length === 0" class="text-center py-8">
+      <i class="bi bi-lock text-gray-400 text-6xl mb-2"></i>
+      <p class="text-gray-600">No permissions available</p>
+    </div>
+  </div>
+
+  <!-- Empty State when no role selected -->
+  <div *ngIf="!selectedRoleId" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+    <i class="bi bi-shield-check text-gray-400 text-6xl mb-4"></i>
+    <h3 class="text-lg font-semibold text-gray-800 mb-2">No Role Selected</h3>
+    <p class="text-gray-600">Please select a role from the dropdown above to view and manage its permissions.</p>
+  </div>
+</div>
+

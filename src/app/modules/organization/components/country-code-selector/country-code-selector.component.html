@@ -1,0 +1,15 @@
+<div class="w-35 relative country-code-wrapper">
+  <select
+    [id]="id"
+    [value]="value"
+    (change)="onCountryCodeChange($event)"
+    class="form-select country-code-select"
+    [title]="getSelectedCountry()?.code + ' ' + getSelectedCountry()?.country">
+    <option *ngFor="let country of countryCodes" [value]="country.code">
+      {{ country.code }} {{ country.country }}
+    </option>
+  </select>
+  <span class="country-code-overlay">{{ value }}</span>
+</div>
+
+    

@@ -240,19 +240,31 @@
             </div>
           </div>
 
-          <!-- Contact Number -->
+          <!-- Contact Number with Country Code -->
           <div class="form-group">
             <label for="contactNumber" class="form-label">Contact Number *</label>
-            <input 
-              type="tel" 
-              id="contactNumber"
-              formControlName="contactNumber" 
-              placeholder="Enter contact number"
-              class="form-input"
-              [class.error]="getFieldError('contactNumber')">
+            <div class="flex gap-2">
+              <!-- Country Code Selector -->
+              <app-country-code-selector
+                id="countryCode"
+                [value]="serviceCenterForm.get('countryCode')?.value || '+971'"
+                (valueChange)="serviceCenterForm.get('countryCode')?.setValue($event); selectedCountryCode = $event">
+              </app-country-code-selector>
+              <!-- Contact Number Input -->
+              <div class="flex-1">
+                <input 
+                  type="tel" 
+                  id="contactNumber"
+                  formControlName="contactNumber" 
+                  placeholder="Enter contact number"
+                  class="form-input"
+                  [class.error]="getFieldError('contactNumber')">
+              </div>
+            </div>
             <div *ngIf="getFieldError('contactNumber')" class="form-error">
               {{ getFieldError('contactNumber') }}
             </div>
+            <p class="text-xs text-gray-500 mt-1">Enter phone number without the country code</p>
           </div>
 
           <!-- Form Actions -->

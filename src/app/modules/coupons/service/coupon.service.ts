@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiService } from '../../../../../core/services/api.service';
-import { environment } from '../../../../../../environments/environment';
+import { ApiService } from '../../../core/services/api.service';
+import { environment } from '../../../../environments/environment';
 import { Coupon } from '../model/coupon.model';
 
 export interface NextSequenceResponse {

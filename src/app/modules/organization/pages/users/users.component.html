@@ -366,18 +366,11 @@
             <label for="mobileNumber" class="form-label">Mobile Number *</label>
             <div class="flex gap-2">
               <!-- Country Code Selector -->
-              <div class="w-35 relative">
-                <select
-                  id="countryCode"
-                  formControlName="countryCode"
-                  (change)="selectedCountryCode = userForm.get('countryCode')?.value"
-                  class="form-select pl-10"
-                >
-                  <option *ngFor="let country of countryCodes" [value]="country.code">
-                    {{ country.flag }} {{ country.code }} {{ country.country }}
-                  </option>
-                </select>
-              </div>
+              <app-country-code-selector
+                id="countryCode"
+                [value]="userForm.get('countryCode')?.value || '+971'"
+                (valueChange)="userForm.get('countryCode')?.setValue($event); selectedCountryCode = $event">
+              </app-country-code-selector>
               <!-- Mobile Number Input -->
               <div class="flex-1">
                 <input 

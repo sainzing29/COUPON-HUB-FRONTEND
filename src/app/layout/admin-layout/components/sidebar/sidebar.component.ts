@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { AuthService } from '../../../../core/services/auth.service';
+import { PermissionService } from '../../../../core/services/permission.service';
 import { Subscription } from 'rxjs';
 
 interface MenuItem {
@@ -14,6 +15,7 @@ interface MenuItem {
   hasSubmenu: boolean;
   expanded?: boolean;
   submenu?: MenuItem[];
+  permission?: string[]; // Required permissions for this menu item
 }
 
 @Component({
@@ -45,11 +47,12 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
   private userSubscription: Subscription = new Subscription();
 
   allMenuItems: MenuItem[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: 'grid_view', route: '/dashboard', active: true, hasSubmenu: false },
-    { id: 'users', label: 'Users', icon: 'person', route: '/organization/users', active: false, hasSubmenu: false },
-    { id: 'customers', label: 'Customers', icon: 'people', route: '/organization/customers', active: false, hasSubmenu: false },
-    { id: 'service-centers', label: 'Service Centers', icon: 'business', route: '/organization/service-centers', active: false, hasSubmenu: false },
-    { id: 'service-redemption', label: 'Service Redemption', icon: 'local_offer', route: '/organization/service-redemption', active: false, hasSubmenu: false },
+    // { id: 'dashboard', label: 'Dashboard', icon: 'grid_view', route: '/dashboard', active: true, hasSubmenu: false },
+    { id: 'users', label: 'Users', icon: 'person', route: '/organization/users', active: false, hasSubmenu: false, permission: ['Users'] },
+    { id: 'role-permissions', label: 'Role & Permissions', icon: 'admin_panel_settings', route: '/organization/role-permissions', active: false, hasSubmenu: false, permission: ['UserRoles'] },
+    { id: 'customers', label: 'Customers', icon: 'people', route: '/organization/customers', active: false, hasSubmenu: false, permission: ['Customer'] },
+    { id: 'service-centers', label: 'Service Centers', icon: 'business', route: '/organization/service-centers', active: false, hasSubmenu: false, permission: ['ServiceCenter'] },
+    // { id: 'service-redemption', label: 'Service Redemption', icon: 'local_offer', route: '/organization/service-redemption', active: false, hasSubmenu: false, permission: ['RadeemCoupon'] },
     { 
       id: 'coupons',
       label: 'Coupons',
@@ -58,13 +61,14 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
       active: false,
       hasSubmenu: true,
       expanded: false,
+      permission: ['ExportCoupons', 'CouponStatusChange', 'GenerateCoupons'],
       submenu: [
-        { id: 'coupons-list', label: 'Coupons', icon: 'list', route: '/organization/coupons', active: false, hasSubmenu: false },
-        { id: 'generate-coupons', label: 'Generate Coupons', icon: 'add_circle', route: '/organization/coupons/generate-coupons', active: false, hasSubmenu: false },
-        { id: 'batches', label: 'Batch History', icon: 'history', route: '/organization/coupons/batches', active: false, hasSubmenu: false }
+        { id: 'coupons-list', label: 'Coupons', icon: 'list', route: '/organization/coupons', active: false, hasSubmenu: false, permission: ['ExportCoupons', 'CouponStatusChange'] },
+        { id: 'generate-coupons', label: 'Generate Coupons', icon: 'add_circle', route: '/organization/coupons/generate-coupons', active: false, hasSubmenu: false, permission: ['GenerateCoupons'] },
+        { id: 'batches', label: 'Batch History', icon: 'history', route: '/organization/coupons/batches', active: false, hasSubmenu: false, permission: ['GenerateCoupons'] }
       ]
     },
-    { id: 'invoices', label: 'Invoices & Payments', icon: 'receipt', route: '/organization/invoices', active: false, hasSubmenu: false },
+    // { id: 'invoices', label: 'Invoices & Payments', icon: 'receipt', route: '/organization/invoices', active: false, hasSubmenu: false, permission: ['FinancialData'] },
     { 
       id: 'configuration', 
       label: 'Configuration', 
@@ -73,74 +77,96 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
       active: false, 
       hasSubmenu: true,
       expanded: false,
+      permission: ['Configuration'],
       submenu: [
-        { id: 'settings', label: 'Settings', icon: 'tune', route: '/organization/settings', active: false, hasSubmenu: false }
+        { id: 'settings', label: 'Settings', icon: 'tune', route: '/organization/settings', active: false, hasSubmenu: false, permission: ['Configuration'] }
       ]
     },
-    { 
-      id: 'reports', 
-      label: 'Reports', 
-      icon: 'assessment', 
-      route: '', 
-      active: false, 
-      hasSubmenu: true,
-      expanded: false,
-      submenu: [
-        { id: 'sales-report', label: 'Sales Report', icon: 'assessment', route: '/reports/sales-report', active: false, hasSubmenu: false },
-        { id: 'service-usage-report', label: 'Service Usage', icon: 'trending_up', route: '/reports/service-usage-report', active: false, hasSubmenu: false },
-        { id: 'service-center-performance', label: 'Center Performance', icon: 'business_center', route: '/reports/service-center-performance', active: false, hasSubmenu: false }
-      ]
-    }
+    // { 
+    //   id: 'reports', 
+    //   label: 'Reports', 
+    //   icon: 'assessment', 
+    //   route: '', 
+    //   active: false, 
+    //   hasSubmenu: true,
+    //   expanded: false,
+    //   permission: ['Reports'],
+    //   submenu: [
+    //     { id: 'sales-report', label: 'Sales Report', icon: 'assessment', route: '/reports/sales-report', active: false, hasSubmenu: false, permission: ['Reports'] },
+    //     { id: 'service-usage-report', label: 'Service Usage', icon: 'trending_up', route: '/reports/service-usage-report', active: false, hasSubmenu: false, permission: ['Reports'] },
+    //     { id: 'service-center-performance', label: 'Center Performance', icon: 'business_center', route: '/reports/service-center-performance', active: false, hasSubmenu: false, permission: ['Reports'] }
+    //   ]
+    // }
   ];
 
   menuItems: MenuItem[] = [];
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private permissionService: PermissionService
   ) { }
 
   ngOnInit(): void {
-    this.filterMenuItemsByRole();
-    this.updateActiveState();
-    this.ensureSubmenuExpanded();
+    // Initial filter - wait a bit to ensure auth service has loaded user from token
+    setTimeout(() => {
+      this.filterMenuItemsByPermission();
+      this.updateActiveState();
+      this.ensureSubmenuExpanded();
+    }, 0);
 
     // Subscribe to user changes to update menu items when user logs in/out
     this.userSubscription = this.authService.currentUser$.subscribe(user => {
       console.log('Sidebar: User changed, filtering menu items', user);
-      this.filterMenuItemsByRole();
+      console.log('Sidebar: User permissions', user?.permission);
+      this.filterMenuItemsByPermission();
+      this.updateActiveState();
+      this.ensureSubmenuExpanded();
     });
   }
 
-  private filterMenuItemsByRole(): void {
-    const currentUser = this.authService.getCurrentUser();
-    const userRole = currentUser?.role;
+  private filterMenuItemsByPermission(): void {
+    // Filter menu items based on permissions
+    this.menuItems = this.allMenuItems
+      .map(item => {
+        // Check if main menu item is accessible
+        if (item.permission && item.permission.length > 0) {
+          if (!this.permissionService.hasAnyPermission(item.permission)) {
+            return null; // Filter out this item
+          }
+        }
 
-    if (userRole === 'Admin') {
-      this.menuItems = this.allMenuItems.filter(item => 
-        item.id !== 'users' && 
-        item.id !== 'service-centers' && 
-        item.id !== 'reports' &&
-        item.id !== 'configuration' &&
-        item.id !== 'coupons' &&
-        item.id !== 'dashboard'
-      );
-    } else if (userRole === 'SuperAdmin') {
-      this.menuItems = this.allMenuItems.filter(item => 
-        item.id !== 'customers' && 
-        item.id !== 'service-redemption' && 
-        item.id !== 'invoices' &&
-        item.id !== 'dashboard' &&
-        item.id !== 'configuration' &&
-        item.id !== 'reports'
-      );
-    } else {
-      this.menuItems = this.allMenuItems.filter(item => 
-        item.id !== 'coupons' &&
-        item.id !== 'dashboard' &&
-        item.id !== 'configuration' &&
-        item.id !== 'reports'
-      );
+        // Filter submenu items if exists
+        if (item.hasSubmenu && item.submenu) {
+          const filteredSubmenu = item.submenu.filter(subItem => {
+            if (subItem.permission && subItem.permission.length > 0) {
+              return this.permissionService.hasAnyPermission(subItem.permission);
+            }
+            return true; // If no permission required, show it
+          });
+
+          // If parent has permission but no submenu items are accessible, hide parent
+          if (filteredSubmenu.length === 0) {
+            return null;
+          }
+
+          // Return item with filtered submenu
+          return {
+            ...item,
+            submenu: filteredSubmenu
+          };
+        }
+
+        return item;
+      })
+      .filter(item => item !== null) as MenuItem[];
+
+    // Always include dashboard if user is logged in
+    if (this.authService.isLoggedIn()) {
+      const dashboardItem = this.allMenuItems.find(item => item.id === 'dashboard');
+      if (dashboardItem && !this.menuItems.find(item => item.id === 'dashboard')) {
+        this.menuItems.unshift(dashboardItem);
+      }
     }
   }
 

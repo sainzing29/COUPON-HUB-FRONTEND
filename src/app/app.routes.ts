@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { permissionGuard } from './core/guards/permission.guard';
 
 export const routes: Routes = [
   {
@@ -60,6 +61,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     loadComponent: () => import('./layout/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent),
+    canActivate: [permissionGuard],
     children: [
       {
         path: '',
@@ -70,80 +72,104 @@ export const routes: Routes = [
   {
     path: 'organization',
     loadComponent: () => import('./layout/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent),
+    canActivate: [permissionGuard],
     children: [
       {
         path: 'users',
-        loadComponent: () => import('./modules/organization/pages/users/users.component').then(m => m.UsersComponent)
+        loadComponent: () => import('./modules/organization/pages/users/users.component').then(m => m.UsersComponent),
+        canActivate: [permissionGuard]
       },
       {
         path: 'service-centers',
-        loadComponent: () => import('./modules/organization/pages/service-centers/service-centers.component').then(m => m.ServiceCentersComponent)
+        loadComponent: () => import('./modules/organization/pages/service-centers/service-centers.component').then(m => m.ServiceCentersComponent),
+        canActivate: [permissionGuard]
       },
       {
         path: 'customers',
-        loadComponent: () => import('./modules/organization/pages/customers/customers.component').then(m => m.CustomersComponent)
+        loadComponent: () => import('./modules/organization/pages/customers/customers.component').then(m => m.CustomersComponent),
+        canActivate: [permissionGuard]
       },
       {
         path: 'service-redemption',
-        loadComponent: () => import('./modules/organization/pages/service-redemption/service-redemption.component').then(m => m.ServiceRedemptionComponent)
+        loadComponent: () => import('./modules/organization/pages/service-redemption/service-redemption.component').then(m => m.ServiceRedemptionComponent),
+        canActivate: [permissionGuard]
       },
       {
         path: 'service-redemption/redeem-service',
-        loadComponent: () => import('./modules/organization/pages/redeem-service/redeem-service').then(m => m.RedeemServiceComponent)
+        loadComponent: () => import('./modules/organization/pages/redeem-service/redeem-service').then(m => m.RedeemServiceComponent),
+        canActivate: [permissionGuard]
       },
       {
         path: 'new-coupons',
-        loadComponent: () => import('./modules/organization/pages/new-coupons/new-coupons').then(m => m.NewCouponsComponent)
+        loadComponent: () => import('./modules/organization/pages/new-coupons/new-coupons').then(m => m.NewCouponsComponent),
+        canActivate: [permissionGuard]
       },
       {
         path: 'new-coupons/sale',
-        loadComponent: () => import('./modules/organization/pages/coupon-sale/coupon-sale').then(m => m.CouponSaleComponent)
+        loadComponent: () => import('./modules/organization/pages/coupon-sale/coupon-sale').then(m => m.CouponSaleComponent),
+        canActivate: [permissionGuard]
       },
       {
         path: 'coupons',
-        loadComponent: () => import('./modules/organization/pages/coupons/coupons/coupons.component').then(m => m.CouponsComponent)
+        loadComponent: () => import('./modules/coupons/coupons/coupons.component').then(m => m.CouponsComponent),
+        canActivate: [permissionGuard]
       },
       {
         path: 'coupons/generate-coupons',
-        loadComponent: () => import('./modules/organization/pages/coupons/generate-coupons/generate-coupons.component').then(m => m.GenerateCouponsComponent)
+        loadComponent: () => import('./modules/coupons/generate-coupons/generate-coupons.component').then(m => m.GenerateCouponsComponent),
+        canActivate: [permissionGuard]
       },
       {
         path: 'coupons/batches',
-        loadComponent: () => import('./modules/organization/pages/coupons/batches/batches.component').then(m => m.BatchesComponent)
+        loadComponent: () => import('./modules/coupons/batches/batches.component').then(m => m.BatchesComponent),
+        canActivate: [permissionGuard]
       },
       {
         path: 'coupons/batches/:id',
-        loadComponent: () => import('./modules/organization/pages/coupons/batches/batch-details/batch-details.component').then(m => m.BatchDetailsComponent)
+        loadComponent: () => import('./modules/coupons/batches/batch-details/batch-details.component').then(m => m.BatchDetailsComponent),
+        canActivate: [permissionGuard]
       },
       {
         path: 'invoices',
-        loadComponent: () => import('./modules/organization/pages/invoices/invoices.component').then(m => m.InvoicesComponent)
+        loadComponent: () => import('./modules/organization/pages/invoices/invoices.component').then(m => m.InvoicesComponent),
+        canActivate: [permissionGuard]
       },
       {
         path: 'customers/:id',
-        loadComponent: () => import('./modules/organization/pages/customer-profile/customer-profile.component').then(m => m.CustomerProfileComponent)
+        loadComponent: () => import('./modules/organization/pages/customer-profile/customer-profile.component').then(m => m.CustomerProfileComponent),
+        canActivate: [permissionGuard]
       },
       {
         path: 'settings',
-        loadComponent: () => import('./modules/organization/pages/settings/settings.component').then(m => m.SettingsComponent)
+        loadComponent: () => import('./modules/organization/pages/settings/settings.component').then(m => m.SettingsComponent),
+        canActivate: [permissionGuard]
+      },
+      {
+        path: 'role-permissions',
+        loadComponent: () => import('./modules/organization/pages/role-permissions/role-permissions.component').then(m => m.RolePermissionsComponent),
+        canActivate: [permissionGuard]
       }
     ]
   },
   {
     path: 'reports',
     loadComponent: () => import('./layout/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent),
+    canActivate: [permissionGuard],
     children: [
       {
         path: 'sales-report',
-        loadComponent: () => import('./modules/reports/pages/sales-report/sales-report.component').then(m => m.SalesReportComponent)
+        loadComponent: () => import('./modules/reports/pages/sales-report/sales-report.component').then(m => m.SalesReportComponent),
+        canActivate: [permissionGuard]
       },
       {
         path: 'service-usage-report',
-        loadComponent: () => import('./modules/reports/pages/service-usage-report/service-usage-report.component').then(m => m.ServiceUsageReportComponent)
+        loadComponent: () => import('./modules/reports/pages/service-usage-report/service-usage-report.component').then(m => m.ServiceUsageReportComponent),
+        canActivate: [permissionGuard]
       },
       {
         path: 'service-center-performance',
-        loadComponent: () => import('./modules/reports/pages/service-center-performance/service-center-performance.component').then(m => m.ServiceCenterPerformanceComponent)
+        loadComponent: () => import('./modules/reports/pages/service-center-performance/service-center-performance.component').then(m => m.ServiceCenterPerformanceComponent),
+        canActivate: [permissionGuard]
       }
     ]
   },

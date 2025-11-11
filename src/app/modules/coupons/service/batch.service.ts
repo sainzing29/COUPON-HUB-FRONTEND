@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiService } from '../../../../../core/services/api.service';
+import { ApiService } from '../../../core/services/api.service';
 import { Batch, BatchDetails } from '../model/batch.model';
 
 export interface MarkPrintedRequest {

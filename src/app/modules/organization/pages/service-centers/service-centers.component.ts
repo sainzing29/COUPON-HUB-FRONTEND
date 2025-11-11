@@ -13,6 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ServiceCenterService, ServiceCenter, ServiceCenterUpdateRequest } from './service-center.service';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { CountryCodeSelectorComponent, COUNTRY_CODES } from '../../components/country-code-selector/country-code-selector.component';
 
 @Component({
   selector: 'app-service-centers',
@@ -29,7 +30,8 @@ import { trigger, transition, style, animate } from '@angular/animations';
     MatSelectModule,
     MatTooltipModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CountryCodeSelectorComponent
   ],
   templateUrl: './service-centers.component.html',
   styleUrls: ['./service-centers.component.scss'],
@@ -66,6 +68,8 @@ export class ServiceCentersComponent implements OnInit {
   editingServiceCenter: ServiceCenter | null = null;
   showAll = false;
 
+  selectedCountryCode = '+971'; // Default to UAE
+
   constructor(
     private fb: FormBuilder,
     private dialog: MatDialog,
@@ -79,6 +83,7 @@ export class ServiceCentersComponent implements OnInit {
     this.serviceCenterForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       address: ['', [Validators.required, Validators.minLength(5)]],
+      countryCode: ['+971', [Validators.required]], // Default to UAE
       contactNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]]
     });
   }
@@ -128,16 +133,36 @@ export class ServiceCentersComponent implements OnInit {
     this.isEditMode = false;
     this.editingServiceCenter = null;
     this.serviceCenterForm.reset();
+    this.selectedCountryCode = '+971'; // Reset to UAE default
+    // Set country code to default
+    this.serviceCenterForm.patchValue({
+      countryCode: '+971'
+    });
     this.showAddServiceCenterForm = true;
   }
 
   onEditServiceCenter(serviceCenter: ServiceCenter): void {
     this.isEditMode = true;
     this.editingServiceCenter = serviceCenter;
+    
+    // Extract country code and phone number from contactNumber if it includes country code
+    let countryCode = '+971'; // Default
+    let contactNumber = serviceCenter.contactNumber;
+    
+    // Check if contactNumber starts with a country code
+    const matchedCountry = COUNTRY_CODES.find(cc => contactNumber.startsWith(cc.code));
+    if (matchedCountry) {
+      countryCode = matchedCountry.code;
+      contactNumber = contactNumber.substring(matchedCountry.code.length).trim();
+    }
+    
+    this.selectedCountryCode = countryCode;
+    
     this.serviceCenterForm.patchValue({
       name: serviceCenter.name,
       address: serviceCenter.address,
-      contactNumber: serviceCenter.contactNumber
+      countryCode: countryCode,
+      contactNumber: contactNumber
     });
     this.showAddServiceCenterForm = true;
   }
@@ -214,7 +239,15 @@ export class ServiceCentersComponent implements OnInit {
 
   onSaveServiceCenter(): void {
     if (this.serviceCenterForm.valid) {
-      const formValue = this.serviceCenterForm.value;
+      const formValue = { ...this.serviceCenterForm.value };
+      
+      // Combine country code with contact number
+      if (formValue.countryCode && formValue.contactNumber) {
+        formValue.contactNumber = `${formValue.countryCode}${formValue.contactNumber}`;
+      }
+      
+      // Remove countryCode from formValue as backend might not expect it
+      delete formValue.countryCode;
       
       if (this.isEditMode && this.editingServiceCenter) {
         // Update existing service center
@@ -240,6 +273,10 @@ export class ServiceCentersComponent implements OnInit {
             
             this.showAddServiceCenterForm = false;
             this.serviceCenterForm.reset();
+            this.selectedCountryCode = '+971'; // Reset to UAE default
+            this.serviceCenterForm.patchValue({
+              countryCode: '+971'
+            });
           },
           error: (error) => {
             console.error('Error updating service center:', error);
@@ -258,6 +295,10 @@ export class ServiceCentersComponent implements OnInit {
             
             this.showAddServiceCenterForm = false;
             this.serviceCenterForm.reset();
+            this.selectedCountryCode = '+971'; // Reset to UAE default
+            this.serviceCenterForm.patchValue({
+              countryCode: '+971'
+            });
           },
           error: (error) => {
             console.error('Error creating service center:', error);
@@ -273,6 +314,10 @@ export class ServiceCentersComponent implements OnInit {
   onCancel(): void {
     this.showAddServiceCenterForm = false;
     this.serviceCenterForm.reset();
+    this.selectedCountryCode = '+971'; // Reset to UAE default
+    this.serviceCenterForm.patchValue({
+      countryCode: '+971'
+    });
     this.isEditMode = false;
     this.editingServiceCenter = null;
   }

@@ -46,6 +46,7 @@ export interface JwtPayload {
   sub: string;                    // User ID
   name: string;                   // First Name
   role: string;                   // User Role
+  permission?: string[];           // User Permissions Array
   serviceCenterId?: string;       // Only for Admin users with ServiceCenterId
   email?: string;                 // User Email
   mobileNumber?: string;          // User Mobile Number
@@ -61,6 +62,7 @@ export interface User {
   id: string;
   name: string;
   role: string;
+  permission?: string[];          // User Permissions Array
   serviceCenterId?: string;
   email?: string;
   mobileNumber?: string;
@@ -98,6 +100,7 @@ export class AuthService {
           id: payload.sub || '',
           name: payload.name || '',
           role: payload.role || '',
+          permission: payload.permission || [],
           serviceCenterId: payload.serviceCenterId,
           email: payload.email || undefined,
           mobileNumber: payload.mobileNumber || undefined,
@@ -244,6 +247,7 @@ export class AuthService {
             id: payload.sub || '',
             name: payload.name || '',
             role: payload.role || '',
+            permission: payload.permission || [],
             serviceCenterId: payload.serviceCenterId,
             email: payload.email || undefined,
             mobileNumber: payload.mobileNumber || undefined,
@@ -252,6 +256,7 @@ export class AuthService {
           };
           
           console.log('Final User Object:', user);
+          console.log('User Permissions:', user.permission);
           
           // Update stored user data with fresh token data
           this.tokenService.setUser(user);
@@ -263,9 +268,25 @@ export class AuthService {
           // Fallback to stored user data
           const user = this.tokenService.getUser();
           if (user) {
+            // Ensure permissions are included even from stored data
+            if (!user.permission) {
+              // Try to decode token again to get permissions
+              try {
+                const payload = this.decodeToken(token);
+                user.permission = payload.permission || [];
+              } catch (e) {
+                user.permission = [];
+              }
+            }
             this.currentUserSubject.next(user);
           }
         }
+      }
+    } else {
+      // If not authenticated, try to load from stored user data as fallback
+      const storedUser = this.tokenService.getUser();
+      if (storedUser) {
+        this.currentUserSubject.next(storedUser);
       }
     }
   }

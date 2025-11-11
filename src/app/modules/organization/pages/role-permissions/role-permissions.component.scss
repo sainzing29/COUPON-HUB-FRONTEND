@@ -1,0 +1,58 @@
+// Custom styles for the role-permissions component
+
+// Role selector - normal size (not full width)
+.role-selector {
+  width: 300px;
+  max-width: 100%;
+}
+
+// Permissions grid - 3 columns
+.permissions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+// Permission item styling
+.permission-item {
+  min-height: 100px;
+}
+
+// Checkbox styling
+.mat-checkbox {
+  flex-shrink: 0;
+}
+
+// Loading spinner
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+// Responsive adjustments
+@media (max-width: 1200px) {
+  .permissions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .role-selector {
+    width: 100%;
+  }
+  
+  .permissions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

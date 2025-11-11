@@ -1,0 +1,64 @@
+// Country code selector
+.w-35 {
+  width: 80px; // Compact width to show only country code
+  min-width: 80px;
+  position: relative;
+}
+
+.country-code-wrapper {
+  position: relative;
+}
+
+.w-35 select.form-select.country-code-select {
+  width: 100%;
+  padding-right: 2rem; // Make room for dropdown arrow
+  color: transparent !important; // Hide the actual text completely
+  background-color: #ffffff; // Keep background visible
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  
+  option {
+    color: #111827 !important; // Show text in dropdown options
+    padding-left: 0.5rem;
+    white-space: normal;
+    background-color: #ffffff;
+  }
+  
+  &:focus {
+    color: transparent !important; // Keep transparent on focus
+    outline: none;
+  }
+  
+  &:hover {
+    color: transparent !important;
+  }
+}
+
+// Overlay showing only the country code
+.country-code-overlay {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 3; // Higher than select to ensure it's visible
+  color: #111827;
+  font-size: 16px;
+  line-height: 1.5;
+  white-space: nowrap;
+  font-weight: 400;
+  background-color: transparent;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .w-35 {
+    width: 100%;
+    min-width: 100%;
+  }
+}
+

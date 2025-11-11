@@ -16,6 +16,7 @@ import { ServiceCenterService, ServiceCenter } from '../service-centers/service-
 import { trigger, transition, style, animate } from '@angular/animations';
 import { CamelCasePipe } from '../../../../core/pipes/camel-case.pipe';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
+import { CountryCodeSelectorComponent, COUNTRY_CODES } from '../../components/country-code-selector/country-code-selector.component';
 
 // User interface is now imported from the service
 
@@ -36,7 +37,8 @@ import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
     FormsModule,
     ReactiveFormsModule,
     CamelCasePipe,
-    NgxSkeletonLoaderModule
+    NgxSkeletonLoaderModule,
+    CountryCodeSelectorComponent
   ],
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss'],
@@ -82,25 +84,6 @@ export class UsersComponent implements OnInit {
   showDeletedUsers = false;
   allowEmailChange = false;
   isLoading = false;
-
-  // Country codes list (UAE first as default, then others)
-  countryCodes = [
-    { code: '+971', country: 'UAE', flag: '🇦🇪' },
-    { code: '+966', country: 'Saudi Arabia', flag: '🇸🇦' },
-    { code: '+974', country: 'Qatar', flag: '🇶🇦' },
-    { code: '+965', country: 'Kuwait', flag: '🇰🇼' },
-    { code: '+973', country: 'Bahrain', flag: '🇧🇭' },
-    { code: '+968', country: 'Oman', flag: '🇴🇲' },
-    { code: '+1', country: 'USA/Canada', flag: '🇺🇸' },
-    { code: '+44', country: 'UK', flag: '🇬🇧' },
-    { code: '+91', country: 'India', flag: '🇮🇳' },
-    { code: '+86', country: 'China', flag: '🇨🇳' },
-    { code: '+33', country: 'France', flag: '🇫🇷' },
-    { code: '+49', country: 'Germany', flag: '🇩🇪' },
-    { code: '+39', country: 'Italy', flag: '🇮🇹' },
-    { code: '+34', country: 'Spain', flag: '🇪🇸' },
-    { code: '+61', country: 'Australia', flag: '🇦🇺' }
-  ];
 
   selectedCountryCode = '+971'; // Default to UAE
 
@@ -232,7 +215,7 @@ export class UsersComponent implements OnInit {
     let mobileNumber = user.mobileNumber || '';
     
     // Check if mobileNumber starts with a country code
-    const matchedCountry = this.countryCodes.find(cc => mobileNumber.startsWith(cc.code));
+    const matchedCountry = COUNTRY_CODES.find(cc => mobileNumber.startsWith(cc.code));
     if (matchedCountry) {
       countryCode = matchedCountry.code;
       mobileNumber = mobileNumber.substring(matchedCountry.code.length).trim();
@@ -617,7 +600,7 @@ export class UsersComponent implements OnInit {
 
   getSelectedCountryFlag(): string {
     const selectedCode = this.userForm.get('countryCode')?.value || this.selectedCountryCode;
-    const country = this.countryCodes.find(cc => cc.code === selectedCode);
+    const country = COUNTRY_CODES.find(cc => cc.code === selectedCode);
     return country?.flag || '🇦🇪';
   }
 }

@@ -32,6 +32,15 @@
   overflow: hidden;
 }
 
+// Sidebar width classes
+.sidebar-open {
+  width: 227px;
+}
+
+.sidebar-closed {
+  width: 64px; // Keep collapsed width as 64px (w-16)
+}
+
 // Sidebar Brand Section
 .sidebar-brand {
   // Background color maintained via themes.scss

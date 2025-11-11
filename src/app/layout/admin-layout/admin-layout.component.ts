@@ -81,6 +81,10 @@ export class AdminLayoutComponent implements OnInit {
       this.activeMenuItem = 'users';
       this.pageTitle = 'Users Management';
       this.pageDescription = 'Manage organization users and their permissions';
+    } else if (url.includes('/organization/role-permissions')) {
+      this.activeMenuItem = 'role-permissions';
+      this.pageTitle = 'Role & Permissions';
+      this.pageDescription = 'Manage roles and their associated permissions';
     } else if (url.includes('/organization/service-centers')) {
       this.activeMenuItem = 'service-centers';
       this.pageTitle = 'Service Centers';

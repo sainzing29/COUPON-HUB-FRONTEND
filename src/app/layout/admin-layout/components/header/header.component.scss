@@ -25,6 +25,19 @@ header {
   // No need for hardcoded colors - they're defined globally in themes.css
 }
 
+// Header positioning based on sidebar state
+.header-container {
+  transition: left 0.3s ease-in-out;
+}
+
+.header-sidebar-open {
+  left: 227px; // Match sidebar-open width
+}
+
+.header-sidebar-closed {
+  left: 64px; // Match sidebar-closed width (w-16)
+}
+
 // Theme modal styles
 .theme-modal-container {
   animation: fadeIn 0.3s ease-out;
