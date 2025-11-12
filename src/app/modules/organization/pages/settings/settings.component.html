@@ -34,12 +34,6 @@
     </div>
   </div>
 
-  <!-- Save Message -->
-  <div *ngIf="saveMessage" class="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg">
-    <i class="fas fa-check-circle mr-2"></i>
-    {{ saveMessage }}
-  </div>
-
   <!-- Loading State -->
   <div *ngIf="isLoading" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
     <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -288,14 +282,14 @@
           <h3 class="text-md font-semibold text-gray-900 mb-4">Coupon Rules & Defaults</h3>
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Default Validity Period (Days)</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Default Validity Period (Months)</label>
               <input
                 type="number"
-                formControlName="defaultValidityPeriodDays"
+                formControlName="defaultValidityPeriodMonths"
                 min="1"
                 max="3650"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-              <div *ngIf="couponForm.get('defaultValidityPeriodDays')?.invalid && couponForm.get('defaultValidityPeriodDays')?.touched" class="text-red-500 text-sm mt-1">
+              <div *ngIf="couponForm.get('defaultValidityPeriodMonths')?.invalid && couponForm.get('defaultValidityPeriodMonths')?.touched" class="text-red-500 text-sm mt-1">
                 Validity period must be between 1 and 3650 days
               </div>
               <p class="text-xs text-gray-500 mt-1">Default number of days before coupons expire</p>
@@ -313,6 +307,20 @@
                 Maximum coupons per batch must be between 1 and 100,000
               </div>
               <p class="text-xs text-gray-500 mt-1">Maximum number of coupons that can be generated in a single batch</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Maximum Unassigned Coupons Threshold</label>
+              <input
+                type="number"
+                formControlName="maxUnassignedCoupons"
+                min="1"
+                max="100000"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <div *ngIf="couponForm.get('maxUnassignedCoupons')?.invalid && couponForm.get('maxUnassignedCoupons')?.touched" class="text-red-500 text-sm mt-1">
+                Maximum unassigned coupons must be between 1 and 100,000
+              </div>
+              <p class="text-xs text-gray-500 mt-1">New coupon generation is only allowed when total unassigned coupon count is less than this value</p>
             </div>
           </div>
         </div>

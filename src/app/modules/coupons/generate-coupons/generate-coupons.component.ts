@@ -169,8 +169,10 @@ export class GenerateCouponsComponent implements OnInit {
         // Form will be reset when they close the batch summary
       },
       error: (error) => {
-        console.error('Error generating coupons:', error);
-        this.toastr.error(error.message || 'Error generating coupons', 'Error');
+        this.toastr.error(error.message || 'Error generating coupons', 'Error', {
+          timeOut: 4000, // Show error for 10 seconds (10000ms)
+          progressBar: true
+        });
         this.isGenerating = false;
       }
     });

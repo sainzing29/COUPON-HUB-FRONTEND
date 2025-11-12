@@ -87,6 +87,14 @@ export class HeaderComponent implements OnInit {
     return 'U';
   }
 
+  getUserFirstName(): string {
+    if (this.currentUser) {
+      const nameParts = this.currentUser.name.split(' ');
+      return nameParts[0] || this.currentUser.name;
+    }
+    return 'User';
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
     const target = event.target as HTMLElement;

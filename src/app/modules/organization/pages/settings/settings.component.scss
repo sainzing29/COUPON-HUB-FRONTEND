@@ -1,8 +1,6 @@
 // Settings Component Styles
 
-.settings-container {
-  @apply p-6;
-}
+
 
 // Tab Navigation
 .tab-navigation {
@@ -138,9 +136,7 @@
 
 // Responsive Design
 @media (max-width: 768px) {
-  .settings-container {
-    @apply p-4;
-  }
+
   
   .form-grid {
     @apply grid-cols-1 gap-4;

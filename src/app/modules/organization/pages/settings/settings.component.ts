@@ -89,8 +89,9 @@ export class SettingsComponent implements OnInit {
 
     // Coupon Settings Form
     this.couponForm = this.fb.group({
-      maxCouponsPerBatch: [1000, [Validators.required, Validators.min(1), Validators.max(100000)]],
-      defaultValidityPeriodDays: [365, [Validators.required, Validators.min(1), Validators.max(3650)]]
+      maxCouponsPerBatch: [100, [Validators.required, Validators.min(1), Validators.max(1000)]],
+      defaultValidityPeriodMonths: [12, [Validators.required, Validators.min(1), Validators.max(12)]],
+      maxUnassignedCoupons: [1000, [Validators.required, Validators.min(1), Validators.max(100000)]]
     });
   }
 
@@ -136,7 +137,8 @@ export class SettingsComponent implements OnInit {
     // Coupon Settings
     this.couponForm.patchValue({
       maxCouponsPerBatch: config.maxCouponsPerBatch || 1000,
-      defaultValidityPeriodDays: config.defaultValidityPeriodDays || 365
+      defaultValidityPeriodMonths: config.defaultValidityPeriodMonths || 365,
+      maxUnassignedCoupons: config.maxUnassignedCoupons || 1000
     });
   }
 
@@ -176,13 +178,14 @@ export class SettingsComponent implements OnInit {
       emailFromName: emailValues.emailFromName || null,
       emailReplyTo: emailValues.emailReplyTo || null,
       maxCouponsPerBatch: couponValues.maxCouponsPerBatch,
-      defaultValidityPeriodDays: couponValues.defaultValidityPeriodDays
+      defaultValidityPeriodMonths: couponValues.defaultValidityPeriodMonths,
+      maxUnassignedCoupons: couponValues.maxUnassignedCoupons
     };
   }
 
   saveGeneralSettings(): void {
     if (this.generalForm.valid) {
-      this.saveAllSettings('General settings saved successfully!');
+      this.saveAllSettings();
     } else {
       this.generalForm.markAllAsTouched();
       this.toastr.error('Please fix the errors in the form', 'Validation Error');
@@ -191,7 +194,7 @@ export class SettingsComponent implements OnInit {
 
   saveEmailSettings(): void {
     if (this.emailForm.valid) {
-      this.saveAllSettings('Email settings saved successfully!');
+      this.saveAllSettings();
     } else {
       this.emailForm.markAllAsTouched();
       this.toastr.error('Please fix the errors in the form', 'Validation Error');
@@ -200,14 +203,14 @@ export class SettingsComponent implements OnInit {
 
   saveCouponSettings(): void {
     if (this.couponForm.valid) {
-      this.saveAllSettings('Coupon settings saved successfully!');
+      this.saveAllSettings();
     } else {
       this.couponForm.markAllAsTouched();
       this.toastr.error('Please fix the errors in the form', 'Validation Error');
     }
   }
 
-  private saveAllSettings(successMessage: string): void {
+  private saveAllSettings(): void {
     // Validate all forms before saving
     if (this.generalForm.invalid || this.couponForm.invalid) {
       this.toastr.error('Please fix all form errors before saving', 'Validation Error');
@@ -226,8 +229,7 @@ export class SettingsComponent implements OnInit {
         this.configuration = config;
         this.hasConfiguration = true;
         this.isSaving = false;
-        this.toastr.success(successMessage, 'Success');
-        this.showSaveMessage(successMessage);
+        this.toastr.success('Settings saved successfully', 'Success');
       },
       error: (error) => {
         console.error('Error saving configuration:', error);
@@ -242,12 +244,7 @@ export class SettingsComponent implements OnInit {
     this.toastr.info('Email connection test feature coming soon', 'Info');
   }
 
-  private showSaveMessage(message: string): void {
-    this.saveMessage = message;
-    setTimeout(() => {
-      this.saveMessage = '';
-    }, 3000);
-  }
+
 
   getTabClass(tab: string): string {
     return this.activeTab === tab 

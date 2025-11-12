@@ -13,7 +13,8 @@ export interface Configuration {
   emailFromName: string | null;
   emailReplyTo: string | null;
   maxCouponsPerBatch: number;
-  defaultValidityPeriodDays: number;
+  defaultValidityPeriodMonths: number;
+  maxUnassignedCoupons: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -32,6 +33,7 @@ export interface ConfigurationRequest {
   emailFromName: string | null;
   emailReplyTo: string | null;
   maxCouponsPerBatch: number;
-  defaultValidityPeriodDays: number;
+  defaultValidityPeriodMonths: number;
+  maxUnassignedCoupons: number;
 }
 
