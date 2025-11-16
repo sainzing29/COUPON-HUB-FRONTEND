@@ -181,7 +181,7 @@ export class UsersComponent implements OnInit {
           user.firstName.toLowerCase().includes(searchTerm) ||
           user.lastName.toLowerCase().includes(searchTerm) ||
           user.email.toLowerCase().includes(searchTerm) ||
-          user.role.toLowerCase().includes(searchTerm)
+          user.roleName.toLowerCase().includes(searchTerm)
         );
       } else {
         this.filteredUsers = [...this.users];
@@ -229,7 +229,7 @@ export class UsersComponent implements OnInit {
       email: user.email,
       countryCode: countryCode,
       mobileNumber: mobileNumber,
-      role: user.role, // Set role from selected user
+      role: user.roleName, // Set role from selected user
       serviceCenterId: user.serviceCenterId || ''
     });
     // Disable email field initially
@@ -356,6 +356,15 @@ export class UsersComponent implements OnInit {
       // Remove countryCode from formValue as backend might not expect it
       delete formValue.countryCode;
       
+      // Remove role from formValue when creating user (not needed in add API)
+      if (!this.isEditMode) {
+        delete formValue.role;
+      } else if (this.isEditMode && formValue.role) {
+        // For update, rename role to roleName
+        formValue.roleName = formValue.role;
+        delete formValue.role;
+      }
+      
       if (this.isEditMode && this.editingUser) {
         this.userService.updateUser(this.editingUser.id, formValue).subscribe({
           next: (updatedUser) => {
@@ -463,13 +472,13 @@ export class UsersComponent implements OnInit {
     return labels[fieldName] || fieldName;
   }
 
-  getRoleBadgeClass(role: string): string {
+  getRoleBadgeClass(roleName: string): string {
     const classes: { [key: string]: string } = {
       'Admin': 'bg-red-100 text-red-800',
       'Manager': 'bg-yellow-100 text-yellow-800',
       'User': 'bg-blue-100 text-blue-800'
     };
-    return classes[role] || 'bg-gray-100 text-gray-800';
+    return classes[roleName] || 'bg-gray-100 text-gray-800';
   }
 
   getServiceCenterName(serviceCenterId: number | undefined): string {

@@ -2,14 +2,16 @@
   <select
     [id]="id"
     [value]="value"
+    [disabled]="disabled"
     (change)="onCountryCodeChange($event)"
     class="form-select country-code-select"
+    [class.disabled]="disabled"
     [title]="getSelectedCountry()?.code + ' ' + getSelectedCountry()?.country">
     <option *ngFor="let country of countryCodes" [value]="country.code">
       {{ country.code }} {{ country.country }}
     </option>
   </select>
-  <span class="country-code-overlay">{{ value }}</span>
+  <span class="country-code-overlay" [class.disabled]="disabled">{{ value }}</span>
 </div>
 
     

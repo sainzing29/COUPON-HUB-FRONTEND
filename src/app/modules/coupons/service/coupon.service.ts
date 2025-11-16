@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
 import { environment } from '../../../../environments/environment';
 import { Coupon } from '../model/coupon.model';
+import { CouponValidationRequest, CouponValidationResponse } from '../model/coupon-sale.model';
 
 export interface NextSequenceResponse {
   prefix: string;
@@ -74,6 +75,13 @@ export class CouponService {
 
   getCoupons(): Observable<Coupon[]> {
     return this.apiService.get<Coupon[]>('/coupons');
+  }
+
+  /**
+   * Validate coupon code
+   */
+  validateCoupon(request: CouponValidationRequest): Observable<CouponValidationResponse> {
+    return this.apiService.post<CouponValidationResponse>('/coupons/validate', request);
   }
 }
 

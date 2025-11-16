@@ -1,0 +1,632 @@
+<div class="coupon-sale-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="flex items-center mb-6">
+      <button 
+        (click)="goBack()"
+        class="mr-4 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1 class="text-2xl font-bold text-gray-900">
+        {{ currentStep === 'verify' ? 'Verify Customer' : 
+           currentStep === 'otp' ? 'Enter OTP' : 
+           currentStep === 'coupon' ? 'Enter Coupon Code' :
+           currentStep === 'details' ? 'Customer Details' : 
+           currentStep === 'verify-details' ? 'Verify Details' :
+           'Invoice' }}
+      </h1>
+    </div>
+  </div>
+
+  <!-- Step 1: Verify Customer -->
+  <div *ngIf="currentStep === 'verify'" class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="text-center mb-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">Verify Customer</h2>
+        <p class="text-gray-600">Choose verification method and enter customer contact details</p>
+      </div>
+
+      <form [formGroup]="verifyForm">
+        <!-- Verification Method Selection -->
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-3">Verification Method</label>
+          <div class="flex space-x-4">
+            <label class="flex items-center cursor-pointer">
+              <input 
+                type="radio" 
+                [(ngModel)]="verificationMethod" 
+                value="email"
+                (change)="onVerificationMethodChange()"
+                [ngModelOptions]="{standalone: true}"
+                class="mr-2 text-blue-600 focus:ring-blue-500">
+              <span class="text-gray-700">Email</span>
+            </label>
+            <label class="flex items-center cursor-pointer">
+              <input 
+                type="radio" 
+                [(ngModel)]="verificationMethod" 
+                value="phone"
+                (change)="onVerificationMethodChange()"
+                [ngModelOptions]="{standalone: true}"
+                class="mr-2 text-blue-600 focus:ring-blue-500">
+              <span class="text-gray-700">Phone</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Email Input -->
+        <div *ngIf="verificationMethod === 'email'" class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Email Address <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-envelope text-gray-400"></i>
+            </div>
+            <input
+              type="email"
+              formControlName="email"
+              class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter email address"
+              [class.border-red-500]="verifyEmailControl?.invalid && verifyEmailControl?.touched">
+          </div>
+          <div *ngIf="verifyEmailControl?.invalid && verifyEmailControl?.touched" 
+               class="text-red-500 text-xs mt-1">
+            <span *ngIf="verifyEmailControl?.errors?.['required']">Email is required</span>
+            <span *ngIf="verifyEmailControl?.errors?.['email']">Please enter a valid email address</span>
+          </div>
+        </div>
+
+        <!-- Phone Input -->
+        <div *ngIf="verificationMethod === 'phone'" class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Phone Number <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-phone text-gray-400"></i>
+            </div>
+            <input
+              type="tel"
+              formControlName="phone"
+              class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter phone number"
+              [class.border-red-500]="verifyPhoneControl?.invalid && verifyPhoneControl?.touched">
+          </div>
+          <div *ngIf="verifyPhoneControl?.invalid && verifyPhoneControl?.touched" 
+               class="text-red-500 text-xs mt-1">
+            <span *ngIf="verifyPhoneControl?.errors?.['required']">Phone number is required</span>
+            <span *ngIf="verifyPhoneControl?.errors?.['pattern']">Please enter a valid phone number</span>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-end">
+          <button
+            type="button"
+            (click)="sendOtp()"
+            [disabled]="verifyForm.invalid || isSendingOtp"
+            class="px-6 py-3 bg-blue-600 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2 font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+            <i *ngIf="isSendingOtp" class="fas fa-spinner fa-spin"></i>
+            <i *ngIf="!isSendingOtp" class="fas fa-paper-plane"></i>
+            <span>{{ isSendingOtp ? 'Sending...' : 'Send OTP' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Step 2: Enter OTP -->
+  <div *ngIf="currentStep === 'otp'" class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="text-center mb-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">Enter OTP</h2>
+        <p class="text-gray-600">
+          OTP sent to {{ verificationMethod === 'email' ? verifiedEmail : verifiedPhone }}
+        </p>
+      </div>
+
+      <form [formGroup]="otpForm">
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Enter 6-digit OTP <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-key text-gray-400"></i>
+            </div>
+            <input
+              type="text"
+              formControlName="otp"
+              class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg tracking-widest"
+              placeholder="000000"
+              maxlength="6"
+              [class.border-red-500]="otpControl?.invalid && otpControl?.touched">
+          </div>
+          <div *ngIf="otpControl?.invalid && otpControl?.touched" 
+               class="text-red-500 text-xs mt-1">
+            <span *ngIf="otpControl?.errors?.['required']">OTP is required</span>
+            <span *ngIf="otpControl?.errors?.['pattern']">Please enter a valid 6-digit OTP</span>
+          </div>
+        </div>
+
+        <!-- Resend OTP Section -->
+        <div class="mb-6 flex items-center justify-between">
+          <button
+            *ngIf="canResend"
+            type="button"
+            (click)="resendOtp()"
+            class="px-4 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200 flex items-center space-x-2">
+            <i class="fas fa-redo"></i>
+            <span>Resend OTP</span>
+          </button>
+          <div *ngIf="!canResend && resendTimer > 0" class="text-sm text-gray-600">
+            <i class="fas fa-clock mr-2"></i>
+            Resend available in <span class="font-semibold text-red-600">{{ getResendTimerText() }}</span>
+          </div>
+        </div>
+
+        <!-- Verify Button -->
+        <div class="flex justify-end">
+          <button
+            type="button"
+            (click)="verifyOtp()"
+            [disabled]="otpForm.invalid"
+            class="px-6 py-3 bg-green-600 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2 font-medium hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+            <i class="fas fa-check"></i>
+            <span>Verify OTP</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Step 3: Enter Coupon Code -->
+  <div *ngIf="currentStep === 'coupon'" class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="text-center mb-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">Enter Coupon Code</h2>
+        <p class="text-gray-600">Enter the 13-character coupon code</p>
+      </div>
+
+      <form [formGroup]="couponForm">
+        <!-- Coupon Code Input (4-4-5 format) -->
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Coupon Code <span class="text-red-500">*</span>
+          </label>
+          <div class="flex items-center justify-center gap-3">
+            <input
+              type="text"
+              formControlName="couponCode1"
+              data-part="1"
+              (input)="onCouponCodeInput($event, 1)"
+              (keydown)="onCouponCodeKeydown($event, 1)"
+              class="w-32 px-5 py-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-xl font-semibold tracking-widest uppercase"
+              placeholder="AAAA"
+              maxlength="4"
+              style="text-transform: uppercase;"
+              [class.border-red-500]="couponCode1Control?.invalid && couponCode1Control?.touched">
+            <span class="text-3xl font-bold text-gray-400">-</span>
+            <input
+              type="text"
+              formControlName="couponCode2"
+              data-part="2"
+              (input)="onCouponCodeInput($event, 2)"
+              (keydown)="onCouponCodeKeydown($event, 2)"
+              class="w-32 px-5 py-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-xl font-semibold tracking-widest uppercase"
+              placeholder="AAAA"
+              maxlength="4"
+              style="text-transform: uppercase;"
+              [class.border-red-500]="couponCode2Control?.invalid && couponCode2Control?.touched">
+            <span class="text-3xl font-bold text-gray-400">-</span>
+            <input
+              type="text"
+              formControlName="couponCode3"
+              data-part="3"
+              (input)="onCouponCodeInput($event, 3)"
+              (keydown)="onCouponCodeKeydown($event, 3)"
+              class="w-32 px-5 py-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-xl font-semibold tracking-widest uppercase"
+              placeholder="AAAAA"
+              maxlength="5"
+              style="text-transform: uppercase;"
+              [class.border-red-500]="couponCode3Control?.invalid && couponCode3Control?.touched">
+          </div>
+          <div *ngIf="(couponCode1Control?.invalid || couponCode2Control?.invalid || couponCode3Control?.invalid) && (couponCode1Control?.touched || couponCode2Control?.touched || couponCode3Control?.touched)" 
+               class="text-red-500 text-xs mt-2 text-center">
+            Please enter complete 13-character coupon code
+          </div>
+        </div>
+
+        <!-- Verify Button -->
+        <div class="flex justify-end">
+          <button
+            type="button"
+            (click)="verifyCouponCode()"
+            [disabled]="couponForm.invalid || isValidatingCoupon"
+            class="px-6 py-3 bg-blue-600 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2 font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+            <i *ngIf="isValidatingCoupon" class="fas fa-spinner fa-spin"></i>
+            <i *ngIf="!isValidatingCoupon" class="fas fa-check"></i>
+            <span>{{ isValidatingCoupon ? 'Verifying...' : 'Verify' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Step 4: Customer Details -->
+  <div *ngIf="currentStep === 'details'" class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="text-center mb-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">Customer Details</h2>
+        <p class="text-gray-600">Enter customer information and select coupon scheme</p>
+      </div>
+
+      <form [formGroup]="customerDetailsForm" (ngSubmit)="submitCustomerDetails()">
+        <div class="space-y-6">
+          <!-- First Name and Last Name in one row -->
+          <div class="grid grid-cols-2 gap-4">
+            <!-- First Name -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                First Name <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                formControlName="FirstName"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter first name"
+                [class.border-red-500]="firstNameControl?.invalid && firstNameControl?.touched">
+              <div *ngIf="firstNameControl?.invalid && firstNameControl?.touched" 
+                   class="text-red-500 text-xs mt-1">
+                <span *ngIf="firstNameControl?.errors?.['required']">First name is required</span>
+                <span *ngIf="firstNameControl?.errors?.['minlength']">First name must be at least 2 characters</span>
+              </div>
+            </div>
+
+            <!-- Last Name -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Last Name <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                formControlName="LastName"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter last name"
+                [class.border-red-500]="lastNameControl?.invalid && lastNameControl?.touched">
+              <div *ngIf="lastNameControl?.invalid && lastNameControl?.touched" 
+                   class="text-red-500 text-xs mt-1">
+                <span *ngIf="lastNameControl?.errors?.['required']">Last name is required</span>
+                <span *ngIf="lastNameControl?.errors?.['minlength']">Last name must be at least 2 characters</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Email <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-envelope text-gray-400"></i>
+              </div>
+              <input
+                type="email"
+                formControlName="Email"
+                [readonly]="verificationMethod === 'email'"
+                class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                [class.bg-gray-100]="verificationMethod === 'email'"
+                [class.text-gray-500]="verificationMethod === 'email'"
+                [class.cursor-not-allowed]="verificationMethod === 'email'"
+                placeholder="Enter email address"
+                [class.border-red-500]="emailControl?.invalid && emailControl?.touched">
+            </div>
+            <div *ngIf="emailControl?.invalid && emailControl?.touched" 
+                 class="text-red-500 text-xs mt-1">
+              <span *ngIf="emailControl?.errors?.['required']">Email is required</span>
+              <span *ngIf="emailControl?.errors?.['email']">Please enter a valid email address</span>
+            </div>
+            <p *ngIf="verificationMethod === 'email'" class="text-xs text-gray-500 mt-1">Email verified from OTP step</p>
+          </div>
+
+          <!-- Mobile Number with Country Code -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Mobile Number <span class="text-red-500">*</span>
+            </label>
+            <div class="flex gap-2">
+              <!-- Country Code Selector -->
+              <app-country-code-selector
+                id="countryCode"
+                [value]="customerDetailsForm.get('countryCode')?.value || '+971'"
+                [disabled]="verificationMethod === 'phone'"
+                (valueChange)="customerDetailsForm.get('countryCode')?.setValue($event); selectedCountryCode = $event">
+              </app-country-code-selector>
+              <!-- Mobile Number Input -->
+              <div class="flex-1">
+                <input
+                  type="tel"
+                  formControlName="MobileNumber"
+                  [readonly]="verificationMethod === 'phone'"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  [class.bg-gray-100]="verificationMethod === 'phone'"
+                  [class.text-gray-500]="verificationMethod === 'phone'"
+                  [class.cursor-not-allowed]="verificationMethod === 'phone'"
+                  placeholder="Enter mobile number"
+                  [class.border-red-500]="mobileNumberControl?.invalid && mobileNumberControl?.touched">
+              </div>
+            </div>
+            <div *ngIf="mobileNumberControl?.invalid && mobileNumberControl?.touched" 
+                 class="text-red-500 text-xs mt-1">
+              <span *ngIf="mobileNumberControl?.errors?.['required']">Mobile number is required</span>
+              <span *ngIf="mobileNumberControl?.errors?.['pattern']">Please enter a valid mobile number</span>
+            </div>
+            <p *ngIf="verificationMethod === 'phone'" class="text-xs text-gray-500 mt-1">Mobile number verified from OTP step</p>
+            <p *ngIf="verificationMethod === 'email'" class="text-xs text-gray-500 mt-1">Enter phone number without the country code</p>
+          </div>
+
+          <!-- Coupon Scheme Selection -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Coupon Scheme <span class="text-red-500">*</span>
+            </label>
+            <select
+              formControlName="SchemeId"
+              (change)="onSchemeChange()"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              [class.border-red-500]="schemeIdControl?.invalid && schemeIdControl?.touched">
+              <option value="">Select a coupon scheme</option>
+              <option *ngFor="let scheme of couponSchemes" [value]="scheme.id">
+                {{ scheme.id }} - {{ scheme.name }}
+              </option>
+            </select>
+            <div *ngIf="schemeIdControl?.invalid && schemeIdControl?.touched" 
+                 class="text-red-500 text-xs mt-1">
+              Please select a coupon scheme
+            </div>
+          </div>
+
+          <!-- Selected Scheme Details -->
+          <div *ngIf="selectedScheme" class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <h4 class="font-semibold text-gray-900 mb-2">{{ selectedScheme.name }}</h4>
+            <p class="text-sm text-gray-600 mb-3">{{ selectedScheme.description }}</p>
+            <div class="text-lg font-bold text-blue-600">{{ selectedScheme.price }} AED</div>
+            <div *ngIf="selectedScheme.products && selectedScheme.products.length > 0" class="mt-3">
+              <p class="text-sm font-medium text-gray-700 mb-2">Products Included:</p>
+              <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                <li *ngFor="let product of selectedScheme.products">{{ product.name }}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Next Button -->
+        <div class="mt-8 flex justify-end">
+          <button
+            type="button"
+            (click)="submitCustomerDetails()"
+            [disabled]="customerDetailsForm.invalid"
+            class="px-8 py-3 bg-blue-600 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2 font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+            <i class="fas fa-arrow-right"></i>
+            <span>Next</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Step 5: Verify Details -->
+  <div *ngIf="currentStep === 'verify-details'" class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="text-center mb-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">Verify Details</h2>
+        <p class="text-gray-600">Please review the details and select payment method</p>
+      </div>
+
+      <!-- Customer Details Summary -->
+      <div class="mb-6 space-y-4">
+        <div class="bg-gray-50 rounded-lg p-4">
+          <h3 class="font-semibold text-gray-900 mb-3">Customer Information</h3>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Name:</span>
+              <span class="font-medium text-gray-900">{{ customerDetailsForm.get('FirstName')?.value }} {{ customerDetailsForm.get('LastName')?.value }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Email:</span>
+              <span class="font-medium text-gray-900">{{ customerDetailsForm.get('Email')?.value }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Mobile:</span>
+              <span class="font-medium text-gray-900">{{ customerDetailsForm.get('countryCode')?.value }}{{ customerDetailsForm.get('MobileNumber')?.value }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-4">
+          <h3 class="font-semibold text-gray-900 mb-3">Coupon Information</h3>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Coupon Code:</span>
+              <span class="font-medium text-gray-900">{{ fullCouponCode }}</span>
+            </div>
+            <div *ngIf="selectedScheme" class="flex justify-between">
+              <span class="text-gray-600">Scheme:</span>
+              <span class="font-medium text-gray-900">{{ selectedScheme.name }} - {{ selectedScheme.price }} AED</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Method -->
+      <form [formGroup]="verifyDetailsForm">
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Payment Method <span class="text-red-500">*</span>
+          </label>
+          <div class="grid grid-cols-3 gap-3">
+            <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors"
+                   [class.border-blue-500]="paymentMethodControl?.value === 'Cash'"
+                   [class.border-gray-300]="paymentMethodControl?.value !== 'Cash'"
+                   [class.bg-blue-50]="paymentMethodControl?.value === 'Cash'">
+              <input
+                type="radio"
+                formControlName="PaymentMethod"
+                value="Cash"
+                class="mr-2 text-blue-600 focus:ring-blue-500">
+              <span class="text-gray-700 font-medium">Cash</span>
+            </label>
+            <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors"
+                   [class.border-blue-500]="paymentMethodControl?.value === 'Card'"
+                   [class.border-gray-300]="paymentMethodControl?.value !== 'Card'"
+                   [class.bg-blue-50]="paymentMethodControl?.value === 'Card'">
+              <input
+                type="radio"
+                formControlName="PaymentMethod"
+                value="Card"
+                class="mr-2 text-blue-600 focus:ring-blue-500">
+              <span class="text-gray-700 font-medium">Card</span>
+            </label>
+            <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors"
+                   [class.border-blue-500]="paymentMethodControl?.value === 'UPI'"
+                   [class.border-gray-300]="paymentMethodControl?.value !== 'UPI'"
+                   [class.bg-blue-50]="paymentMethodControl?.value === 'UPI'">
+              <input
+                type="radio"
+                formControlName="PaymentMethod"
+                value="UPI"
+                class="mr-2 text-blue-600 focus:ring-blue-500">
+              <span class="text-gray-700 font-medium">UPI</span>
+            </label>
+          </div>
+          <div *ngIf="paymentMethodControl?.invalid && paymentMethodControl?.touched" 
+               class="text-red-500 text-xs mt-1">
+            Please select a payment method
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-between">
+          <button
+            type="button"
+            (click)="goBack()"
+            class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center space-x-2">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back</span>
+          </button>
+          <button
+            type="button"
+            (click)="generateInvoice()"
+            [disabled]="verifyDetailsForm.invalid || isSubmitting"
+            class="px-8 py-3 bg-green-600 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2 font-medium hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+            <i *ngIf="isSubmitting" class="fas fa-spinner fa-spin"></i>
+            <i *ngIf="!isSubmitting" class="fas fa-file-invoice"></i>
+            <span>{{ isSubmitting ? 'Generating...' : 'Generate Invoice' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Step 6: Invoice -->
+  <div *ngIf="currentStep === 'invoice' && invoiceDetails" class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <!-- Invoice Header -->
+      <div class="flex justify-between items-start mb-6 pb-6 border-b">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">Invoice</h2>
+          <p class="text-sm text-gray-600">Invoice #: {{ invoiceDetails.invoiceNumber }}</p>
+          <p class="text-sm text-gray-600">Date: {{ invoiceDetails.invoiceDate }}</p>
+        </div>
+        <div class="flex space-x-3">
+          <button 
+            (click)="printInvoice()"
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center space-x-2">
+            <i class="fas fa-print"></i>
+            <span>Print</span>
+          </button>
+          <button 
+            (click)="downloadInvoice()"
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center space-x-2">
+            <i class="fas fa-download"></i>
+            <span>Download</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Customer Information -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Bill To:</h3>
+        <div class="bg-gray-50 rounded-lg p-4">
+          <p class="font-medium text-gray-900">{{ invoiceDetails.customerName }}</p>
+          <p *ngIf="invoiceDetails.customerEmail" class="text-sm text-gray-600 mt-1">
+            <i class="fas fa-envelope mr-2"></i>{{ invoiceDetails.customerEmail }}
+          </p>
+          <p *ngIf="invoiceDetails.customerPhone" class="text-sm text-gray-600 mt-1">
+            <i class="fas fa-phone mr-2"></i>{{ invoiceDetails.customerPhone }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Coupon Details -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Coupon Details:</h3>
+        <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+          <p class="font-medium text-gray-900">Coupon Code: <span class="text-blue-600">{{ invoiceDetails.couponCode }}</span></p>
+          <p class="text-sm text-gray-600 mt-1">{{ invoiceDetails.couponScheme.name }}</p>
+        </div>
+      </div>
+
+      <!-- Products Included -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Products Included:</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="border border-gray-300 px-4 py-3 text-left text-sm font-medium text-gray-700">#</th>
+                <th class="border border-gray-300 px-4 py-3 text-left text-sm font-medium text-gray-700">Product Name</th>
+                <th class="border border-gray-300 px-4 py-3 text-left text-sm font-medium text-gray-700">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let product of invoiceDetails.couponScheme.products; let i = index" 
+                  class="hover:bg-gray-50">
+                <td class="border border-gray-300 px-4 py-3 text-sm text-gray-900">{{ i + 1 }}</td>
+                <td class="border border-gray-300 px-4 py-3 text-sm font-medium text-gray-900">{{ product.name }}</td>
+                <td class="border border-gray-300 px-4 py-3 text-sm text-gray-600">{{ product.description }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Total Amount -->
+      <div class="flex justify-end mb-6">
+        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 w-64">
+          <div class="flex justify-between items-center">
+            <span class="text-lg font-semibold text-gray-900">Total Amount:</span>
+            <span class="text-xl font-bold text-blue-600">{{ invoiceDetails.totalAmount }} AED</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end space-x-3 pt-6 border-t">
+        <button 
+          (click)="resetAllForms()"
+          class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200">
+          New Sale
+        </button>
+        <button 
+          (click)="goBack()"
+          class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

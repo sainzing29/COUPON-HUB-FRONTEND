@@ -6,11 +6,12 @@
   [@slideInOut]="sidebarOpen ? 'in' : 'out'"
 >
   <!-- Brand Section -->
-  <div class="sidebar-brand">
+  <div class="sidebar-brand" tabindex="-1">
     <img 
       src="assets/images/ces-logo.svg" 
       alt="CES Warranty Logo" 
-      [class]="sidebarOpen ? 'logo-expanded' : 'logo-collapsed'">
+      [class]="sidebarOpen ? 'logo-expanded' : 'logo-collapsed'"
+      tabindex="-1">
   </div>
 
   <!-- Navigation Menu -->

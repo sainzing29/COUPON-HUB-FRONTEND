@@ -1,0 +1,38 @@
+// Coupon Schemes Component Styles
+
+.container {
+  padding: 1.5rem;
+}
+
+// Master list item hover effect
+.cursor-pointer {
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateX(2px);
+  }
+}
+
+// Detail view scrollbar
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+  }
+}
+

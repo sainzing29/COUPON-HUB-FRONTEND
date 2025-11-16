@@ -130,6 +130,36 @@ export const routes: Routes = [
         canActivate: [permissionGuard]
       },
       {
+        path: 'coupons/coupon-schemes',
+        loadComponent: () => import('./modules/coupons/coupon-schemes/coupon-schemes.component').then(m => m.CouponSchemesComponent),
+        canActivate: [permissionGuard],
+        data: { permission: 'CouponScheme' }
+      },
+      {
+        path: 'coupons/coupon-schemes/new',
+        loadComponent: () => import('./modules/coupons/coupon-scheme-add/coupon-scheme-add.component').then(m => m.CouponSchemeAddComponent),
+        canActivate: [permissionGuard],
+        data: { permission: 'CouponScheme' }
+      },
+      {
+        path: 'coupons/coupon-schemes/:id',
+        loadComponent: () => import('./modules/coupons/coupon-scheme-add/coupon-scheme-add.component').then(m => m.CouponSchemeAddComponent),
+        canActivate: [permissionGuard],
+        data: { permission: 'CouponScheme' }
+      },
+      {
+        path: 'coupons/coupon-sale',
+        loadComponent: () => import('./modules/coupons/coupon-sale/coupon-sale.component').then(m => m.CouponSaleComponent),
+        canActivate: [permissionGuard],
+        data: { permission: 'CouponSale' }
+      },
+      {
+        path: 'coupons/invoice-view',
+        loadComponent: () => import('./modules/coupons/invoice-view/invoice-view.component').then(m => m.InvoiceViewComponent),
+        canActivate: [permissionGuard],
+        data: { permission: 'CouponSale' }
+      },
+      {
         path: 'invoices',
         loadComponent: () => import('./modules/organization/pages/invoices/invoices.component').then(m => m.InvoicesComponent),
         canActivate: [permissionGuard]

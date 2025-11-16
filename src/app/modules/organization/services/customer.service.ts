@@ -30,6 +30,37 @@ export interface CustomerUpdateRequest {
   mobileNumber?: string;
 }
 
+export interface CustomerCoupon {
+  couponId: number;
+  couponCode: string;
+  price: number;
+  status: string;
+  purchaseDate: string;
+  expiryDate: string;
+}
+
+export interface CustomerService {
+  serviceName: string;
+  redemptionDate: string;
+  serviceCenter: string;
+  status: string;
+}
+
+export interface CustomerInvoice {
+  invoiceNumber: string;
+  serviceCenter: string;
+  createdAt: string;
+  amount: number;
+  paymentStatus: string;
+}
+
+export interface CustomerDetailResponse {
+  customer: Customer;
+  coupons: CustomerCoupon[];
+  services: CustomerService[];
+  invoices: CustomerInvoice[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -44,6 +75,11 @@ export class CustomerService {
   // Get customer by ID
   getCustomerById(id: number): Observable<Customer> {
     return this.apiService.get<Customer>(`/customers/${id}`);
+  }
+
+  // Get customer details with coupons, services, and invoices
+  getCustomerDetails(id: number): Observable<CustomerDetailResponse> {
+    return this.apiService.get<CustomerDetailResponse>(`/customers/${id}`);
   }
 
   // Create new customer

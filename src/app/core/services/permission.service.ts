@@ -15,11 +15,12 @@ export class PermissionService {
     'Users': ['/organization/users'],
     'ServiceCenter': ['/organization/service-centers'],
     'Customer': ['/organization/customers'],
-    'CouponSale': ['/organization/new-coupons/sale'],
+    'CouponSale': ['/organization/new-coupons/sale', '/organization/coupons/coupon-sale'],
     'RadeemCoupon': ['/organization/service-redemption', '/organization/service-redemption/redeem-service'],
     'GenerateCoupons': ['/organization/coupons/generate-coupons'],
     'ExportCoupons': ['/organization/coupons'], // Export is typically a feature within coupons list
     'CouponStatusChange': ['/organization/coupons'], // Status change is typically a feature within coupons list
+    'CouponScheme': ['/organization/coupons/coupon-schemes'],
     'FinancialData': ['/organization/invoices'],
     'Reports': ['/reports/sales-report', '/reports/service-usage-report', '/reports/service-center-performance'],
     'Configuration': ['/organization/settings'],
@@ -37,6 +38,8 @@ export class PermissionService {
     'coupons-list': ['ExportCoupons', 'CouponStatusChange'], // View coupons
     'generate-coupons': ['GenerateCoupons'],
     'batches': ['GenerateCoupons'], // Batch history is related to coupon generation
+    'coupon-schemes': ['CouponScheme'],
+    'coupon-sale': ['CouponSale'],
     'invoices': ['FinancialData'],
     'settings': ['Configuration'],
     'reports': ['Reports'],
@@ -68,7 +71,13 @@ export class PermissionService {
    */
   hasAnyPermission(permissions: string[]): boolean {
     const userPermissions = this.getPermissions();
-    return permissions.some(permission => userPermissions.includes(permission));
+    const hasAccess = permissions.some(permission => userPermissions.includes(permission));
+    console.log('PermissionService: hasAnyPermission check', { 
+      requiredPermissions: permissions, 
+      userPermissions, 
+      hasAccess 
+    });
+    return hasAccess;
   }
 
   /**

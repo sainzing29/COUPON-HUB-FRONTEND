@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../../../core/services/api.service';
-import { Configuration, ConfigurationRequest } from './configuration.model';
+import { Configuration, ConfigurationRequest, BasicConfiguration } from './configuration.model';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +28,13 @@ export class ConfigurationService {
    */
   updateConfiguration(config: ConfigurationRequest): Observable<Configuration> {
     return this.apiService.put<Configuration>('/configuration', config);
+  }
+
+  /**
+   * Get basic configuration
+   */
+  getBasicConfiguration(): Observable<BasicConfiguration> {
+    return this.apiService.get<BasicConfiguration>('/configuration/basic');
   }
 }
 

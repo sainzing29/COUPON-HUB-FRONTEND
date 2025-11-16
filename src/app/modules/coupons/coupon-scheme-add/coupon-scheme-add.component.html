@@ -1,0 +1,304 @@
+<div class="mx-auto" [@pageFadeIn]>
+  <!-- Page Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">
+      {{ isEditMode ? 'Edit Coupon Scheme' : 'Add New Coupon Scheme' }}
+    </h1>
+    <p class="text-gray-600 mt-1">
+      {{ isEditMode ? 'Update coupon scheme details and products' : 'Create a new coupon scheme with products' }}
+    </p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center py-12">
+    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    <p class="text-gray-600 mt-2">Loading coupon scheme...</p>
+  </div>
+
+  <!-- Form -->
+  <form *ngIf="!isLoading" [formGroup]="schemeForm" (ngSubmit)="onSubmit()" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <!-- Scheme Details -->
+    <div class="mb-8">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">Scheme Details</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Name -->
+        <div class="form-group">
+          <label for="name" class="form-label">Name *</label>
+          <input 
+            type="text" 
+            id="name"
+            formControlName="name" 
+            placeholder="Enter scheme name"
+            class="form-input"
+            [class.error]="getMainFieldError('name')">
+          <div *ngIf="getMainFieldError('name')" class="form-error">
+            {{ getMainFieldError('name') }}
+          </div>
+        </div>
+
+        <!-- Price -->
+        <div class="form-group">
+          <label for="price" class="form-label">Price *</label>
+          <input 
+            type="number" 
+            id="price"
+            formControlName="price" 
+            placeholder="0"
+            min="0"
+            max="9999"
+            maxlength="4"
+            (input)="onPriceInput($event)"
+            class="form-input w-32"
+            [class.error]="getMainFieldError('price')">
+          <div *ngIf="getMainFieldError('price')" class="form-error">
+            {{ getMainFieldError('price') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group mt-6">
+        <label for="description" class="form-label">Description *</label>
+        <textarea 
+          id="description"
+          formControlName="description" 
+          placeholder="Enter scheme description"
+          rows="3"
+          class="form-textarea"
+          [class.error]="getMainFieldError('description')"></textarea>
+        <div *ngIf="getMainFieldError('description')" class="form-error">
+          {{ getMainFieldError('description') }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Products Section -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-800">Products</h2>
+        <button 
+          type="button"
+          (click)="openProductModal()"
+          class="text-blue-600 hover:text-blue-800 px-3 py-1 rounded-lg border border-blue-600 hover:bg-blue-50 flex items-center space-x-1 transition-colors">
+          <i class="bi bi-plus-circle"></i>
+          <span>Add Product</span>
+        </button>
+      </div>
+
+      <!-- Products Table -->
+      <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Order
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Name
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Description
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Icon
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr *ngIf="productsFormArray.length === 0">
+                <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                  <i class="bi bi-inbox text-4xl mb-2"></i>
+                  <p>No products added. Click "Add Product" to add one.</p>
+                </td>
+              </tr>
+              <tr *ngFor="let product of productsList; let i = index" class="hover:bg-gray-50">
+                <!-- Display Order -->
+                <td class="px-4 py-2 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">{{ product.displayOrder }}</div>
+                </td>
+                <!-- Name -->
+                <td class="px-4 py-2 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">{{ product.name }}</div>
+                </td>
+                <!-- Description -->
+                <td class="px-4 py-2">
+                  <div class="text-sm text-gray-900 max-w-xs truncate" [title]="product.description">
+                    {{ product.description }}
+                  </div>
+                </td>
+                <!-- Icon -->
+                <td class="px-4 py-2 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">{{ product.icon || 'N/A' }}</div>
+                </td>
+                <!-- Actions -->
+                <td class="px-4 py-2 whitespace-nowrap text-sm font-medium">
+                  <div class="flex items-center space-x-2" (click)="$event.stopPropagation()">
+                    <button 
+                      type="button"
+                      (click)="moveProductUp(product.index); $event.stopPropagation()"
+                      [disabled]="product.index === 0"
+                      class="text-gray-600 hover:text-gray-800 p-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                      matTooltip="Move Up">
+                      <i class="bi bi-arrow-up"></i>
+                    </button>
+                    <button 
+                      type="button"
+                      (click)="moveProductDown(product.index); $event.stopPropagation()"
+                      [disabled]="product.index === productsFormArray.length - 1"
+                      class="text-gray-600 hover:text-gray-800 p-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                      matTooltip="Move Down">
+                      <i class="bi bi-arrow-down"></i>
+                    </button>
+                    <button 
+                      type="button"
+                      (click)="openProductModal(product.index); $event.stopPropagation()"
+                      class="text-blue-600 hover:text-blue-800 p-1 rounded"
+                      matTooltip="Edit Product">
+                      <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button 
+                      type="button"
+                      (click)="removeProduct(product.index); $event.stopPropagation()"
+                      class="text-red-600 hover:text-red-800 p-1 rounded"
+                      matTooltip="Remove Product">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+      <button 
+        type="button"
+        (click)="onCancel()"
+        class="form-button form-button-secondary">
+        Cancel
+      </button>
+      <button 
+        type="submit"
+        [disabled]="schemeForm.invalid || isSubmitting"
+        class="form-button">
+        <span *ngIf="isSubmitting" class="inline-flex items-center">
+          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ isEditMode ? 'Updating...' : 'Creating...' }}
+        </span>
+        <span *ngIf="!isSubmitting">
+          {{ isEditMode ? 'Update Scheme' : 'Create Scheme' }}
+        </span>
+      </button>
+    </div>
+  </form>
+
+  <!-- Add/Edit Product Modal -->
+  <div *ngIf="showProductModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-900">
+            {{ editingProductIndex !== null ? 'Edit Product' : 'Add New Product' }}
+          </h2>
+          <button 
+            type="button"
+            (click)="closeProductModal()"
+            class="text-gray-400 hover:text-gray-600">
+            <i class="bi bi-x-lg text-xl"></i>
+          </button>
+        </div>
+
+        <!-- Product Form -->
+        <form [formGroup]="productForm" (ngSubmit)="saveProduct()" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Product Name -->
+            <div class="form-group">
+              <label for="productName" class="form-label">Product Name *</label>
+              <input 
+                type="text" 
+                id="productName"
+                formControlName="name" 
+                placeholder="Enter product name"
+                class="form-input"
+                [class.error]="getProductFieldError('name')">
+              <div *ngIf="getProductFieldError('name')" class="form-error">
+                {{ getProductFieldError('name') }}
+              </div>
+            </div>
+
+            <!-- Display Order -->
+            <div class="form-group">
+              <label for="displayOrder" class="form-label">Display Order *</label>
+              <input 
+                type="number" 
+                id="displayOrder"
+                formControlName="displayOrder" 
+                placeholder="1"
+                min="1"
+                class="form-input"
+                [class.error]="getProductFieldError('displayOrder')">
+              <div *ngIf="getProductFieldError('displayOrder')" class="form-error">
+                {{ getProductFieldError('displayOrder') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Product Description -->
+          <div class="form-group">
+            <label for="productDescription" class="form-label">Product Description *</label>
+            <textarea 
+              id="productDescription"
+              formControlName="description" 
+              placeholder="Enter product description"
+              rows="3"
+              class="form-textarea"
+              [class.error]="getProductFieldError('description')"></textarea>
+            <div *ngIf="getProductFieldError('description')" class="form-error">
+              {{ getProductFieldError('description') }}
+            </div>
+          </div>
+
+          <!-- Icon -->
+          <div class="form-group">
+            <label for="productIcon" class="form-label">Icon (Optional)</label>
+            <input 
+              type="text" 
+              id="productIcon"
+              formControlName="icon" 
+              placeholder="Enter icon name or path"
+              class="form-input">
+            <p class="text-xs text-gray-500 mt-1">Enter icon file name or path (e.g., "oil-change-icon.svg")</p>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="flex justify-end space-x-3 pt-4">
+            <button 
+              type="button"
+              (click)="closeProductModal()"
+              class="form-button form-button-secondary">
+              Cancel
+            </button>
+            <button 
+              type="submit"
+              [disabled]="productForm.invalid"
+              class="form-button">
+              {{ editingProductIndex !== null ? 'Update Product' : 'Add Product' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+

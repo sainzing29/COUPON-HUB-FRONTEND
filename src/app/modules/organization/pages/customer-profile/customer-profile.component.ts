@@ -9,49 +9,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ToastrService } from 'ngx-toastr';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CustomerService, Customer } from '../../services/customer.service';
+import { CustomerService, Customer, CustomerDetailResponse, CustomerCoupon, CustomerService as CustomerServiceData, CustomerInvoice } from '../../services/customer.service';
 import { trigger, transition, style, animate } from '@angular/animations';
-
-interface Coupon {
-  id: number;
-  code: string;
-  discount: string;
-  originalPrice: number;
-  discountedPrice: number;
-  status: 'Active' | 'Used' | 'Expired';
-  purchaseDate: string;
-  expiryDate: string;
-  serviceCenterName: string;
-}
-
-interface ServiceHistory {
-  id: number;
-  serviceName: string;
-  serviceCenterName: string;
-  serviceDate: string;
-  status: 'Completed' | 'In Progress' | 'Cancelled';
-  amount: number;
-  technician: string;
-}
-
-interface Invoice {
-  id: number;
-  invoiceNumber: string;
-  customerName: string;
-  serviceCenterName: string;
-  issueDate: string;
-  dueDate: string;
-  amount: number;
-  status: 'Paid' | 'Pending' | 'Overdue';
-  items: InvoiceItem[];
-}
-
-interface InvoiceItem {
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  total: number;
-}
 
 @Component({
   selector: 'app-customer-profile',
@@ -90,10 +49,10 @@ export class CustomerProfileComponent implements OnInit {
   customer: Customer | null = null;
   selectedTabIndex = 0;
   
-  // Sample data - replace with actual API calls
-  coupons: Coupon[] = [];
-  serviceHistory: ServiceHistory[] = [];
-  invoices: Invoice[] = [];
+  // Data from API
+  coupons: CustomerCoupon[] = [];
+  services: CustomerServiceData[] = [];
+  invoices: CustomerInvoice[] = [];
   
   // Edit form
   editForm: FormGroup;
@@ -118,156 +77,26 @@ export class CustomerProfileComponent implements OnInit {
     // Get customer ID from route params or input
     const id = this.customerId || this.route.snapshot.params['id'];
     if (id) {
-      this.loadCustomer(+id);
+      this.loadCustomerDetails(+id);
     }
-    this.loadSampleData();
   }
 
-  private loadCustomer(id: number): void {
-    this.customerService.getCustomerById(id).subscribe({
-      next: (customer) => {
-        this.customer = customer;
+  private loadCustomerDetails(id: number): void {
+    this.customerService.getCustomerDetails(id).subscribe({
+      next: (response: CustomerDetailResponse) => {
+        this.customer = response.customer;
+        this.coupons = response.coupons || [];
+        this.services = response.services || [];
+        this.invoices = response.invoices || [];
         this.populateEditForm();
       },
       error: (error) => {
-        console.error('Error loading customer:', error);
+        console.error('Error loading customer details:', error);
         this.toastr.error('Error loading customer details', 'Error');
-        // Fallback to sample data
-        this.loadSampleCustomer();
       }
     });
   }
 
-  private loadSampleCustomer(): void {
-    this.customer = {
-      id: 1,
-      firstName: 'John',
-      lastName: 'Doe',
-      fullName: 'John Doe',
-      email: 'john.doe@example.com',
-      mobileNumber: '1234567890',
-      isActive: true,
-      createdAt: '2024-01-15T10:30:00Z',
-      couponCount: 5,
-      invoiceCount: 3,
-      googleId: null
-    };
-    this.populateEditForm();
-  }
-
-
-  private loadSampleData(): void {
-    // Sample coupons data
-    this.coupons = [
-      {
-        id: 1,
-        code: 'SUMMER20',
-        discount: '20%',
-        originalPrice: 100,
-        discountedPrice: 80,
-        status: 'Active',
-        purchaseDate: '2024-01-15',
-        expiryDate: '2024-02-15',
-        serviceCenterName: 'Downtown Service Center'
-      },
-      {
-        id: 2,
-        code: 'SAVEBIG10',
-        discount: '$10 Off',
-        originalPrice: 50,
-        discountedPrice: 40,
-        status: 'Used',
-        purchaseDate: '2024-01-10',
-        expiryDate: '2024-02-10',
-        serviceCenterName: 'Downtown Service Center'
-      },
-      {
-        id: 3,
-        code: 'FREEDELIVERY',
-        discount: 'Free Delivery',
-        originalPrice: 10,
-        discountedPrice: 0,
-        status: 'Expired',
-        purchaseDate: '2024-01-01',
-        expiryDate: '2024-01-31',
-        serviceCenterName: 'Downtown Service Center'
-      }
-    ];
-
-    // Sample service history data
-    this.serviceHistory = [
-      {
-        id: 1,
-        serviceName: 'Oil Change',
-        serviceCenterName: 'Downtown Service Center',
-        serviceDate: '2024-01-20',
-        status: 'Completed',
-        amount: 50,
-        technician: 'Mike Johnson'
-      },
-      {
-        id: 2,
-        serviceName: 'Brake Inspection',
-        serviceCenterName: 'Downtown Service Center',
-        serviceDate: '2024-01-15',
-        status: 'Completed',
-        amount: 75,
-        technician: 'Sarah Wilson'
-      },
-      {
-        id: 3,
-        serviceName: 'Tire Rotation',
-        serviceCenterName: 'Downtown Service Center',
-        serviceDate: '2024-01-10',
-        status: 'Completed',
-        amount: 25,
-        technician: 'Mike Johnson'
-      }
-    ];
-
-    // Sample invoices data
-    this.invoices = [
-      {
-        id: 1,
-        invoiceNumber: 'INV-2024-001',
-        customerName: 'John Doe',
-        serviceCenterName: 'Downtown Service Center',
-        issueDate: '2024-01-20',
-        dueDate: '2024-02-20',
-        amount: 50,
-        status: 'Paid',
-        items: [
-          { description: 'Oil Change Service', quantity: 1, unitPrice: 50, total: 50 }
-        ]
-      },
-      {
-        id: 2,
-        invoiceNumber: 'INV-2024-002',
-        customerName: 'John Doe',
-        serviceCenterName: 'Downtown Service Center',
-        issueDate: '2024-01-15',
-        dueDate: '2024-02-15',
-        amount: 75,
-        status: 'Paid',
-        items: [
-          { description: 'Brake Inspection', quantity: 1, unitPrice: 75, total: 75 }
-        ]
-      },
-      {
-        id: 3,
-        invoiceNumber: 'INV-2024-003',
-        customerName: 'John Doe',
-        serviceCenterName: 'Downtown Service Center',
-        issueDate: '2024-01-10',
-        dueDate: '2024-02-10',
-        amount: 25,
-        status: 'Pending',
-        items: [
-          { description: 'Tire Rotation', quantity: 1, unitPrice: 25, total: 25 }
-        ]
-      }
-    ];
-  }
 
   private populateEditForm(): void {
     if (this.customer) {
@@ -374,8 +203,8 @@ export class CustomerProfileComponent implements OnInit {
     }).format(amount);
   }
 
-  getCouponsByStatus(status: string): Coupon[] {
-    return this.coupons.filter(coupon => coupon.status === status);
+  getCouponsByStatus(status: string): CustomerCoupon[] {
+    return this.coupons.filter(coupon => coupon.status?.toLowerCase() === status.toLowerCase());
   }
 
   getTotalAmount(): number {
@@ -384,25 +213,21 @@ export class CustomerProfileComponent implements OnInit {
 
   getPaidAmount(): number {
     return this.invoices
-      .filter(invoice => invoice.status === 'Paid')
+      .filter(invoice => invoice.paymentStatus?.toLowerCase() === 'paid')
       .reduce((total, invoice) => total + invoice.amount, 0);
   }
 
   getPendingAmount(): number {
     return this.invoices
-      .filter(invoice => invoice.status === 'Pending')
+      .filter(invoice => invoice.paymentStatus?.toLowerCase() === 'pending')
       .reduce((total, invoice) => total + invoice.amount, 0);
   }
 
   getCompletedServicesCount(): number {
-    return this.serviceHistory.filter(s => s.status === 'Completed').length;
+    return this.services.filter(s => s.status?.toLowerCase() === 'completed').length;
   }
 
   getInProgressServicesCount(): number {
-    return this.serviceHistory.filter(s => s.status === 'In Progress').length;
-  }
-
-  getTotalServiceAmount(): number {
-    return this.serviceHistory.reduce((total, s) => total + s.amount, 0);
+    return this.services.filter(s => s.status?.toLowerCase() === 'in progress').length;
   }
 }

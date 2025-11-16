@@ -69,6 +69,13 @@ export class RolePermissionsComponent implements OnInit {
       next: (roles) => {
         this.roles = roles;
         this.isLoadingRoles = false;
+        
+        // Set default role to 'Admin' if available
+        const adminRole = roles.find(r => r.name === 'Admin' || r.name === 'admin');
+        if (adminRole) {
+          this.roleForm.patchValue({ roleId: adminRole.id });
+          this.onRoleChange();
+        }
       },
       error: (error) => {
         console.error('Error loading roles:', error);

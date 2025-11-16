@@ -9,6 +9,8 @@ export interface Configuration {
   companyState: string | null;
   companyZip: string | null;
   companyCountry: string | null;
+  companyPhone: string | null;
+  companyEmail: string | null;
   sendGridApiKey: string | null;
   emailFromName: string | null;
   emailReplyTo: string | null;
@@ -29,11 +31,22 @@ export interface ConfigurationRequest {
   companyState: string | null;
   companyZip: string | null;
   companyCountry: string | null;
+  companyPhone: string | null;
+  companyEmail: string | null;
   sendGridApiKey: string | null;
   emailFromName: string | null;
   emailReplyTo: string | null;
   maxCouponsPerBatch: number;
   defaultValidityPeriodMonths: number;
   maxUnassignedCoupons: number;
+}
+
+export interface BasicConfiguration {
+  companyName: string;
+  companyCountry: string | null;
+  companyCity: string | null;
+  companyPhone: string | null;
+  companyEmail: string | null;
+  logo: string | null;
 }
 

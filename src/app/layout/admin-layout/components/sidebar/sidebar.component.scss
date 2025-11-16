@@ -54,15 +54,32 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   overflow: visible;
   
+  // Prevent cursor from appearing
+  cursor: default;
+  user-select: none;
+  outline: none;
+  
+  // Prevent focus outline
+  &:focus {
+    outline: none;
+  }
+  
   // Logo styling
   img {
     display: block;
     object-fit: contain;
     transition: all 0.3s ease-in-out;
     transition-property: width, height, opacity, transform;
+    cursor: default;
+    user-select: none;
     
     &:hover {
       transform: scale(1.05);
+    }
+    
+    // Prevent focus outline
+    &:focus {
+      outline: none;
     }
   }
   

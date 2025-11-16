@@ -5,11 +5,12 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { ConfigurationService } from './configuration.service';
 import { Configuration, ConfigurationRequest } from './configuration.model';
 import { ToastrService } from 'ngx-toastr';
+import { CountryCodeSelectorComponent, COUNTRY_CODES } from '../../components/country-code-selector/country-code-selector.component';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, CountryCodeSelectorComponent],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
   animations: [
@@ -28,6 +29,7 @@ export class SettingsComponent implements OnInit {
   saveMessage: string = '';
   configuration: Configuration | null = null;
   hasConfiguration: boolean = false;
+  selectedCountryCode: string = '+971'; // Default to UAE
 
   // Form groups
   generalForm!: FormGroup;
@@ -77,7 +79,10 @@ export class SettingsComponent implements OnInit {
       companyCity: [null],
       companyState: [null],
       companyZip: [null],
-      companyCountry: [null]
+      companyCountry: [null],
+      countryCode: ['+971', [Validators.required]], // Default to UAE
+      companyPhone: [null, [Validators.pattern(/^[0-9]{7,15}$/)]],
+      companyEmail: [null, [Validators.email]]
     });
 
     // Email Settings Form
@@ -114,6 +119,21 @@ export class SettingsComponent implements OnInit {
   }
 
   private populateForms(config: Configuration): void {
+    // Extract country code and phone number from companyPhone if it includes country code
+    let phoneNumber = config.companyPhone || '';
+    let countryCode = '+971'; // Default to UAE
+    
+    if (phoneNumber) {
+      // Check if phoneNumber starts with a country code
+      const matchedCountry = COUNTRY_CODES.find(cc => phoneNumber.startsWith(cc.code));
+      if (matchedCountry) {
+        countryCode = matchedCountry.code;
+        phoneNumber = phoneNumber.substring(matchedCountry.code.length).trim();
+      }
+    }
+    
+    this.selectedCountryCode = countryCode;
+    
     // General Settings
     this.generalForm.patchValue({
       companyName: config.companyName || '',
@@ -124,7 +144,10 @@ export class SettingsComponent implements OnInit {
       companyCity: config.companyCity || null,
       companyState: config.companyState || null,
       companyZip: config.companyZip || null,
-      companyCountry: config.companyCountry || null
+      companyCountry: config.companyCountry || null,
+      countryCode: countryCode,
+      companyPhone: phoneNumber || null,
+      companyEmail: config.companyEmail || null
     });
 
     // Email Settings
@@ -164,6 +187,14 @@ export class SettingsComponent implements OnInit {
     const emailValues = this.emailForm.value;
     const couponValues = this.couponForm.value;
 
+    // Combine country code and phone number
+    let companyPhone = null;
+    if (generalValues.countryCode && generalValues.companyPhone) {
+      companyPhone = `${generalValues.countryCode}${generalValues.companyPhone}`;
+    } else if (generalValues.companyPhone) {
+      companyPhone = generalValues.companyPhone;
+    }
+
     return {
       companyName: generalValues.companyName,
       logo: generalValues.logo || null,
@@ -174,6 +205,8 @@ export class SettingsComponent implements OnInit {
       companyState: generalValues.companyState || null,
       companyZip: generalValues.companyZip || null,
       companyCountry: generalValues.companyCountry || null,
+      companyPhone: companyPhone,
+      companyEmail: generalValues.companyEmail || null,
       sendGridApiKey: emailValues.sendGridApiKey || null,
       emailFromName: emailValues.emailFromName || null,
       emailReplyTo: emailValues.emailReplyTo || null,

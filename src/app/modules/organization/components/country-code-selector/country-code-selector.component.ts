@@ -36,6 +36,7 @@ export const COUNTRY_CODES: CountryCode[] = [
 export class CountryCodeSelectorComponent {
   @Input() id: string = 'countryCode';
   @Input() value: string = '+971';
+  @Input() disabled: boolean = false;
   @Output() valueChange = new EventEmitter<string>();
   @Output() countryCodeChange = new EventEmitter<string>();
 

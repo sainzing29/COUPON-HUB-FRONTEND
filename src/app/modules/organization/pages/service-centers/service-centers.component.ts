@@ -84,7 +84,7 @@ export class ServiceCentersComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(2)]],
       address: ['', [Validators.required, Validators.minLength(5)]],
       countryCode: ['+971', [Validators.required]], // Default to UAE
-      contactNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]]
+      contactNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{7,15}$/)]]
     });
   }
 
@@ -339,7 +339,7 @@ export class ServiceCentersComponent implements OnInit {
         return `${this.getFieldLabel(fieldName)} must be at least ${field.errors['minlength'].requiredLength} characters`;
       }
       if (field.errors['pattern']) {
-        return 'Please enter a valid 10-digit contact number';
+        return 'Please enter a valid mobile number (7-15 digits)';
       }
     }
     return '';

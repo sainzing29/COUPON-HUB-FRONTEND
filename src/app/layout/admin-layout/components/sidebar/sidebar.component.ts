@@ -61,11 +61,13 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
       active: false,
       hasSubmenu: true,
       expanded: false,
-      permission: ['ExportCoupons', 'CouponStatusChange', 'GenerateCoupons'],
+      permission: ['ExportCoupons', 'CouponStatusChange', 'GenerateCoupons', 'CouponScheme', 'CouponSale'],
       submenu: [
         { id: 'coupons-list', label: 'Coupons', icon: 'list', route: '/organization/coupons', active: false, hasSubmenu: false, permission: ['ExportCoupons', 'CouponStatusChange'] },
+        { id: 'coupon-sale', label: 'Coupon Sale', icon: 'shopping_cart', route: '/organization/coupons/coupon-sale', active: false, hasSubmenu: false, permission: ['CouponSale'] },
         { id: 'generate-coupons', label: 'Generate Coupons', icon: 'add_circle', route: '/organization/coupons/generate-coupons', active: false, hasSubmenu: false, permission: ['GenerateCoupons'] },
-        { id: 'batches', label: 'Batch History', icon: 'history', route: '/organization/coupons/batches', active: false, hasSubmenu: false, permission: ['GenerateCoupons'] }
+        { id: 'batches', label: 'Batch History', icon: 'history', route: '/organization/coupons/batches', active: false, hasSubmenu: false, permission: ['GenerateCoupons'] },
+        { id: 'coupon-schemes', label: 'Coupon Schemes', icon: 'category', route: '/organization/coupons/coupon-schemes', active: false, hasSubmenu: false, permission: ['CouponScheme'] }
       ]
     },
     // { id: 'invoices', label: 'Invoices & Payments', icon: 'receipt', route: '/organization/invoices', active: false, hasSubmenu: false, permission: ['FinancialData'] },
@@ -127,11 +129,16 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
 
   private filterMenuItemsByPermission(): void {
     // Filter menu items based on permissions
+    const userPermissions = this.permissionService.getPermissions();
+    console.log('Sidebar: Filtering menu items. User permissions:', userPermissions);
+    
     this.menuItems = this.allMenuItems
       .map(item => {
         // Check if main menu item is accessible
         if (item.permission && item.permission.length > 0) {
-          if (!this.permissionService.hasAnyPermission(item.permission)) {
+          const hasAccess = this.permissionService.hasAnyPermission(item.permission);
+          console.log(`Sidebar: Menu item "${item.id}" requires permissions:`, item.permission, 'Has access:', hasAccess);
+          if (!hasAccess) {
             return null; // Filter out this item
           }
         }
@@ -140,13 +147,16 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
         if (item.hasSubmenu && item.submenu) {
           const filteredSubmenu = item.submenu.filter(subItem => {
             if (subItem.permission && subItem.permission.length > 0) {
-              return this.permissionService.hasAnyPermission(subItem.permission);
+              const hasAccess = this.permissionService.hasAnyPermission(subItem.permission);
+              console.log(`Sidebar: Submenu item "${subItem.id}" requires permissions:`, subItem.permission, 'Has access:', hasAccess);
+              return hasAccess;
             }
             return true; // If no permission required, show it
           });
 
           // If parent has permission but no submenu items are accessible, hide parent
           if (filteredSubmenu.length === 0) {
+            console.log(`Sidebar: Hiding parent menu "${item.id}" because no submenu items are accessible`);
             return null;
           }
 
@@ -160,6 +170,8 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
         return item;
       })
       .filter(item => item !== null) as MenuItem[];
+    
+    console.log('Sidebar: Filtered menu items:', this.menuItems.map(m => ({ id: m.id, label: m.label, submenuCount: m.submenu?.length || 0 })));
 
     // Always include dashboard if user is logged in
     if (this.authService.isLoggedIn()) {

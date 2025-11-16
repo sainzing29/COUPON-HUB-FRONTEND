@@ -1,0 +1,272 @@
+// Invoice View Component Styles
+
+.invoice-view-container {
+  @apply min-h-screen bg-gray-50 py-6 px-4;
+}
+
+// Header Section
+.header-section {
+  @apply mb-6;
+}
+
+// Invoice Content
+.invoice-content {
+  @apply max-w-5xl mx-auto;
+}
+
+.invoice-card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-8;
+  animation: slideInUp 0.6s ease-out;
+}
+
+// Invoice Header
+.invoice-header {
+  @apply flex justify-between items-start mb-8 pb-6 border-b-2 border-gray-200;
+  
+  .company-info {
+    @apply flex flex-col;
+    
+    .company-details {
+      @apply mb-6;
+      
+      .company-name {
+        @apply text-xl font-bold text-gray-900 mb-1;
+      }
+      
+      .company-address,
+      .company-contact {
+        @apply text-sm text-gray-600;
+      }
+    }
+    
+    .customer-section {
+      @apply mt-4;
+      
+      .section-title {
+        @apply text-lg font-semibold text-gray-900 mb-3;
+      }
+      
+      .customer-info {
+        .customer-name {
+          @apply text-lg font-bold text-gray-900 mb-2;
+        }
+        
+        .customer-details {
+          @apply space-y-1;
+          
+          .customer-detail {
+            @apply flex items-center space-x-2 text-sm text-gray-600;
+            
+            i {
+              @apply text-blue-500 w-4;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .invoice-details {
+    @apply text-right;
+    
+    .invoice-title {
+      @apply text-3xl font-bold text-gray-900 mb-4;
+    }
+    
+    .invoice-meta {
+      @apply space-y-2;
+      
+      .meta-row {
+        @apply flex justify-between items-center space-x-4;
+        
+        .meta-label {
+          @apply text-sm text-gray-600 font-medium;
+        }
+        
+        .meta-value {
+          @apply text-sm font-bold text-gray-900;
+        }
+      }
+    }
+  }
+}
+
+
+// Products Section
+.products-section {
+  @apply mb-6;
+  
+  .section-title {
+    @apply text-lg font-semibold text-gray-900 mb-4;
+  }
+  
+  .products-list {
+    @apply space-y-2;
+    
+    .product-item {
+      @apply flex items-start space-x-4 p-4 bg-gray-50 rounded-lg;
+      
+      .product-number {
+        @apply text-sm font-normal text-gray-700;
+      }
+      
+      .product-details {
+        @apply flex-1;
+        
+        .product-name {
+          @apply font-medium text-gray-900 mb-1;
+        }
+        
+        .product-description {
+          @apply text-sm text-gray-600;
+        }
+      }
+    }
+  }
+}
+
+// Amount Details Section
+.amount-details-section {
+  @apply mb-8 pb-6 border-b border-gray-200;
+  
+  .amount-details {
+    @apply flex flex-col items-end space-y-2 max-w-md ml-auto;
+    
+    .amount-row {
+      @apply flex justify-between items-center w-full;
+      min-width: 200px;
+      
+      &.total {
+        @apply pt-2 border-t border-gray-300;
+        
+        .amount-label {
+          @apply text-lg font-semibold text-gray-900;
+        }
+        
+        .amount-value {
+          @apply text-xl font-bold text-gray-900;
+        }
+      }
+      
+      .amount-label {
+        @apply text-sm text-gray-600 font-medium;
+      }
+      
+      .amount-value {
+        @apply text-sm font-bold text-gray-900;
+      }
+    }
+  }
+}
+
+// Invoice Summary
+.invoice-summary {
+  @apply mb-8 pb-6 border-b border-gray-200;
+  
+  .summary-grid {
+    @apply grid grid-cols-2 lg:grid-cols-4 gap-4;
+    
+    .summary-item {
+      @apply flex flex-col items-center p-4 bg-gray-50 rounded-lg;
+      
+      &.total {
+        @apply bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200;
+      }
+      
+      .summary-label {
+        @apply text-sm text-gray-600 mb-1 font-medium;
+      }
+      
+      .summary-value {
+        @apply text-xl font-bold text-gray-900;
+      }
+    }
+  }
+}
+
+// Invoice Footer
+.invoice-footer {
+  @apply flex justify-between items-start;
+  
+  .footer-note {
+    @apply flex-1 pr-8;
+    
+    p {
+      @apply text-sm font-semibold text-gray-900 mb-2;
+    }
+    
+    ul {
+      @apply text-xs text-gray-600 space-y-1;
+      
+      li {
+        @apply list-disc list-inside;
+      }
+    }
+  }
+  
+  .footer-signature {
+    @apply text-center;
+    
+    .signature-line {
+      @apply w-32 h-0.5 bg-gray-400 mb-2 mx-auto;
+    }
+    
+    p {
+      @apply text-xs text-gray-600;
+    }
+  }
+}
+
+// Animations
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Print Styles
+@media print {
+  .invoice-view-container {
+    background: white !important;
+  }
+  
+  .header-section {
+    .flex.space-x-3 {
+      display: none;
+    }
+  }
+  
+  .invoice-card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .invoice-header {
+    @apply flex-col space-y-6;
+    
+    .invoice-details {
+      @apply text-left;
+    }
+  }
+  
+  .summary-grid {
+    @apply grid-cols-1;
+  }
+  
+  .invoice-footer {
+    @apply flex-col space-y-4;
+    
+    .footer-note {
+      @apply pr-0;
+    }
+  }
+}
+
