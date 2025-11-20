@@ -1,24 +1,8 @@
 <div class="space-y-6" [@staggerCards]>
-  <!-- Refresh Data Button -->
-  <div class="flex justify-end mb-4">
-    <button 
-      (click)="refreshChartData()" 
-      class="text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center space-x-2"
-      style="background-color: var(--button-primary-bg);"
-      onmouseover="this.style.backgroundColor='var(--button-primary-hover)'"
-      onmouseout="this.style.backgroundColor='var(--button-primary-bg)'"
-      onfocus="this.style.backgroundColor='var(--button-primary-focus)'"
-      onblur="this.style.backgroundColor='var(--button-primary-bg)'"
-      [disabled]="isLoading">
-      <span class="material-icons text-sm" [class.animate-spin]="isLoading">refresh</span>
-      <span>{{ isLoading ? 'Loading...' : 'Refresh Data' }}</span>
-    </button>
-  </div>
-
   <!-- Statistics Cards -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
     <!-- Total Coupons Sold Card -->
-    <div class="stat-card bg-white rounded-lg shadow-card p-6 card-hover" [@fadeInUp]>
+    <div class="stat-card bg-white rounded-lg shadow-card p-6" [@fadeInUp]>
       <div class="flex items-center justify-between">
         <div class="flex-1">
           <div class="flex items-center space-x-3 mb-2">
@@ -39,7 +23,7 @@
     </div>
 
     <!-- Active Coupons Card -->
-    <div class="stat-card bg-white rounded-lg shadow-card p-6 card-hover" [@fadeInUp]>
+    <div class="stat-card bg-white rounded-lg shadow-card p-6" [@fadeInUp]>
       <div class="flex items-center justify-between">
         <div class="flex-1">
           <div class="flex items-center space-x-3 mb-2">
@@ -60,7 +44,7 @@
     </div>
 
     <!-- Services Completed Card -->
-    <div class="stat-card bg-white rounded-lg shadow-card p-6 card-hover" [@fadeInUp]>
+    <div class="stat-card bg-white rounded-lg shadow-card p-6" [@fadeInUp]>
       <div class="flex items-center justify-between">
         <div class="flex-1">
           <div class="flex items-center space-x-3 mb-2">
@@ -81,7 +65,7 @@
     </div>
 
     <!-- Revenue Card -->
-    <div class="stat-card bg-white rounded-lg shadow-card p-6 card-hover" [@fadeInUp]>
+    <div class="stat-card bg-white rounded-lg shadow-card p-6" [@fadeInUp]>
       <div class="flex items-center justify-between">
         <div class="flex-1">
           <div class="flex items-center space-x-3 mb-2">

@@ -63,9 +63,9 @@
           </tr>
           <tr *ngFor="let customer of paginatedCustomers" class="hover:bg-gray-50">
             <!-- Name Column -->
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-4 py-2 whitespace-nowrap">
               <div class="flex items-center">
-                <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
                   <span class="text-gray-600 font-medium text-sm">
                     {{ customer.firstName.charAt(0) }}{{ customer.lastName.charAt(0) }}
                   </span>
@@ -77,27 +77,27 @@
             </td>
 
             <!-- Email Column -->
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-4 py-2 whitespace-nowrap">
               <div class="text-sm text-gray-900">{{ customer.email }}</div>
             </td>
 
             <!-- Mobile Column -->
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-4 py-2 whitespace-nowrap">
               <div class="text-sm text-gray-900">{{ customer.mobileNumber }}</div>
             </td>
 
             <!-- Coupons Column -->
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-4 py-2 whitespace-nowrap">
               <div class="text-sm text-gray-900">{{ customer.couponCount || 0 }}</div>
             </td>
 
             <!-- Invoices Column -->
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-4 py-2 whitespace-nowrap">
               <div class="text-sm text-gray-900">{{ customer.invoiceCount || 0 }}</div>
             </td>
 
             <!-- Status Column -->
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-4 py-2 whitespace-nowrap">
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                     [class]="customer.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
                 <i class="bi bi-circle-fill text-xs mr-1"></i>
@@ -106,7 +106,7 @@
             </td>
 
             <!-- View Column -->
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            <td class="px-4 py-2 whitespace-nowrap text-sm font-medium">
               <button 
                 (click)="onViewCustomer(customer)"
                 class="text-blue-600 hover:text-blue-800 p-1 rounded"

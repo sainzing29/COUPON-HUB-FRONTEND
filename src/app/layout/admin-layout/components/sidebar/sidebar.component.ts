@@ -49,7 +49,7 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
   private routerSubscription: Subscription = new Subscription();
 
   allMenuItems: MenuItem[] = [
-    // { id: 'dashboard', label: 'Dashboard', icon: 'grid_view', route: '/dashboard', active: true, hasSubmenu: false },
+    { id: 'dashboard', label: 'Dashboard', icon: 'grid_view', route: '/dashboard', active: true, hasSubmenu: false },
     { id: 'users', label: 'Users', icon: 'person', route: '/organization/users', active: false, hasSubmenu: false, permission: ['Users'] },
     { id: 'role-permissions', label: 'Role & Permissions', icon: 'admin_panel_settings', route: '/organization/role-permissions', active: false, hasSubmenu: false, permission: ['UserRoles'] },
     { id: 'customers', label: 'Customers', icon: 'people', route: '/organization/customers', active: false, hasSubmenu: false, permission: ['Customer'] },

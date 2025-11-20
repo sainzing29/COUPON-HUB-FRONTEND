@@ -1,4 +1,4 @@
-<div class="h-screen bg-gray-50 flex overflow-hidden">
+<div class="h-screen flex overflow-hidden" [style.background]="'rgba(0, 0, 0, 0.01)'">
   <!-- Sidebar -->
   <app-sidebar 
     [sidebarOpen]="sidebarOpen"
@@ -16,7 +16,7 @@
     </app-header>
 
     <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto p-6 pt-20">
+    <main class="flex-1 overflow-y-auto p-8 pt-24">
       <div class="h-full" [@pageFadeIn]>
         <router-outlet></router-outlet>
       </div>
