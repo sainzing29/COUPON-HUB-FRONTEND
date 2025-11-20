@@ -346,6 +346,65 @@ export class CouponSaleComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Handle paste event for coupon code inputs
+  onCouponCodePaste(event: ClipboardEvent): void {
+    event.preventDefault();
+    const pastedData = event.clipboardData?.getData('text') || '';
+    
+    // Remove dashes, spaces, and convert to uppercase
+    const cleanedData = pastedData.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+    
+    // If the pasted data is 13 characters (full coupon code), split it
+    if (cleanedData.length === 13) {
+      const part1 = cleanedData.substring(0, 4);
+      const part2 = cleanedData.substring(4, 8);
+      const part3 = cleanedData.substring(8, 13);
+      
+      // Update form controls
+      this.couponForm.patchValue({
+        couponCode1: part1,
+        couponCode2: part2,
+        couponCode3: part3
+      }, { emitEvent: false });
+      
+      // Update component properties
+      this.couponCode1 = part1;
+      this.couponCode2 = part2;
+      this.couponCode3 = part3;
+      
+      // Focus on the last input
+      setTimeout(() => {
+        const lastInput = document.querySelector(`input[data-part="3"]`) as HTMLInputElement;
+        lastInput?.focus();
+        lastInput?.select();
+      }, 0);
+    } else if (cleanedData.length > 0) {
+      // If it's not exactly 13 characters, try to fill what we can
+      const part1 = cleanedData.substring(0, 4);
+      const part2 = cleanedData.substring(4, 8);
+      const part3 = cleanedData.substring(8, 13);
+      
+      this.couponForm.patchValue({
+        couponCode1: part1 || '',
+        couponCode2: part2 || '',
+        couponCode3: part3 || ''
+      }, { emitEvent: false });
+      
+      this.couponCode1 = part1 || '';
+      this.couponCode2 = part2 || '';
+      this.couponCode3 = part3 || '';
+      
+      // Focus on the appropriate input
+      setTimeout(() => {
+        let focusPart = 1;
+        if (cleanedData.length > 4) focusPart = 2;
+        if (cleanedData.length > 8) focusPart = 3;
+        const focusInput = document.querySelector(`input[data-part="${focusPart}"]`) as HTMLInputElement;
+        focusInput?.focus();
+      }, 0);
+    }
+  }
+
   // Handle backspace keydown for coupon code inputs
   onCouponCodeKeydown(event: KeyboardEvent, part: number): void {
     if (event.key === 'Backspace') {

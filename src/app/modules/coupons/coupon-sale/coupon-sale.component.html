@@ -185,7 +185,7 @@
   <div *ngIf="currentStep === 'coupon'" class="max-w-2xl mx-auto">
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <div class="text-center mb-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-2">Enter Coupon Code</h2>
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">Enter Coupon Code to Sale</h2>
         <p class="text-gray-600">Enter the 13-character coupon code</p>
       </div>
 
@@ -202,6 +202,7 @@
               data-part="1"
               (input)="onCouponCodeInput($event, 1)"
               (keydown)="onCouponCodeKeydown($event, 1)"
+              (paste)="onCouponCodePaste($event)"
               class="w-32 px-5 py-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-xl font-semibold tracking-widest uppercase"
               placeholder="AAAA"
               maxlength="4"
@@ -214,6 +215,7 @@
               data-part="2"
               (input)="onCouponCodeInput($event, 2)"
               (keydown)="onCouponCodeKeydown($event, 2)"
+              (paste)="onCouponCodePaste($event)"
               class="w-32 px-5 py-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-xl font-semibold tracking-widest uppercase"
               placeholder="AAAA"
               maxlength="4"
@@ -226,6 +228,7 @@
               data-part="3"
               (input)="onCouponCodeInput($event, 3)"
               (keydown)="onCouponCodeKeydown($event, 3)"
+              (paste)="onCouponCodePaste($event)"
               class="w-32 px-5 py-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-xl font-semibold tracking-widest uppercase"
               placeholder="AAAAA"
               maxlength="5"
