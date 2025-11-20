@@ -53,6 +53,7 @@ export class CouponSaleComponent implements OnInit, OnDestroy {
   selectedScheme: CouponScheme | null = null;
   isSubmitting = false;
   selectedCountryCode: string = '+971'; // Default to UAE
+  verifyCountryCode: string = '+971'; // Country code for verify step
   
   // Step 5: Verify Details Form
   verifyDetailsForm: FormGroup;
@@ -77,7 +78,8 @@ export class CouponSaleComponent implements OnInit, OnDestroy {
     // Initialize verify form
     this.verifyForm = this.fb.group({
       email: ['', [Validators.email]],
-      phone: ['', [Validators.pattern(/^[0-9+\-\s()]+$/)]]
+      phone: ['', [Validators.pattern(/^[0-9+\-\s()]+$/)]],
+      countryCode: ['+971', [Validators.required]]
     });
 
     // Initialize OTP form
@@ -141,8 +143,10 @@ export class CouponSaleComponent implements OnInit, OnDestroy {
     this.updateVerificationValidators();
     this.verifyForm.patchValue({
       email: '',
-      phone: ''
+      phone: '',
+      countryCode: '+971'
     });
+    this.verifyCountryCode = '+971';
   }
 
   updateVerificationValidators(): void {
@@ -171,10 +175,16 @@ export class CouponSaleComponent implements OnInit, OnDestroy {
     this.isSendingOtp = true;
     const email = this.verifyForm.get('email')?.value;
     const phone = this.verifyForm.get('phone')?.value;
+    const countryCode = this.verifyForm.get('countryCode')?.value || this.verifyCountryCode;
+    
+    // Combine country code with phone number if phone verification
+    const fullPhoneNumber = this.verificationMethod === 'phone' && countryCode && phone
+      ? `${countryCode}${phone}`
+      : phone;
 
     const request = this.verificationMethod === 'email' 
       ? this.couponSaleService.sendOtpToEmail(email)
-      : this.couponSaleService.sendOtpToPhone(phone);
+      : this.couponSaleService.sendOtpToPhone(fullPhoneNumber);
 
     request.subscribe({
       next: (response) => {
@@ -185,7 +195,9 @@ export class CouponSaleComponent implements OnInit, OnDestroy {
           if (this.verificationMethod === 'email') {
             this.verifiedEmail = email;
           } else {
-            this.verifiedPhone = phone;
+            // Store the full phone number with country code
+            const countryCode = this.verifyForm.get('countryCode')?.value || this.verifyCountryCode;
+            this.verifiedPhone = fullPhoneNumber;
           }
           this.startResendTimer();
           this.toastr.success('OTP sent successfully', 'Success');
@@ -267,7 +279,7 @@ export class CouponSaleComponent implements OnInit, OnDestroy {
     }
 
     const email = this.verifiedEmail;
-    const phone = this.verifiedPhone;
+    const phone = this.verifiedPhone; // This already includes country code from sendOtp()
 
     const request = this.verificationMethod === 'email'
       ? this.couponSaleService.sendOtpToEmail(email)
