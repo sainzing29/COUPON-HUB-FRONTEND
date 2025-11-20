@@ -5,11 +5,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CouponRedemptionService } from '../pages/coupon-redemption.service';
 import { VerifyCustomerRequest, VerifyCustomerResponse, VerifyOtpRequest, VerifyOtpResponse } from '../pages/coupon-redemption.model';
 import { ToastrService } from 'ngx-toastr';
+import { CountryCodeSelectorComponent } from '../../../organization/components/country-code-selector/country-code-selector.component';
 
 @Component({
   selector: 'app-verify-customer',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, CountryCodeSelectorComponent],
   templateUrl: './verify-customer.component.html',
   styleUrls: ['./verify-customer.component.scss']
 })
@@ -28,6 +29,7 @@ export class VerifyCustomerComponent implements OnInit, OnDestroy {
   resendTimer: number = 0; // in seconds
   resendTimerInterval: any;
   canResend = false;
+  selectedCountryCode = '+971'; // Default to UAE
 
   get otpSendOption(): 'email' | 'phone' {
     return this.verifyForm.get('otpSendOption')?.value || 'email';
@@ -43,6 +45,7 @@ export class VerifyCustomerComponent implements OnInit, OnDestroy {
       couponNumber: [''],
       email: ['', [Validators.email]],
       phone: [''],
+      countryCode: ['+971'],
       otpSendOption: ['email']
     }, { validators: this.atLeastOneRequired });
 
@@ -165,7 +168,9 @@ export class VerifyCustomerComponent implements OnInit, OnDestroy {
     } else if (formValue.email) {
       identifier = formValue.email;
     } else if (formValue.phone) {
-      identifier = formValue.phone;
+      // Combine country code with phone number
+      const countryCode = formValue.countryCode || this.selectedCountryCode;
+      identifier = countryCode + formValue.phone;
     }
 
     const request: VerifyCustomerRequest = {
