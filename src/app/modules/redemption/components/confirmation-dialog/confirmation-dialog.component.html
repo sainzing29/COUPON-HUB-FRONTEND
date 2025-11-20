@@ -1,0 +1,46 @@
+<div 
+  *ngIf="show" 
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center"
+  (click)="onBackdropClick()">
+  <div 
+    class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4"
+    (click)="$event.stopPropagation()">
+    
+    <!-- Dialog Header -->
+    <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900">{{ title }}</h3>
+      <button 
+        (click)="onCancel()"
+        class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <!-- Dialog Body -->
+    <div class="px-6 py-4">
+      <p class="text-gray-700 mb-4">{{ message }}</p>
+      <div *ngIf="productName || productDescription" class="bg-gray-50 p-4 rounded-lg">
+        <p *ngIf="productName" class="font-medium text-gray-900 mb-1">{{ productName }}</p>
+        <p *ngIf="productDescription" class="text-sm text-gray-600">{{ productDescription }}</p>
+      </div>
+    </div>
+
+    <!-- Dialog Footer -->
+    <div class="flex justify-end space-x-3 px-6 py-4 border-t border-gray-200">
+      <button
+        (click)="onCancel()"
+        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200">
+        {{ cancelButtonText }}
+      </button>
+      <button
+        (click)="onConfirm()"
+        class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors duration-200"
+        style="background-color: var(--button-primary-bg);"
+        onmouseover="this.style.backgroundColor='var(--button-primary-hover)'"
+        onmouseout="this.style.backgroundColor='var(--button-primary-bg)'">
+        {{ confirmButtonText }}
+      </button>
+    </div>
+  </div>
+</div>
+

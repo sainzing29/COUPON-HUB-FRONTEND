@@ -105,11 +105,6 @@ export const routes: Routes = [
         canActivate: [permissionGuard]
       },
       {
-        path: 'new-coupons/sale',
-        loadComponent: () => import('./modules/organization/pages/coupon-sale/coupon-sale').then(m => m.CouponSaleComponent),
-        canActivate: [permissionGuard]
-      },
-      {
         path: 'coupons',
         loadComponent: () => import('./modules/coupons/coupons/coupons.component').then(m => m.CouponsComponent),
         canActivate: [permissionGuard]
@@ -152,6 +147,11 @@ export const routes: Routes = [
         loadComponent: () => import('./modules/coupons/coupon-sale/coupon-sale.component').then(m => m.CouponSaleComponent),
         canActivate: [permissionGuard],
         data: { permission: 'CouponSale' }
+      },
+      {
+        path: 'redemption/coupon-redemption',
+        loadComponent: () => import('./modules/redemption/components/pages/coupon-redemption.component').then(m => m.CouponRedemptionComponent),
+        canActivate: [permissionGuard]
       },
       {
         path: 'coupons/invoice-view',

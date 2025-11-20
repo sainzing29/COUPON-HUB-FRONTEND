@@ -22,7 +22,8 @@
         <div 
           (click)="onMenuItemClick($event, item.id)"
           class="sidebar-menu-item cursor-pointer rounded-lg p-3 flex items-center"
-          [class.active]="item.active"
+          [class.active]="item.active && !item.hasSubmenu"
+          [class.has-active-submenu]="hasActiveSubmenu(item)"
           [class.space-x-3]="sidebarOpen"
           [class.justify-between]="item.hasSubmenu && sidebarOpen">
           <div class="flex items-center space-x-3">

@@ -121,7 +121,11 @@ function handleError(error: HttpErrorResponse, environmentService: EnvironmentSe
         errorMessage = 'Forbidden - You do not have permission to access this resource';
         break;
       case 404:
-        errorMessage = 'Not Found - The requested resource was not found';
+        if (error.error.message) {
+          errorMessage = error.error.message;
+        } else {
+          errorMessage = 'Not Found - The requested resource was not found';
+        }
         break;
       case 422:
         errorMessage = 'Validation Error - Please check your input data';

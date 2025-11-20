@@ -1,0 +1,163 @@
+<div class="max-w-2xl mx-auto">
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div class="mb-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-2">Verify Customer</h2>
+      <p class="text-gray-600 text-sm">Enter at least one identifier to verify the customer</p>
+    </div>
+
+    <!-- Verification Form -->
+    <form [formGroup]="verifyForm" class="space-y-4" *ngIf="!otpSent">
+      <!-- Coupon Number -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Coupon Number
+        </label>
+        <input
+          type="text"
+          formControlName="couponNumber"
+          placeholder="Enter coupon number"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          [class.border-red-500]="verifyForm.get('couponNumber')?.invalid && verifyForm.get('couponNumber')?.touched">
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Email
+        </label>
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="Enter email address"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          [class.border-red-500]="verifyForm.get('email')?.invalid && verifyForm.get('email')?.touched">
+        <div *ngIf="verifyForm.get('email')?.invalid && verifyForm.get('email')?.touched" 
+             class="text-red-500 text-xs mt-1">
+          <span *ngIf="verifyForm.get('email')?.errors?.['email']">Please enter a valid email address</span>
+        </div>
+      </div>
+
+      <!-- Phone -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Phone
+        </label>
+        <input
+          type="tel"
+          formControlName="phone"
+          placeholder="Enter phone number"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          [class.border-red-500]="verifyForm.get('phone')?.invalid && verifyForm.get('phone')?.touched">
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="verifyFormError" class="text-red-500 text-sm">
+        {{ verifyFormError }}
+      </div>
+
+      <!-- OTP Send Option -->
+      <div class="mt-4">
+        <label class="block text-sm font-medium text-gray-700 mb-3">Send OTP via</label>
+        <div class="flex space-x-6">
+          <label class="flex items-center">
+            <input
+              type="radio"
+              formControlName="otpSendOption"
+              value="email"
+              class="mr-2">
+            <span class="text-sm text-gray-700">Email</span>
+          </label>
+          <label class="flex items-center">
+            <input
+              type="radio"
+              formControlName="otpSendOption"
+              value="phone"
+              class="mr-2">
+            <span class="text-sm text-gray-700">Phone</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Send OTP Button -->
+      <div class="pt-4">
+        <button
+          type="button"
+          (click)="sendOtp()"
+          [disabled]="isSendingOtp"
+          class="w-full px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          style="background-color: var(--button-primary-bg);"
+          onmouseover="this.style.backgroundColor='var(--button-primary-hover)'"
+          onmouseout="this.style.backgroundColor='var(--button-primary-bg)'">
+          <span *ngIf="!isSendingOtp">Send OTP</span>
+          <span *ngIf="isSendingOtp">Sending...</span>
+        </button>
+      </div>
+    </form>
+
+    <!-- OTP Verification Section -->
+    <div *ngIf="otpSent" class="space-y-4">
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+        <p class="text-sm text-blue-800" *ngIf="verifyCustomerResponse">
+          {{ verifyCustomerResponse.message }}
+        </p>
+      </div>
+
+      <form [formGroup]="otpForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-3 text-center">
+            Enter Verification Code
+          </label>
+          <div class="flex justify-center space-x-3">
+            <input
+              *ngFor="let digit of otpDigits; let i = index"
+              #otpInput
+              type="text"
+              maxlength="1"
+              [formControlName]="'digit' + i"
+              class="w-12 h-12 text-center text-lg font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
+              [class.border-red-500]="otpForm.get('digit' + i)?.invalid && otpForm.get('digit' + i)?.touched"
+              (input)="onDigitInput($event, i)"
+              (keydown)="onKeyDown($event, i)"
+              (paste)="onPaste($event)">
+          </div>
+          
+          <p class="mt-2 text-sm text-red-600 text-center" *ngIf="otpForm.invalid && otpForm.touched">
+            Please enter a valid 6-digit code
+          </p>
+        </div>
+
+        <!-- Resend OTP Section -->
+        <div class="mb-4 flex items-center justify-between">
+          <button
+            *ngIf="canResend"
+            type="button"
+            (click)="resendOtp()"
+            [disabled]="isResendingOtp"
+            class="px-4 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
+            <span class="material-icons text-sm" [class.animate-spin]="isResendingOtp">refresh</span>
+            <span>{{ isResendingOtp ? 'Resending...' : 'Resend OTP' }}</span>
+          </button>
+          <div *ngIf="!canResend && resendTimer > 0" class="text-sm text-gray-600 flex items-center">
+            <span class="material-icons text-sm mr-1">schedule</span>
+            <span>Resend available in <span class="font-semibold text-red-600">{{ getResendTimerText() }}</span></span>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button
+            type="button"
+            (click)="verifyOtp()"
+            [disabled]="otpForm.invalid || isVerifyingOtp"
+            class="w-full px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            style="background-color: var(--button-primary-bg);"
+            onmouseover="this.style.backgroundColor='var(--button-primary-hover)'"
+            onmouseout="this.style.backgroundColor='var(--button-primary-bg)'">
+            <span *ngIf="!isVerifyingOtp">Verify OTP</span>
+            <span *ngIf="isVerifyingOtp">Verifying...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+

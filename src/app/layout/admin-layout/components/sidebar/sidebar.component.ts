@@ -1,10 +1,11 @@
 import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { AuthService } from '../../../../core/services/auth.service';
 import { PermissionService } from '../../../../core/services/permission.service';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 interface MenuItem {
   id: string;
@@ -45,6 +46,7 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
   @Output() menuItemClick = new EventEmitter<string>();
 
   private userSubscription: Subscription = new Subscription();
+  private routerSubscription: Subscription = new Subscription();
 
   allMenuItems: MenuItem[] = [
     // { id: 'dashboard', label: 'Dashboard', icon: 'grid_view', route: '/dashboard', active: true, hasSubmenu: false },
@@ -70,6 +72,7 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
         { id: 'coupon-schemes', label: 'Coupon Schemes', icon: 'category', route: '/organization/coupons/coupon-schemes', active: false, hasSubmenu: false, permission: ['CouponScheme'] }
       ]
     },
+    { id: 'redeem-service', label: 'Redeem Service', icon: 'local_offer', route: '/organization/redemption/coupon-redemption', active: false, hasSubmenu: false, permission: ['RadeemCoupon'] },
     // { id: 'invoices', label: 'Invoices & Payments', icon: 'receipt', route: '/organization/invoices', active: false, hasSubmenu: false, permission: ['FinancialData'] },
     { 
       id: 'configuration', 
@@ -113,7 +116,7 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
     // Initial filter - wait a bit to ensure auth service has loaded user from token
     setTimeout(() => {
       this.filterMenuItemsByPermission();
-      this.updateActiveState();
+      this.updateActiveStateFromRoute();
       this.ensureSubmenuExpanded();
     }, 0);
 
@@ -122,9 +125,19 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
       console.log('Sidebar: User changed, filtering menu items', user);
       console.log('Sidebar: User permissions', user?.permission);
       this.filterMenuItemsByPermission();
-      this.updateActiveState();
+      this.updateActiveStateFromRoute();
       this.ensureSubmenuExpanded();
     });
+
+    // Subscribe to router events to update active menu item based on current route
+    this.routerSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        // Use setTimeout to ensure route is fully updated
+        setTimeout(() => {
+          this.updateActiveStateFromRoute();
+        }, 0);
+      });
   }
 
   private filterMenuItemsByPermission(): void {
@@ -191,6 +204,67 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     this.userSubscription.unsubscribe();
+    this.routerSubscription.unsubscribe();
+  }
+
+  /**
+   * Update active state based on current route
+   */
+  private updateActiveStateFromRoute(): void {
+    const currentUrl = this.router.url.split('?')[0].split('#')[0]; // Remove query parameters and hash
+    let foundMenuItemId: string | null = null;
+
+    // Search through all menu items to find matching route
+    // Use allMenuItems to ensure we check all possible routes, not just filtered ones
+    const itemsToCheck = this.allMenuItems;
+    
+    // Check submenu items first (more specific routes should be checked first)
+    // Sort by route length (longer routes first) to match most specific routes first
+    const submenuItems: Array<{item: MenuItem, subItem: MenuItem}> = [];
+    for (const item of itemsToCheck) {
+      if (item.hasSubmenu && item.submenu) {
+        for (const subItem of item.submenu) {
+          if (subItem.route) {
+            submenuItems.push({item, subItem});
+          }
+        }
+      }
+    }
+    
+    // Sort by route length (longer = more specific)
+    submenuItems.sort((a, b) => (b.subItem.route?.length || 0) - (a.subItem.route?.length || 0));
+    
+    // Check submenu items
+    for (const {subItem} of submenuItems) {
+      if (subItem.route) {
+        // Exact match or starts with route (for nested routes)
+        if (currentUrl === subItem.route || currentUrl.startsWith(subItem.route + '/')) {
+          foundMenuItemId = subItem.id;
+          break;
+        }
+      }
+    }
+
+    // If no submenu match found, check main menu items
+    if (!foundMenuItemId) {
+      const mainMenuItems = itemsToCheck.filter(item => item.route && item.route !== '');
+      mainMenuItems.sort((a, b) => (b.route?.length || 0) - (a.route?.length || 0));
+      
+      for (const item of mainMenuItems) {
+        if (item.route && (currentUrl === item.route || currentUrl.startsWith(item.route + '/'))) {
+          foundMenuItemId = item.id;
+          break;
+        }
+      }
+    }
+
+    // Update activeMenuItem if found
+    if (foundMenuItemId) {
+      this.activeMenuItem = foundMenuItemId;
+    }
+
+    // Update active state
+    this.updateActiveState();
   }
 
   private updateActiveState(): void {
@@ -249,23 +323,39 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
     event.stopPropagation();
     event.preventDefault();
     
-    this.activeMenuItem = subItemId;
-    
     // Find the parent item and ensure it stays expanded
     const parentItem = this.menuItems.find(item => item.id === parentId);
-    if (parentItem) {
-      parentItem.expanded = true; // Ensure parent stays expanded
-    }
-    
-    this.updateActiveState();
     
     // Find the submenu item and navigate to its route
     if (parentItem && parentItem.submenu) {
       const subItem = parentItem.submenu.find(item => item.id === subItemId);
       if (subItem) {
-        this.router.navigate([subItem.route]);
+        // Set active menu item immediately for better UX
+        this.activeMenuItem = subItemId;
+        
+        // Ensure parent is expanded
+        if (parentItem) {
+          parentItem.expanded = true;
+        }
+        
+        // Update active state immediately
+        this.updateActiveState();
+        
+        // Navigate to route - the router subscription will handle route-based updates
+        this.router.navigate([subItem.route]).then(() => {
+          // Ensure active state is updated after navigation completes
+          this.updateActiveStateFromRoute();
+        });
+        
         this.menuItemClick.emit(subItemId);
       }
     }
+  }
+
+  /**
+   * Check if a menu item has an active submenu item
+   */
+  hasActiveSubmenu(item: MenuItem): boolean {
+    return !!(item.hasSubmenu && item.submenu && item.submenu.some(sub => sub.active));
   }
 }

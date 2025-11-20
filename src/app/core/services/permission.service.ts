@@ -16,7 +16,7 @@ export class PermissionService {
     'ServiceCenter': ['/organization/service-centers'],
     'Customer': ['/organization/customers'],
     'CouponSale': ['/organization/new-coupons/sale', '/organization/coupons/coupon-sale'],
-    'RadeemCoupon': ['/organization/service-redemption', '/organization/service-redemption/redeem-service'],
+    'RadeemCoupon': ['/organization/service-redemption', '/organization/service-redemption/redeem-service', '/organization/redemption/coupon-redemption'],
     'GenerateCoupons': ['/organization/coupons/generate-coupons'],
     'ExportCoupons': ['/organization/coupons'], // Export is typically a feature within coupons list
     'CouponStatusChange': ['/organization/coupons'], // Status change is typically a feature within coupons list

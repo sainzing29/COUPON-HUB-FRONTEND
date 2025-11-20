@@ -402,9 +402,8 @@
               formControlName="serviceCenterId" 
               class="form-select"
               [class.error]="getFieldError('serviceCenterId')">
-            
               <option *ngFor="let center of serviceCenters" [value]="center.id">
-                {{ center.name }}
+                {{ center.name }}{{ center.address ? ' - ' + center.address : '' }}
               </option>
             </select>
             <div *ngIf="getFieldError('serviceCenterId')" class="form-error">

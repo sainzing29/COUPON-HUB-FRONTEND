@@ -1,0 +1,81 @@
+// Models for Service Redemption Flow
+
+export interface VerifyCustomerRequest {
+  identifier: string; // coupon/email/phone
+  otpSendOption: 'email' | 'phone';
+}
+
+export interface VerifyCustomerResponse {
+  customerId: number;
+  customerName: string;
+  email: string;
+  mobileNumber: string;
+  otpSentTo: 'email' | 'phone';
+  message: string;
+}
+
+export interface VerifyOtpRequest {
+  email?: string;
+  phone?: string;
+  otpCode: string;
+}
+
+export interface Coupon {
+  couponId: number;
+  couponCode: string;
+  price: number;
+  status: string;
+  purchaseDate: string;
+  expiryDate: string;
+  totalServices: number;
+  usedServices: number;
+  remainingServices: number;
+  schemeName: string;
+}
+
+export interface VerifyOtpResponse {
+  customerId: number;
+  customerName: string;
+  email: string;
+  mobileNumber: string;
+  coupons: Coupon[];
+}
+
+export interface Product {
+  productId: number;
+  productName: string;
+  description: string;
+  icon: string | null;
+  displayOrder: number;
+  isRedeemed: boolean;
+  redemptionDate: string | null;
+  redemptionId: number | null;
+  redemptionStatus: string | null;
+}
+
+export interface CreateRedemptionRequest {
+  couponId: number;
+  serviceCenterId: number;
+  customerId: number;
+  productId: number;
+  notes: string;
+}
+
+export interface RedemptionResponse {
+  id: number;
+  couponId: number;
+  couponCode: string;
+  serviceCenterId: number;
+  serviceCenterName: string;
+  customerId: number;
+  customerName: string;
+  productId: number;
+  productName: string;
+  redemptionDate: string;
+  notes: string;
+  status: number;
+  cancelledAt: string | null;
+  cancellationReason: string | null;
+  cancelledByUserId: number | null;
+}
+

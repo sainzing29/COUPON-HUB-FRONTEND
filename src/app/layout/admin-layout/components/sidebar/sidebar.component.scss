@@ -68,19 +68,9 @@
   img {
     display: block;
     object-fit: contain;
-    transition: all 0.3s ease-in-out;
-    transition-property: width, height, opacity, transform;
     cursor: default;
     user-select: none;
-    
-    &:hover {
-      transform: scale(1.05);
-    }
-    
-    // Prevent focus outline
-    &:focus {
-      outline: none;
-    }
+
   }
   
   // Expanded logo (when sidebar is open)
@@ -158,9 +148,7 @@ nav {
   font-size: 0.875rem;
   line-height: 1.25rem;
   
-  // Smooth transitions
-  transition: all 0.2s ease-in-out;
-  transition-property: background-color, color, transform, box-shadow;
+
   
   // Icon styling
   .material-icons {
@@ -193,6 +181,18 @@ nav {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     
     .material-icons {
+      font-weight: 500;
+    }
+  }
+
+  // Gray background when main menu has active submenu
+  &.has-active-submenu {
+    background-color: #F8F9FA !important;
+    color: #28243D !important;
+    font-weight: 600;
+    
+    .material-icons {
+      color: #28243D !important;
       font-weight: 500;
     }
   }
@@ -266,15 +266,21 @@ nav {
     transform: translateX(2px);
   }
   
-  // Active state - standard styling without changing background
+  // Active state - use default active color (dark purple) like main menu
   &.active {
+    background-color: #28243D !important;
+    color: #FFFFFF !important;
     font-weight: 600;
-    border: 2px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     
     .material-icons {
       opacity: 1;
       font-weight: 500;
+      color: #FFFFFF !important;
+    }
+    
+    span:not(.material-icons) {
+      color: #FFFFFF !important;
     }
   }
   
