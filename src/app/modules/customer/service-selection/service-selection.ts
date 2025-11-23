@@ -4,6 +4,10 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { RouterModule } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { CustomerAuthService } from '../services/customer-auth.service';
+import { TokenService } from '../../../core/services/token.service';
+import { CustomerCouponsService } from './customer-coupons.service';
+import { CustomerCoupon, Product } from './customer-coupons.models';
+import { ToastrService } from 'ngx-toastr';
 
 interface Service {
   id: number;
@@ -21,6 +25,7 @@ interface Coupon {
   isActive: boolean;
   expirationDate: string;
   services: Service[];
+  products?: Product[];
 }
 
 @Component({
@@ -62,119 +67,88 @@ export class ServiceSelectionComponent implements OnInit {
   customerEmail: string = '';
   customerPhone: string = '';
   customerAddress: string = '';
+  customerId: number | null = null;
   isLoginFlow: boolean = false;
-  selectedCouponId: number = 1;
+  selectedCouponId: number | null = null;
   showServices: boolean = false;
+  isLoadingCoupons: boolean = false;
 
-  coupons: Coupon[] = [
-    {
-      id: 1,
-      couponNumber: '1234567890',
-      isActive: true,
-      expirationDate: '2025-12-31',
-      services: [
-        {
-          id: 1,
-          name: 'Screen Protector Installation',
-          description: 'High-quality screen protector installation with warranty',
-          value: 'AED 50',
-          isSelected: false,
-          redemptionStatus: 'redeemed',
-          redeemedDate: '2024-01-15'
-        },
-        {
-          id: 2,
-          name: 'One Time Service Charge Waiver',
-          description: 'Waive service charges for one-time repairs and maintenance',
-          value: 'AED 100',
-          isSelected: false,
-          redemptionStatus: 'available'
-        },
-        {
-          id: 3,
-          name: 'CES 5000mAh Power Bank',
-          description: 'Portable power bank with 5000mAh capacity and fast charging',
-          value: 'AED 80',
-          isSelected: false,
-          redemptionStatus: 'redeemed',
-          redeemedDate: '2024-01-20'
-        },
-        {
-          id: 4,
-          name: 'Free Diagnostic Checkup',
-          description: 'Complimentary device diagnostic service and health check',
-          value: 'AED 30',
-          isSelected: false,
-          redemptionStatus: 'available'
-        },
-        {
-          id: 5,
-          name: '10% Off Mobile Outlets Product',
-          description: 'Get 10% discount on any mobile outlet product purchase',
-          value: 'Up to AED 200',
-          isSelected: false,
-          redemptionStatus: 'redeemed',
-          redeemedDate: '2024-01-18'
-        }
-      ]
-    },
-    {
-      id: 2,
-      couponNumber: '0987654321',
-      isActive: true,
-      expirationDate: '2026-03-20',
-      services: [
-        {
-          id: 6,
-          name: 'Premium Screen Repair',
-          description: 'Professional screen repair service with premium materials',
-          value: 'AED 150',
-          isSelected: false,
-          redemptionStatus: 'available'
-        },
-        {
-          id: 7,
-          name: 'Battery Replacement',
-          description: 'High-quality battery replacement with warranty',
-          value: 'AED 80',
-          isSelected: false,
-          redemptionStatus: 'redeemed',
-          redeemedDate: '2024-01-25'
-        }
-      ]
-    },
-    {
-      id: 3,
-      couponNumber: '5555555555',
-      isActive: true,
-      expirationDate: '2025-02-15',
-      services: [
-        {
-          id: 8,
-          name: 'Quick Service',
-          description: 'Fast service for urgent repairs',
-          value: 'AED 60',
-          isSelected: false,
-          redemptionStatus: 'available'
-        }
-      ]
-    }
-  ];
+  coupons: Coupon[] = [];
+  apiCoupons: CustomerCoupon[] = [];
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private customerAuthService: CustomerAuthService
+    private customerAuthService: CustomerAuthService,
+    private tokenService: TokenService,
+    private customerCouponsService: CustomerCouponsService,
+    private toastr: ToastrService
   ) { }
 
   ngOnInit(): void {
-    // Get customer data from route parameters
+    // Load customer data from localStorage (from token)
+    const userData = this.tokenService.getUser();
+    if (userData) {
+      // Get customer name - try multiple fields
+      const firstName = userData.firstName || '';
+      const lastName = userData.lastName || '';
+      const fullName = userData.name || (firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || 'Customer');
+      this.customerName = fullName;
+      this.customerEmail = userData.email || '';
+      this.customerPhone = userData.mobileNumber || '';
+      this.customerId = userData.id ? parseInt(userData.id.toString()) : null;
+    }
+
+    // Fallback to route parameters if localStorage doesn't have data
     this.route.queryParams.subscribe(params => {
-      this.customerName = params['customerName'] || 'Customer';
-      this.customerEmail = params['email'] || '';
-      this.customerPhone = params['phone'] || '';
-      this.customerAddress = params['address'] || '';
+      if (!this.customerName || this.customerName === 'Customer') {
+        this.customerName = params['customerName'] || this.customerName || 'Customer';
+      }
+      if (!this.customerEmail) {
+        this.customerEmail = params['email'] || this.customerEmail;
+      }
+      if (!this.customerPhone) {
+        this.customerPhone = params['phone'] || this.customerPhone;
+      }
+      if (!this.customerAddress) {
+        this.customerAddress = params['address'] || this.customerAddress;
+      }
       this.isLoginFlow = params['isLogin'] === 'true';
+    });
+
+    // Load customer coupons if customerId is available
+    if (this.customerId) {
+      this.loadCustomerCoupons();
+    } else {
+      console.warn('Customer ID not found. Cannot load coupons.');
+    }
+  }
+
+  loadCustomerCoupons(): void {
+    if (!this.customerId) {
+      return;
+    }
+
+    this.isLoadingCoupons = true;
+    this.customerCouponsService.getCustomerCoupons(this.customerId).subscribe({
+      next: (coupons) => {
+        this.isLoadingCoupons = false;
+        this.apiCoupons = coupons;
+        // Map API coupons to component coupons structure
+        this.coupons = coupons.map(coupon => ({
+          id: coupon.couponId,
+          couponNumber: coupon.couponCode,
+          isActive: coupon.status === 'Active',
+          expirationDate: coupon.expiryDate,
+          services: [], // Will be populated from products
+          products: coupon.scheme?.products || []
+        }));
+      },
+      error: (error) => {
+        this.isLoadingCoupons = false;
+        console.error('Error loading customer coupons:', error);
+        this.toastr.error('Failed to load coupons', 'Error');
+      }
     });
   }
 
@@ -184,6 +158,10 @@ export class ServiceSelectionComponent implements OnInit {
 
   get services(): Service[] {
     return this.selectedCoupon?.services || [];
+  }
+
+  get products(): Product[] {
+    return this.selectedCoupon?.products || [];
   }
 
   toggleCoupon(couponId: number): void {
@@ -253,6 +231,14 @@ export class ServiceSelectionComponent implements OnInit {
 
   getAnimationState(couponId: number): string {
     return this.selectedCouponId === couponId && this.showServices ? 'in' : 'out';
+  }
+
+  getRemainingServices(coupon: Coupon): number {
+    const apiCoupon = this.apiCoupons.find(c => c.couponId === coupon.id);
+    if (apiCoupon) {
+      return apiCoupon.totalServices - apiCoupon.usedServices;
+    }
+    return 0;
   }
 
   getRemainingDays(expirationDate: string): number {

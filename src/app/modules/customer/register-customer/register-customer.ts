@@ -1,8 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { RegisterCustomerService } from './register-customer.service';
+import { CustomerByCouponResponse } from './register-customer.model';
+import { ToastrService } from 'ngx-toastr';
+import { TokenService } from '../../../core/services/token.service';
 
 @Component({
   selector: 'app-register-customer',
@@ -11,12 +15,26 @@ import { Router } from '@angular/router';
   templateUrl: './register-customer.html',
   styleUrls: ['./register-customer.scss']
 })
-export class RegisterCustomerComponent implements OnInit {
-  currentStep: 'coupon-verification' | 'registration' = 'coupon-verification';
+export class RegisterCustomerComponent implements OnInit, OnDestroy {
+  currentStep: 'coupon-verification' | 'otp-verification' | 'pin-creation' | 'registration' = 'coupon-verification';
   couponVerificationForm: FormGroup;
+  otpForm: FormGroup;
+  pinForm: FormGroup;
   registrationForm: FormGroup;
   isSubmitting = false;
+  isVerifyingOtp = false;
+  isCreatingPin = false;
   verifiedCouponNumber: string = '';
+  couponCode1: string = '';
+  couponCode2: string = '';
+  couponCode3: string = '';
+  customerData: CustomerByCouponResponse | null = null;
+  otpMethod: 'email' | 'phone' = 'email';
+  
+  // Resend OTP timer
+  resendTimer: number = 0;
+  resendTimerInterval: any;
+  canResend = false;
   
   // Country code options
   countryCodes = [
@@ -41,12 +59,28 @@ export class RegisterCustomerComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private registerCustomerService: RegisterCustomerService,
+    private toastr: ToastrService,
+    private tokenService: TokenService
   ) {
-    // Coupon verification form
+    // Coupon verification form with separate inputs (4-4-5 format)
     this.couponVerificationForm = this.fb.group({
-      couponNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]]
+      couponCode1: ['', [Validators.required, Validators.pattern(/^[A-Z0-9]{4}$/)]],
+      couponCode2: ['', [Validators.required, Validators.pattern(/^[A-Z0-9]{4}$/)]],
+      couponCode3: ['', [Validators.required, Validators.pattern(/^[A-Z0-9]{5}$/)]]
     });
+
+    // OTP form
+    this.otpForm = this.fb.group({
+      otp: ['', [Validators.required, Validators.pattern(/^[0-9]{6}$/)]]
+    });
+
+    // PIN form
+    this.pinForm = this.fb.group({
+      pin: ['', [Validators.required, Validators.pattern(/^[0-9]{6}$/)]],
+      confirmPin: ['', [Validators.required]]
+    }, { validators: this.pinMatchValidator });
 
     // Registration form (without coupon number)
     this.registrationForm = this.fb.group({
@@ -62,6 +96,12 @@ export class RegisterCustomerComponent implements OnInit {
 
   ngOnInit(): void {
     // Component initialization
+  }
+
+  ngOnDestroy(): void {
+    if (this.resendTimerInterval) {
+      clearInterval(this.resendTimerInterval);
+    }
   }
 
   // Password match validator
@@ -81,33 +121,285 @@ export class RegisterCustomerComponent implements OnInit {
     return null;
   }
 
+  // PIN match validator
+  pinMatchValidator(form: FormGroup) {
+    const pin = form.get('pin');
+    const confirmPin = form.get('confirmPin');
+    
+    if (pin && confirmPin && pin.value !== confirmPin.value) {
+      confirmPin.setErrors({ pinMismatch: true });
+      return { pinMismatch: true };
+    }
+    
+    if (confirmPin && confirmPin.hasError('pinMismatch')) {
+      confirmPin.setErrors(null);
+    }
+    
+    return null;
+  }
+
+  // Coupon Code Input Handlers
+  onCouponCodeInput(event: any, part: number): void {
+    // Allow alphanumeric characters and convert to uppercase
+    const value = event.target.value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+    const maxLength = part === 3 ? 5 : 4;
+    const trimmedValue = value.substring(0, maxLength);
+    
+    // Update form control
+    if (part === 1) {
+      this.couponVerificationForm.patchValue({ couponCode1: trimmedValue }, { emitEvent: false });
+      this.couponCode1 = trimmedValue;
+      if (trimmedValue.length === 4) {
+        setTimeout(() => {
+          const nextInput = document.querySelector(`input[data-part="2"]`) as HTMLInputElement;
+          nextInput?.focus();
+        }, 0);
+      }
+    } else if (part === 2) {
+      this.couponVerificationForm.patchValue({ couponCode2: trimmedValue }, { emitEvent: false });
+      this.couponCode2 = trimmedValue;
+      if (trimmedValue.length === 4) {
+        setTimeout(() => {
+          const nextInput = document.querySelector(`input[data-part="3"]`) as HTMLInputElement;
+          nextInput?.focus();
+        }, 0);
+      }
+    } else if (part === 3) {
+      this.couponVerificationForm.patchValue({ couponCode3: trimmedValue }, { emitEvent: false });
+      this.couponCode3 = trimmedValue;
+    }
+  }
+
+  // Handle paste event for coupon code inputs
+  onCouponCodePaste(event: ClipboardEvent): void {
+    event.preventDefault();
+    const pastedData = event.clipboardData?.getData('text') || '';
+    
+    // Remove dashes, spaces, and convert to uppercase
+    const cleanedData = pastedData.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+    
+    // If the pasted data is 13 characters (full coupon code), split it
+    if (cleanedData.length === 13) {
+      const part1 = cleanedData.substring(0, 4);
+      const part2 = cleanedData.substring(4, 8);
+      const part3 = cleanedData.substring(8, 13);
+      
+      // Update form controls
+      this.couponVerificationForm.patchValue({
+        couponCode1: part1,
+        couponCode2: part2,
+        couponCode3: part3
+      }, { emitEvent: false });
+      
+      // Update component properties
+      this.couponCode1 = part1;
+      this.couponCode2 = part2;
+      this.couponCode3 = part3;
+      
+      // Focus on the last input
+      setTimeout(() => {
+        const lastInput = document.querySelector(`input[data-part="3"]`) as HTMLInputElement;
+        lastInput?.focus();
+        lastInput?.select();
+      }, 0);
+    } else if (cleanedData.length > 0) {
+      // If it's not exactly 13 characters, try to fill what we can
+      const part1 = cleanedData.substring(0, 4);
+      const part2 = cleanedData.substring(4, 8);
+      const part3 = cleanedData.substring(8, 13);
+      
+      this.couponVerificationForm.patchValue({
+        couponCode1: part1 || '',
+        couponCode2: part2 || '',
+        couponCode3: part3 || ''
+      }, { emitEvent: false });
+      
+      this.couponCode1 = part1 || '';
+      this.couponCode2 = part2 || '';
+      this.couponCode3 = part3 || '';
+      
+      // Focus on the appropriate input
+      setTimeout(() => {
+        let focusPart = 1;
+        if (cleanedData.length > 4) focusPart = 2;
+        if (cleanedData.length > 8) focusPart = 3;
+        const focusInput = document.querySelector(`input[data-part="${focusPart}"]`) as HTMLInputElement;
+        focusInput?.focus();
+      }, 0);
+    }
+  }
+
+  // Handle backspace keydown for coupon code inputs
+  onCouponCodeKeydown(event: KeyboardEvent, part: number): void {
+    if (event.key === 'Backspace') {
+      if (part === 1 && this.couponCode1Control?.value === '') {
+        event.preventDefault();
+      } else if (part === 2 && this.couponCode2Control?.value === '') {
+        event.preventDefault();
+        // Focus previous input
+        const prevInput = document.querySelector(`input[data-part="1"]`) as HTMLInputElement;
+        prevInput?.focus();
+      } else if (part === 3 && this.couponCode3Control?.value === '') {
+        event.preventDefault();
+        // Focus previous input
+        const prevInput = document.querySelector(`input[data-part="2"]`) as HTMLInputElement;
+        prevInput?.focus();
+      }
+    }
+  }
+
   verifyCoupon(): void {
     if (this.couponVerificationForm.valid) {
       this.isSubmitting = true;
       
-      // Simulate API call to verify coupon
-      setTimeout(() => {
-        this.isSubmitting = false;
-        
-        const couponNumber = this.couponVerificationForm.get('couponNumber')?.value;
-        
-        // Mock verification - in real app, this would call an API
-        if (this.isValidCoupon(couponNumber)) {
-          this.verifiedCouponNumber = couponNumber;
-          this.currentStep = 'registration';
-        } else {
-          // Show error message
-          this.couponVerificationForm.get('couponNumber')?.setErrors({ invalidCoupon: true });
+      // Combine the three parts
+      const fullCouponCode = `${this.couponCode1}${this.couponCode2}${this.couponCode3}`;
+      
+      // Call API to get customer by coupon
+      this.registerCustomerService.getCustomerByCoupon(fullCouponCode, this.otpMethod).subscribe({
+        next: (response) => {
+          this.isSubmitting = false;
+          this.customerData = response;
+          this.verifiedCouponNumber = fullCouponCode;
+          this.currentStep = 'otp-verification';
+          this.startResendTimer();
+          this.toastr.success('OTP sent successfully', 'Success');
+        },
+        error: (error) => {
+          this.isSubmitting = false;
+          console.error('Error verifying coupon:', error);
+          const errorMessage = error.error?.message || error.error?.error || 'Invalid coupon code. Please check and try again.';
+          this.toastr.error(errorMessage, 'Error');
+          // Show error message on form
+          this.couponVerificationForm.get('couponCode1')?.setErrors({ invalidCoupon: true });
+          this.couponVerificationForm.get('couponCode2')?.setErrors({ invalidCoupon: true });
+          this.couponVerificationForm.get('couponCode3')?.setErrors({ invalidCoupon: true });
         }
-      }, 1500);
+      });
     } else {
       this.markCouponFormTouched();
     }
   }
 
-  private isValidCoupon(couponNumber: string): boolean {
-    // Mock validation - accept any 10-digit number
-    return /^[0-9]{10}$/.test(couponNumber);
+  // Verify OTP
+  verifyOtp(): void {
+    if (this.otpForm.invalid || !this.customerData) {
+      this.markFormGroupTouched(this.otpForm);
+      return;
+    }
+
+    this.isVerifyingOtp = true;
+    const otpCode = this.otpForm.get('otp')?.value;
+
+    this.registerCustomerService.verifyEmailOtp({
+      email: this.customerData.customer.email,
+      otpCode: otpCode
+    }).subscribe({
+      next: (response) => {
+        this.isVerifyingOtp = false;
+        if (response.success) {
+          this.toastr.success('OTP verified successfully', 'Success');
+          this.currentStep = 'pin-creation';
+        } else {
+          this.toastr.error(response.message || 'Invalid OTP', 'Error');
+        }
+      },
+      error: (error) => {
+        this.isVerifyingOtp = false;
+        console.error('Error verifying OTP:', error);
+        const errorMessage = error.error?.message || error.error?.error || 'Invalid OTP. Please try again.';
+        this.toastr.error(errorMessage, 'Error');
+        // Clear OTP form on error
+        this.otpForm.patchValue({ otp: '' });
+      }
+    });
+  }
+
+  // Resend OTP
+  resendOtp(): void {
+    if (!this.canResend || !this.customerData) {
+      return;
+    }
+
+    // Note: The API doesn't have a resend endpoint, so we'll just reset the timer
+    // In a real scenario, you might need to call the coupon verification API again
+    this.otpForm.patchValue({ otp: '' });
+    this.startResendTimer();
+    this.toastr.info('Please request OTP again by verifying coupon', 'Info');
+  }
+
+  // Resend timer (3 minutes = 180 seconds)
+  startResendTimer(): void {
+    this.resendTimer = 180; // 3 minutes
+    this.canResend = false;
+
+    if (this.resendTimerInterval) {
+      clearInterval(this.resendTimerInterval);
+    }
+
+    this.resendTimerInterval = setInterval(() => {
+      this.resendTimer--;
+      if (this.resendTimer <= 0) {
+        this.canResend = true;
+        clearInterval(this.resendTimerInterval);
+      }
+    }, 1000);
+  }
+
+  getResendTimerText(): string {
+    const minutes = Math.floor(this.resendTimer / 60);
+    const seconds = this.resendTimer % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  // Create PIN
+  createPin(): void {
+    if (this.pinForm.invalid || !this.customerData) {
+      this.markFormGroupTouched(this.pinForm);
+      return;
+    }
+
+    this.isCreatingPin = true;
+    const pin = this.pinForm.get('pin')?.value;
+
+    this.registerCustomerService.createPin(this.customerData.customer.id, pin).subscribe({
+      next: (response) => {
+        this.isCreatingPin = false;
+        if (response.success && response.token) {
+          // Store token
+          this.tokenService.setToken(response.token);
+          
+          // Decode and store user data from token
+          try {
+            const base64Url = response.token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(
+              atob(base64)
+                .split('')
+                .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+            );
+            const userData = JSON.parse(jsonPayload);
+            this.tokenService.setUser(userData);
+          } catch (error) {
+            console.error('Error decoding token:', error);
+          }
+
+          this.toastr.success(response.message || 'PIN created successfully', 'Success');
+          
+          // Navigate to service selection page
+          this.router.navigate(['/customer/service-selection']);
+        } else {
+          this.toastr.error(response.message || 'Failed to create PIN', 'Error');
+        }
+      },
+      error: (error) => {
+        this.isCreatingPin = false;
+        console.error('Error creating PIN:', error);
+        const errorMessage = error.error?.message || error.error?.error || 'Failed to create PIN. Please try again.';
+        this.toastr.error(errorMessage, 'Error');
+      }
+    });
   }
 
   submitRegistration(): void {
@@ -131,7 +423,7 @@ export class RegisterCustomerComponent implements OnInit {
       }, 2000);
     } else {
       // Mark all fields as touched to show validation errors
-      this.markFormGroupTouched();
+      this.markFormGroupTouched(this.registrationForm);
     }
   }
 
@@ -139,17 +431,26 @@ export class RegisterCustomerComponent implements OnInit {
     this.currentStep = 'coupon-verification';
     this.couponVerificationForm.reset();
     this.verifiedCouponNumber = '';
+    this.couponCode1 = '';
+    this.couponCode2 = '';
+    this.couponCode3 = '';
+    this.customerData = null;
+    this.otpForm.reset();
+    this.pinForm.reset();
+    if (this.resendTimerInterval) {
+      clearInterval(this.resendTimerInterval);
+      this.resendTimer = 0;
+      this.canResend = false;
+    }
+  }
+
+  goBackToOtpVerification(): void {
+    this.currentStep = 'otp-verification';
+    this.otpForm.reset();
   }
 
   goToSignIn(): void {
     this.router.navigate(['/customer/login']);
-  }
-
-  private markFormGroupTouched(): void {
-    Object.keys(this.registrationForm.controls).forEach(key => {
-      const control = this.registrationForm.get(key);
-      control?.markAsTouched();
-    });
   }
 
   private markCouponFormTouched(): void {
@@ -159,9 +460,24 @@ export class RegisterCustomerComponent implements OnInit {
     });
   }
 
+  private markFormGroupTouched(formGroup: FormGroup): void {
+    Object.keys(formGroup.controls).forEach(key => {
+      const control = formGroup.get(key);
+      control?.markAsTouched();
+    });
+  }
+
   // Getters for form validation
-  get couponNumberControl() {
-    return this.couponVerificationForm.get('couponNumber');
+  get couponCode1Control() {
+    return this.couponVerificationForm.get('couponCode1');
+  }
+
+  get couponCode2Control() {
+    return this.couponVerificationForm.get('couponCode2');
+  }
+
+  get couponCode3Control() {
+    return this.couponVerificationForm.get('couponCode3');
   }
 
   get fullNameControl() {
@@ -186,5 +502,17 @@ export class RegisterCustomerComponent implements OnInit {
 
   get confirmPasswordControl() {
     return this.registrationForm.get('confirmPassword');
+  }
+
+  get otpControl() {
+    return this.otpForm.get('otp');
+  }
+
+  get pinControl() {
+    return this.pinForm.get('pin');
+  }
+
+  get confirmPinControl() {
+    return this.pinForm.get('confirmPin');
   }
 }

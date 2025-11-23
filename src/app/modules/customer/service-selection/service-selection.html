@@ -34,7 +34,20 @@
     <!-- Coupon Selection -->
     <div class="space-y-4">
       <h3 class="text-lg font-semibold text-white">Your Coupons</h3>
-      <div class="space-y-3">
+      
+      <!-- Loading State -->
+      <div *ngIf="isLoadingCoupons" class="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <span class="material-icons animate-spin text-purple-600 text-4xl mb-2">refresh</span>
+        <p class="text-gray-600">Loading coupons...</p>
+      </div>
+
+      <!-- Coupons List -->
+      <div *ngIf="!isLoadingCoupons" class="space-y-3">
+        <div *ngIf="coupons.length === 0" class="bg-white border border-gray-200 rounded-lg p-8 text-center">
+          <span class="material-icons text-gray-400 text-4xl mb-2">confirmation_number</span>
+          <p class="text-gray-600">No coupons found</p>
+        </div>
+        
         <div 
           *ngFor="let coupon of coupons" 
           class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
@@ -43,7 +56,7 @@
               <span class="material-icons text-purple-600">confirmation_number</span>
               <div>
                 <h4 class="font-semibold text-gray-900">Coupon #{{ coupon.couponNumber }}</h4>
-                <p class="text-sm text-gray-600">{{ coupon.services.length }} services available</p>
+                <p class="text-sm text-gray-600">{{ getRemainingServices(coupon) }} of {{ coupon.products?.length || 0 }} services available</p>
                 <p class="text-xs text-orange-600 font-medium">{{getRemainingDays(coupon.expirationDate)}} days remaining</p>
               </div>
             </div>
@@ -56,7 +69,8 @@
               </button>
               <button 
                 (click)="toggleCoupon(coupon.id)"
-                class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2"
+                [disabled]="!coupon.products || coupon.products.length === 0"
+                class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 [class]="selectedCouponId === coupon.id && showServices ? 'bg-purple-600 text-white' : 'bg-purple-100 text-purple-600 hover:bg-purple-200'">
                 <span class="material-icons text-sm">{{ selectedCouponId === coupon.id && showServices ? 'expand_less' : 'expand_more' }}</span>
                 <span>{{ selectedCouponId === coupon.id && showServices ? 'Hide Services' : 'View Services' }}</span>
@@ -64,37 +78,33 @@
             </div>
           </div>
 
-          <!-- Services Grid (Inline under each coupon) -->
+          <!-- Products Grid (Inline under each coupon) -->
           <div 
+            *ngIf="selectedCouponId === coupon.id && coupon.products"
             [@slideInOut]="getAnimationState(coupon.id)"
             class="mt-6 space-y-4 overflow-hidden">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div 
-                *ngFor="let service of coupon.services; let i = index" 
+                *ngFor="let product of coupon.products; let i = index" 
                 [@fadeInUp]="getAnimationState(coupon.id)"
                 [style.animation-delay]="getAnimationState(coupon.id) === 'in' ? (i * 100 + 'ms') : '0ms'"
                 class="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200"
                 [class]="getServiceCardClass(i)">
                 <div class="flex items-start space-x-3 mb-3">
                   <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white bg-purple-600">
-                    {{ i + 1 }}
+                    {{ product.displayOrder || (i + 1) }}
                   </div>
                   <div class="flex-1">
-                    <h5 class="text-base font-semibold text-gray-900 mb-1">{{ service.name }}</h5>
-                    <p class="text-xs text-gray-600 mb-2">{{ service.description }}</p>
-                    <div class="flex items-center space-x-2">
-                      <span class="text-xs text-gray-500 font-medium">Value:</span>
-                      <span class="text-xs font-bold text-green-600">{{ service.value }}</span>
-                    </div>
+                    <h5 class="text-base font-semibold text-gray-900 mb-1">{{ product.name }}</h5>
+                    <p class="text-xs text-gray-600 mb-2">{{ product.description }}</p>
                   </div>
                 </div>
                 
                 <div class="flex justify-end">
                   <div class="px-3 py-1 text-xs font-medium rounded-lg flex items-center space-x-1 min-w-[100px] justify-center"
-                       [class]="getRedemptionStatusClass(service.redemptionStatus)">
-                    <span class="material-icons text-xs" [class]="getRedemptionStatusIcon(service.redemptionStatus)"></span>
-                    <span class="font-semibold">{{ getRedemptionStatusText(service.redemptionStatus) }}</span>
-                    <span *ngIf="service.redeemedDate" class="text-xs opacity-75 block mt-1">{{ service.redeemedDate }}</span>
+                       [class]="product.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'">
+                    <span class="material-icons text-xs">{{ product.isActive ? 'check_circle' : 'cancel' }}</span>
+                    <span class="font-semibold">{{ product.isActive ? 'Active' : 'Inactive' }}</span>
                   </div>
                 </div>
               </div>
