@@ -31,6 +31,7 @@ export interface CustomerUpdateRequest {
 }
 
 export interface CustomerCoupon {
+  remainingDays?: number;
   couponId: number;
   couponCode: string;
   price: number;

@@ -14,7 +14,7 @@
           routerLink="/customer/service-selection"
           class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2 bg-white/20 text-white hover:bg-white/30">
           <span class="material-icons text-sm">home</span>
-          <span>Service Status</span>
+          <span>Purchased Coupons</span>
         </a>
         <a 
           routerLink="/customer/locations"
@@ -31,8 +31,16 @@
       </nav>
     </div>
 
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex items-center justify-center min-h-[400px]">
+      <div class="text-center">
+        <span class="material-icons animate-spin text-white text-4xl mb-4">refresh</span>
+        <p class="text-white">Loading service centers...</p>
+      </div>
+    </div>
+
     <!-- Locations Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div *ngIf="!isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div 
         *ngFor="let location of locations" 
         class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
@@ -51,7 +59,6 @@
             <span class="material-icons text-gray-400 text-sm mt-0.5">location_on</span>
             <div>
               <p class="text-sm text-gray-700">{{ location.address }}</p>
-              <p class="text-sm text-gray-600">{{ location.city }}, UAE</p>
             </div>
           </div>
           
@@ -59,24 +66,27 @@
             <span class="material-icons text-gray-400 text-sm">phone</span>
             <p class="text-sm text-gray-700">{{ location.phone }}</p>
           </div>
-          
-          <div class="flex items-start space-x-3">
-            <span class="material-icons text-gray-400 text-sm mt-0.5">schedule</span>
-            <p class="text-sm text-gray-700">{{ location.hours }}</p>
-          </div>
         </div>
         
-        <button 
+        <!-- <button 
           (click)="getDirections(location)"
           class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2">
           <span class="material-icons text-sm">directions</span>
           <span>Get Directions</span>
-        </button>
+        </button> -->
+      </div>
+      
+      <!-- Empty State -->
+      <div *ngIf="locations.length === 0" class="col-span-full">
+        <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+          <span class="material-icons text-gray-400 text-4xl mb-2">location_off</span>
+          <p class="text-gray-600">No service centers found</p>
+        </div>
       </div>
     </div>
     
     <!-- Map Section -->
-    <div class="bg-white rounded-lg shadow-lg p-6">
+    <!-- <div class="bg-white rounded-lg shadow-lg p-6">
       <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
         <span class="material-icons text-purple-600">map</span>
         <span>Interactive Map</span>
@@ -94,7 +104,7 @@
           <span>Open in Google Maps</span>
         </button>
       </div>
-    </div>
+    </div> -->
 
     <!-- Back Button -->
     <div class="flex justify-center">
@@ -102,7 +112,7 @@
         (click)="goBack()"
         class="px-6 py-3 text-purple-600 hover:text-purple-500 hover:bg-purple-50 rounded-lg transition-colors duration-200 flex items-center space-x-2">
         <span class="material-icons">arrow_back</span>
-        <span>Back to Service Status</span>
+        <span>Back to Coupons</span>
       </button>
     </div>
   </div>

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { ApiService } from '../../../core/services/api.service';
 
 export interface CustomerData {
   customerName: string;
@@ -10,6 +11,16 @@ export interface CustomerData {
   isLoggedIn: boolean;
 }
 
+export interface CustomerLoginRequest {
+  email?: string;
+  mobileNumber?: string;
+  pin: string;
+}
+
+export interface CustomerLoginResponse {
+  token: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -17,9 +28,16 @@ export class CustomerAuthService {
   private customerSubject = new BehaviorSubject<CustomerData | null>(null);
   public customer$ = this.customerSubject.asObservable();
 
-  constructor() {
+  constructor(private apiService: ApiService) {
     // Check for existing session on service initialization
     this.loadCustomerFromStorage();
+  }
+
+  /**
+   * Customer login with email/phone and PIN
+   */
+  customerLogin(request: CustomerLoginRequest): Observable<CustomerLoginResponse> {
+    return this.apiService.post<CustomerLoginResponse>('/Auth/customer-login', request);
   }
 
   // Login customer with email/phone and password

@@ -221,36 +221,18 @@
 
         <!-- Product Form -->
         <form [formGroup]="productForm" (ngSubmit)="saveProduct()" class="space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Product Name -->
-            <div class="form-group">
-              <label for="productName" class="form-label">Product Name *</label>
-              <input 
-                type="text" 
-                id="productName"
-                formControlName="name" 
-                placeholder="Enter product name"
-                class="form-input"
-                [class.error]="getProductFieldError('name')">
-              <div *ngIf="getProductFieldError('name')" class="form-error">
-                {{ getProductFieldError('name') }}
-              </div>
-            </div>
-
-            <!-- Display Order -->
-            <div class="form-group">
-              <label for="displayOrder" class="form-label">Display Order *</label>
-              <input 
-                type="number" 
-                id="displayOrder"
-                formControlName="displayOrder" 
-                placeholder="1"
-                min="1"
-                class="form-input"
-                [class.error]="getProductFieldError('displayOrder')">
-              <div *ngIf="getProductFieldError('displayOrder')" class="form-error">
-                {{ getProductFieldError('displayOrder') }}
-              </div>
+          <!-- Product Name -->
+          <div class="form-group">
+            <label for="productName" class="form-label">Product Name *</label>
+            <input 
+              type="text" 
+              id="productName"
+              formControlName="name" 
+              placeholder="Enter product name"
+              class="form-input"
+              [class.error]="getProductFieldError('name')">
+            <div *ngIf="getProductFieldError('name')" class="form-error">
+              {{ getProductFieldError('name') }}
             </div>
           </div>
 

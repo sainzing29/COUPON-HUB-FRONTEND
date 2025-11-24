@@ -2,15 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
-
-interface InvoiceItem {
-  id: number;
-  name: string;
-  description: string;
-  value: string;
-  status: 'available' | 'redeemed';
-  redeemedDate?: string;
-}
+import { CouponSaleService } from '../../coupons/service/coupon-sale.service';
+import { InvoiceDetailResponse } from '../../coupons/model/coupon-sale.model';
+import { ConfigurationService } from '../../organization/pages/settings/configuration.service';
+import { BasicConfiguration } from '../../organization/pages/settings/configuration.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-customer-invoice',
@@ -20,86 +16,61 @@ interface InvoiceItem {
   styleUrls: ['./customer-invoice.scss']
 })
 export class CustomerInvoiceComponent implements OnInit {
-  customerName: string = '';
-  customerEmail: string = '';
-  customerPhone: string = '';
-  customerAddress: string = '';
-  couponNumber: string = '';
-  invoiceDate: string = '';
-  invoiceNumber: string = '';
-
-  invoiceItems: InvoiceItem[] = [
-    {
-      id: 1,
-      name: 'Screen Protector Installation',
-      description: 'High-quality screen protector installation with warranty',
-      value: 'AED 50',
-      status: 'redeemed',
-      redeemedDate: '2024-01-15'
-    },
-    {
-      id: 2,
-      name: 'One Time Service Charge Waiver',
-      description: 'Waive service charges for one-time repairs and maintenance',
-      value: 'AED 100',
-      status: 'available'
-    },
-    {
-      id: 3,
-      name: 'CES 5000mAh Power Bank',
-      description: 'Portable power bank with 5000mAh capacity and fast charging',
-      value: 'AED 80',
-      status: 'redeemed',
-      redeemedDate: '2024-01-20'
-    },
-    {
-      id: 4,
-      name: 'Free Diagnostic Checkup',
-      description: 'Complimentary device diagnostic service and health check',
-      value: 'AED 30',
-      status: 'available'
-    },
-    {
-      id: 5,
-      name: '10% Off Mobile Outlets Product',
-      description: 'Get 10% discount on any mobile outlet product purchase',
-      value: 'Up to AED 200',
-      status: 'redeemed',
-      redeemedDate: '2024-01-18'
-    }
-  ];
+  invoiceData: InvoiceDetailResponse | null = null;
+  isLoading = false;
+  companyDetails: BasicConfiguration | null = null;
+  couponCode: string = '';
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private couponSaleService: CouponSaleService,
+    private configurationService: ConfigurationService,
+    private toastr: ToastrService
   ) { }
 
   ngOnInit(): void {
-    // Get customer data from route parameters
+    // Load company details
+    this.loadCompanyDetails();
+    
+    // Get coupon code from route parameters
     this.route.queryParams.subscribe(params => {
-      this.customerName = params['customerName'] || 'Customer';
-      this.customerEmail = params['customerEmail'] || '';
-      this.customerPhone = params['customerPhone'] || '';
-      this.customerAddress = params['customerAddress'] || '';
-      this.couponNumber = params['couponNumber'] || 'N/A';
+      this.couponCode = params['couponCode'] || params['couponNumber'] || '';
+      if (this.couponCode) {
+        this.loadInvoiceDetails(this.couponCode);
+      } else {
+        this.toastr.error('Coupon code not found', 'Error');
+      }
     });
-
-    // Generate invoice details
-    this.generateInvoiceDetails();
   }
 
-  private generateInvoiceDetails(): void {
-    const now = new Date();
-    this.invoiceDate = now.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+  loadCompanyDetails(): void {
+    this.configurationService.getBasicConfiguration().subscribe({
+      next: (response) => {
+        this.companyDetails = response;
+      },
+      error: (error) => {
+        console.error('Error loading company details:', error);
+        // Don't show error toast as this is not critical
+      }
     });
-    
-    // Generate invoice number
-    const timestamp = now.getTime().toString().slice(-8);
-    this.invoiceNumber = `INV-${timestamp}`;
+  }
+
+  loadInvoiceDetails(couponCode: string): void {
+    this.isLoading = true;
+    this.couponSaleService.getInvoiceDetailsByCouponCode(couponCode).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.invoiceData = response;
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error loading invoice details:', error);
+        const errorMessage = error.error?.message || error.error?.error || 'Failed to load invoice details';
+        this.toastr.error(errorMessage, 'Error');
+      }
+    });
   }
 
   goBack(): void {
@@ -111,31 +82,28 @@ export class CustomerInvoiceComponent implements OnInit {
   }
 
   downloadInvoice(): void {
-    // In a real application, this would generate and download a PDF
-    alert('Invoice download feature will be implemented with PDF generation');
+    // TODO: Implement PDF download
+    alert('PDF download feature will be implemented');
   }
 
-  getTotalValue(): string {
-    return 'AED 99';
+  formatDate(dateString: string | undefined): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   }
 
-  getRedeemedCount(): number {
-    return this.invoiceItems.filter(item => item.status === 'redeemed').length;
-  }
-
-  getAvailableCount(): number {
-    return this.invoiceItems.filter(item => item.status === 'available').length;
-  }
-
-  getStatusClass(status: string): string {
-    return status === 'redeemed' ? 'status-redeemed' : 'status-available';
-  }
-
-  getStatusIcon(status: string): string {
-    return status === 'redeemed' ? 'fas fa-check-circle' : 'fas fa-clock';
-  }
-
-  getStatusText(status: string): string {
-    return status === 'redeemed' ? 'Redeemed' : 'Available';
+  formatDateTime(dateString: string | undefined): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 }

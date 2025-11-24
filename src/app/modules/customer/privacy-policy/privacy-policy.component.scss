@@ -1,0 +1,20 @@
+// Privacy Policy Component Styles
+
+.prose {
+  h3, h4 {
+    @apply text-gray-900;
+  }
+  
+  p {
+    @apply text-gray-700 leading-relaxed;
+  }
+  
+  ul {
+    @apply space-y-2;
+    
+    li {
+      @apply text-gray-700;
+    }
+  }
+}
+

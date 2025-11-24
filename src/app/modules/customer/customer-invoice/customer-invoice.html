@@ -3,14 +3,15 @@
   <div class="header-section">
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center">
-        <button 
-          (click)="goBack()"
-          class="mr-4 p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors duration-200">
-          <i class="fas fa-arrow-left"></i>
-        </button>
         <h1 class="text-2xl font-bold text-white">Customer Invoice</h1>
       </div>
-      <div class="flex space-x-3">
+      <div class="flex items-center space-x-3">
+        <button 
+          (click)="goBack()"
+          class="px-4 py-2 bg-white bg-opacity-20 text-white hover:bg-opacity-30 rounded-lg transition-colors duration-200 flex items-center space-x-2">
+          <i class="fas fa-arrow-left"></i>
+          <span>Back</span>
+        </button>
         <button 
           (click)="printInvoice()"
           class="px-4 py-2 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 transition-colors duration-200 flex items-center space-x-2">
@@ -27,19 +28,52 @@
     </div>
   </div>
 
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex items-center justify-center min-h-[400px]">
+    <div class="text-center">
+      <i class="fas fa-spinner fa-spin text-blue-500 text-4xl mb-4"></i>
+      <p class="text-gray-600">Loading invoice details...</p>
+    </div>
+  </div>
+
   <!-- Invoice Content -->
-  <div class="invoice-content">
+  <div *ngIf="invoiceData && !isLoading" class="invoice-content">
     <div class="invoice-card">
       <!-- Invoice Header -->
       <div class="invoice-header">
-        <div class="company-info">
-          <div class="logo">
-            <span class="logo-text">COUPON HUB</span>
+        <div class="header-left">
+          <div class="company-info">
+            <div class="company-details">
+              <h2 class="company-name">{{ companyDetails?.companyName || 'Coupon Hub Services' }}</h2>
+              <p class="company-address" *ngIf="companyDetails?.companyCity || companyDetails?.companyCountry">
+                <span *ngIf="companyDetails?.companyCity">{{ companyDetails?.companyCity }}</span>
+                <span *ngIf="companyDetails?.companyCity && companyDetails?.companyCountry">, </span>
+                <span *ngIf="companyDetails?.companyCountry">{{ companyDetails?.companyCountry }}</span>
+              </p>
+              <p class="company-contact" *ngIf="companyDetails?.companyPhone">
+                <i class="fas fa-phone mr-2"></i>{{ companyDetails?.companyPhone }}
+              </p>
+              <p class="company-contact" *ngIf="companyDetails?.companyEmail">
+                <i class="fas fa-envelope mr-2"></i>{{ companyDetails?.companyEmail }}
+              </p>
+            </div>
           </div>
-          <div class="company-details">
-            <h2 class="company-name">Coupon Hub Services</h2>
-            <p class="company-address">Dubai, UAE</p>
-            <p class="company-contact">Email: info@couponhub.com</p>
+          <!-- Customer Information -->
+          <div class="customer-section">
+            <h4 class="section-title">Bill To:</h4>
+            <div class="customer-info">
+              <div class="customer-name">{{ invoiceData.customerFirstName }} {{ invoiceData.customerLastName }}</div>
+              <div class="customer-details">
+                <div class="customer-detail">
+                  <i class="fas fa-envelope"></i>
+                  <span>{{ invoiceData.customerEmail }}</span>
+                </div>
+                <div class="customer-detail">
+                  <i class="fas fa-phone"></i>
+                  <span>{{ invoiceData.customerMobileNumber }}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="invoice-details">
@@ -47,70 +81,49 @@
           <div class="invoice-meta">
             <div class="meta-row">
               <span class="meta-label">Invoice #:</span>
-              <span class="meta-value">{{ invoiceNumber }}</span>
+              <span class="meta-value">{{ invoiceData.invoiceNumber }}</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Coupon Code:</span>
+              <span class="meta-value">{{ invoiceData.couponCode }}</span>
             </div>
             <div class="meta-row">
               <span class="meta-label">Date:</span>
-              <span class="meta-value">{{ invoiceDate }}</span>
+              <span class="meta-value">{{ formatDate(invoiceData.createdAt) }}</span>
             </div>
             <div class="meta-row">
-              <span class="meta-label">Coupon #:</span>
-              <span class="meta-value">{{ couponNumber }}</span>
+              <span class="meta-label">Payment Method:</span>
+              <span class="meta-value">{{ invoiceData.paymentMethod }}</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Payment Status:</span>
+              <span class="meta-value">{{ invoiceData.paymentStatus }}</span>
+            </div>
+            <div class="meta-row" *ngIf="invoiceData.scheme">
+              <span class="meta-label">Scheme Name:</span>
+              <span class="meta-value">{{ invoiceData.scheme.name }}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Customer Information -->
-      <div class="customer-section">
-        <h4 class="section-title">Bill To:</h4>
-        <div class="customer-info">
-          <div class="customer-name">{{ customerName }}</div>
-          <div class="customer-details">
-            <div *ngIf="customerEmail" class="customer-detail">
-              <i class="fas fa-envelope"></i>
-              <span>{{ customerEmail }}</span>
-            </div>
-            <div *ngIf="customerPhone" class="customer-detail">
-              <i class="fas fa-phone"></i>
-              <span>{{ customerPhone }}</span>
-            </div>
-            <div *ngIf="customerAddress" class="customer-detail">
-              <i class="fas fa-map-marker-alt"></i>
-              <span>{{ customerAddress }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Invoice Items -->
-      <div class="invoice-items-section">
-        <h4 class="section-title">Services Included:</h4>
+      <!-- Products Included -->
+      <div class="invoice-items-section" *ngIf="invoiceData.scheme && invoiceData.scheme.products && invoiceData.scheme.products.length > 0">
+        <h4 class="section-title">Products Included:</h4>
         <div class="items-table">
           <div class="table-header">
-            <div class="col-service">Service</div>
+            <div class="col-service">Product</div>
             <div class="col-description">Description</div>
-            <div class="col-status">Status</div>
           </div>
           <div class="table-body">
             <div 
-              *ngFor="let item of invoiceItems; let i = index" 
-              class="table-row"
-              [class]="getStatusClass(item.status)">
+              *ngFor="let product of invoiceData.scheme.products; let i = index" 
+              class="table-row">
               <div class="col-service">
-                <div class="service-number">{{ i + 1 }}</div>
-                <div class="service-name">{{ item.name }}</div>
+                <div class="service-number">{{ product.displayOrder || (i + 1) }}</div>
+                <div class="service-name">{{ product.name }}</div>
               </div>
-              <div class="col-description">{{ item.description }}</div>
-              <div class="col-status">
-                <div class="status-badge" [class]="getStatusClass(item.status)">
-                  <i [class]="getStatusIcon(item.status)"></i>
-                  <span>{{ getStatusText(item.status) }}</span>
-                  <div *ngIf="item.redeemedDate" class="redeemed-date">
-                    {{ item.redeemedDate }}
-                  </div>
-                </div>
-              </div>
+              <div class="col-description">{{ product.description }}</div>
             </div>
           </div>
         </div>
@@ -118,23 +131,9 @@
 
       <!-- Invoice Summary -->
       <div class="invoice-summary">
-        <div class="summary-grid">
-          <div class="summary-item">
-            <span class="summary-label">Total Services:</span>
-            <span class="summary-value">{{ invoiceItems.length }}</span>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">Redeemed:</span>
-            <span class="summary-value redeemed">{{ getRedeemedCount() }}</span>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">Available:</span>
-            <span class="summary-value available">{{ getAvailableCount() }}</span>
-          </div>
-          <div class="summary-item total">
-            <span class="summary-label">Total Value:</span>
-            <span class="summary-value">{{ getTotalValue() }}</span>
-          </div>
+        <div class="total-amount-container">
+          <span class="total-amount-label">Total Amount:</span>
+          <span class="total-amount-value">{{ invoiceData.totalAmount }} {{ invoiceData.currency }}</span>
         </div>
       </div>
 
@@ -149,11 +148,15 @@
             <li>For support, contact us at info@couponhub.com</li>
           </ul>
         </div>
-        <div class="footer-signature">
-          <div class="signature-line"></div>
-          <p>Authorized Signature</p>
-        </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!invoiceData && !isLoading" class="flex items-center justify-center min-h-[400px]">
+    <div class="text-center">
+      <i class="fas fa-exclamation-triangle text-yellow-500 text-4xl mb-4"></i>
+      <p class="text-gray-600">Invoice data not found</p>
     </div>
   </div>
 </div>

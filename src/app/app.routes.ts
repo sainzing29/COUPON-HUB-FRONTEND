@@ -39,6 +39,10 @@ export const routes: Routes = [
       {
         path: 'invoice',
         loadComponent: () => import('./modules/customer/customer-invoice/customer-invoice').then(m => m.CustomerInvoiceComponent)
+      },
+      {
+        path: 'privacy-policy',
+        loadComponent: () => import('./modules/customer/privacy-policy/privacy-policy.component').then(m => m.PrivacyPolicyComponent)
       }
     ]
   },

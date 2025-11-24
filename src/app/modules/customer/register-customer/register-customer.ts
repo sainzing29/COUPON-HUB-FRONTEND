@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -16,6 +16,10 @@ import { TokenService } from '../../../core/services/token.service';
   styleUrls: ['./register-customer.scss']
 })
 export class RegisterCustomerComponent implements OnInit, OnDestroy {
+  @ViewChildren('otpInput') otpInputs!: QueryList<ElementRef>;
+  @ViewChildren('pinInput') pinInputs!: QueryList<ElementRef>;
+  @ViewChildren('confirmPinInput') confirmPinInputs!: QueryList<ElementRef>;
+  
   currentStep: 'coupon-verification' | 'otp-verification' | 'pin-creation' | 'registration' = 'coupon-verification';
   couponVerificationForm: FormGroup;
   otpForm: FormGroup;
@@ -30,6 +34,8 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
   couponCode3: string = '';
   customerData: CustomerByCouponResponse | null = null;
   otpMethod: 'email' | 'phone' = 'email';
+  otpDigits: number[] = [0, 1, 2, 3, 4, 5];
+  pinDigits: number[] = [0, 1, 2, 3, 4, 5];
   
   // Resend OTP timer
   resendTimer: number = 0;
@@ -71,15 +77,30 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
       couponCode3: ['', [Validators.required, Validators.pattern(/^[A-Z0-9]{5}$/)]]
     });
 
-    // OTP form
+    // OTP form with 6 separate inputs
     this.otpForm = this.fb.group({
-      otp: ['', [Validators.required, Validators.pattern(/^[0-9]{6}$/)]]
+      digit0: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      digit1: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      digit2: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      digit3: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      digit4: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      digit5: ['', [Validators.required, Validators.pattern(/[0-9]/)]]
     });
 
-    // PIN form
+    // PIN form with 6 separate inputs for PIN and Confirm PIN
     this.pinForm = this.fb.group({
-      pin: ['', [Validators.required, Validators.pattern(/^[0-9]{6}$/)]],
-      confirmPin: ['', [Validators.required]]
+      pin0: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      pin1: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      pin2: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      pin3: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      pin4: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      pin5: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      confirmPin0: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      confirmPin1: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      confirmPin2: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      confirmPin3: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      confirmPin4: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      confirmPin5: ['', [Validators.required, Validators.pattern(/[0-9]/)]]
     }, { validators: this.pinMatchValidator });
 
     // Registration form (without coupon number)
@@ -95,7 +116,8 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Component initialization
+    // Focus on first OTP input when OTP step is shown
+    // This will be handled when step changes
   }
 
   ngOnDestroy(): void {
@@ -123,16 +145,28 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
 
   // PIN match validator
   pinMatchValidator(form: FormGroup) {
-    const pin = form.get('pin');
-    const confirmPin = form.get('confirmPin');
+    // Combine PIN digits
+    const pin = [0, 1, 2, 3, 4, 5].map(i => form.get(`pin${i}`)?.value).join('');
+    const confirmPin = [0, 1, 2, 3, 4, 5].map(i => form.get(`confirmPin${i}`)?.value).join('');
     
-    if (pin && confirmPin && pin.value !== confirmPin.value) {
-      confirmPin.setErrors({ pinMismatch: true });
+    if (pin && confirmPin && pin.length === 6 && confirmPin.length === 6 && pin !== confirmPin) {
+      // Set error on all confirmPin fields
+      for (let i = 0; i < 6; i++) {
+        form.get(`confirmPin${i}`)?.setErrors({ pinMismatch: true });
+      }
       return { pinMismatch: true };
     }
     
-    if (confirmPin && confirmPin.hasError('pinMismatch')) {
-      confirmPin.setErrors(null);
+    // Clear errors if PINs match
+    if (pin === confirmPin && pin.length === 6) {
+      for (let i = 0; i < 6; i++) {
+        const control = form.get(`confirmPin${i}`);
+        if (control?.hasError('pinMismatch')) {
+          const errors = { ...control.errors };
+          delete errors['pinMismatch'];
+          control.setErrors(Object.keys(errors).length > 0 ? errors : null);
+        }
+      }
     }
     
     return null;
@@ -264,6 +298,12 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
           this.currentStep = 'otp-verification';
           this.startResendTimer();
           this.toastr.success('OTP sent successfully', 'Success');
+          // Focus on first OTP input when step changes
+          setTimeout(() => {
+            if (this.otpInputs && this.otpInputs.length > 0) {
+              this.otpInputs.first.nativeElement.focus();
+            }
+          }, 100);
         },
         error: (error) => {
           this.isSubmitting = false;
@@ -281,6 +321,115 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
     }
   }
 
+  // OTP Input Handlers
+  onOtpDigitInput(event: any, index: number): void {
+    const value = event.target.value;
+    
+    // Only allow single digit
+    if (value.length > 1) {
+      event.target.value = value.slice(-1);
+    }
+    
+    // Only allow numeric input
+    if (value && !/^[0-9]$/.test(value)) {
+      event.target.value = '';
+      return;
+    }
+    
+    // Update form control value
+    this.otpForm.get(`digit${index}`)?.setValue(value);
+    
+    // Move to next input if current is filled
+    if (value && index < 5) {
+      setTimeout(() => {
+        // Try ViewChildren first
+        if (this.otpInputs && this.otpInputs.length > index + 1) {
+          const nextInput = this.otpInputs.toArray()[index + 1];
+          if (nextInput) {
+            nextInput.nativeElement.focus();
+            nextInput.nativeElement.select();
+            return;
+          }
+        }
+        
+        // Fallback to DOM query
+        const nextInput = document.querySelector(`input[formControlName="digit${index + 1}"]`) as HTMLInputElement;
+        if (nextInput) {
+          nextInput.focus();
+          nextInput.select();
+        }
+      }, 10);
+    }
+  }
+
+  onOtpKeyDown(event: KeyboardEvent, index: number): void {
+    const input = event.target as HTMLInputElement;
+    
+    // Handle backspace
+    if (event.key === 'Backspace') {
+      const currentValue = input.value;
+      if (!currentValue && index > 0) {
+        // Move to previous input if current is empty
+        if (this.otpInputs && this.otpInputs.length > index) {
+          const prevInput = this.otpInputs.toArray()[index - 1];
+          if (prevInput) {
+            prevInput.nativeElement.focus();
+          }
+        }
+      }
+    }
+    
+    // Handle arrow keys
+    if (event.key === 'ArrowLeft' && index > 0) {
+      if (this.otpInputs && this.otpInputs.length > index) {
+        const prevInput = this.otpInputs.toArray()[index - 1];
+        if (prevInput) {
+          prevInput.nativeElement.focus();
+        }
+      }
+    }
+    
+    if (event.key === 'ArrowRight' && index < 5) {
+      if (this.otpInputs && this.otpInputs.length > index + 1) {
+        const nextInput = this.otpInputs.toArray()[index + 1];
+        if (nextInput) {
+          nextInput.nativeElement.focus();
+        }
+      }
+    }
+  }
+
+  onOtpPaste(event: ClipboardEvent): void {
+    event.preventDefault();
+    const pastedData = event.clipboardData?.getData('text') || '';
+    const digits = pastedData.replace(/\D/g, '').slice(0, 6);
+    
+    // Clear all inputs first
+    for (let i = 0; i < 6; i++) {
+      this.otpForm.get(`digit${i}`)?.setValue('');
+    }
+    
+    // Fill inputs with pasted digits
+    for (let i = 0; i < digits.length && i < 6; i++) {
+      this.otpForm.get(`digit${i}`)?.setValue(digits[i]);
+    }
+    
+    // Focus on the next empty input or last input
+    const nextEmptyIndex = digits.length < 6 ? digits.length : 5;
+    setTimeout(() => {
+      if (this.otpInputs && this.otpInputs.length > nextEmptyIndex) {
+        this.otpInputs.toArray()[nextEmptyIndex].nativeElement.focus();
+      }
+    }, 0);
+  }
+
+  private isAllOtpDigitsFilled(): boolean {
+    return this.otpDigits.every(index => {
+      const value = this.otpForm.get(`digit${index}`)?.value;
+      return value && value.length === 1;
+    });
+  }
+
   // Verify OTP
   verifyOtp(): void {
     if (this.otpForm.invalid || !this.customerData) {
@@ -289,7 +438,10 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
     }
 
     this.isVerifyingOtp = true;
-    const otpCode = this.otpForm.get('otp')?.value;
+    // Combine all 6 digits into a single OTP code
+    const otpCode = this.otpDigits.map(index => 
+      this.otpForm.get(`digit${index}`)?.value
+    ).join('');
 
     this.registerCustomerService.verifyEmailOtp({
       email: this.customerData.customer.email,
@@ -300,6 +452,12 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
         if (response.success) {
           this.toastr.success('OTP verified successfully', 'Success');
           this.currentStep = 'pin-creation';
+          // Focus on first PIN input when step changes
+          setTimeout(() => {
+            if (this.pinInputs && this.pinInputs.length > 0) {
+              this.pinInputs.first.nativeElement.focus();
+            }
+          }, 100);
         } else {
           this.toastr.error(response.message || 'Invalid OTP', 'Error');
         }
@@ -310,7 +468,15 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
         const errorMessage = error.error?.message || error.error?.error || 'Invalid OTP. Please try again.';
         this.toastr.error(errorMessage, 'Error');
         // Clear OTP form on error
-        this.otpForm.patchValue({ otp: '' });
+        for (let i = 0; i < 6; i++) {
+          this.otpForm.get(`digit${i}`)?.setValue('');
+        }
+        // Focus on first input
+        setTimeout(() => {
+          if (this.otpInputs && this.otpInputs.length > 0) {
+            this.otpInputs.first.nativeElement.focus();
+          }
+        }, 100);
       }
     });
   }
@@ -323,9 +489,18 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
 
     // Note: The API doesn't have a resend endpoint, so we'll just reset the timer
     // In a real scenario, you might need to call the coupon verification API again
-    this.otpForm.patchValue({ otp: '' });
+    // Clear all OTP inputs
+    for (let i = 0; i < 6; i++) {
+      this.otpForm.get(`digit${i}`)?.setValue('');
+    }
     this.startResendTimer();
     this.toastr.info('Please request OTP again by verifying coupon', 'Info');
+    // Focus on first input
+    setTimeout(() => {
+      if (this.otpInputs && this.otpInputs.length > 0) {
+        this.otpInputs.first.nativeElement.focus();
+      }
+    }, 100);
   }
 
   // Resend timer (3 minutes = 180 seconds)
@@ -352,6 +527,168 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 
+  // PIN Input Handlers
+  onPinDigitInput(event: any, index: number): void {
+    const value = event.target.value;
+    
+    // Only allow single digit
+    if (value.length > 1) {
+      event.target.value = value.slice(-1);
+    }
+    
+    // Only allow numeric input
+    if (value && !/^[0-9]$/.test(value)) {
+      event.target.value = '';
+      return;
+    }
+    
+    // Update form control value
+    this.pinForm.get(`pin${index}`)?.setValue(value);
+    
+    // Move to next input if current is filled
+    if (value && index < 5) {
+      setTimeout(() => {
+        if (this.pinInputs && this.pinInputs.length > index + 1) {
+          const nextInput = this.pinInputs.toArray()[index + 1];
+          if (nextInput) {
+            nextInput.nativeElement.focus();
+            nextInput.nativeElement.select();
+            return;
+          }
+        }
+        
+        const nextInput = document.querySelector(`input[formControlName="pin${index + 1}"]`) as HTMLInputElement;
+        if (nextInput) {
+          nextInput.focus();
+          nextInput.select();
+        }
+      }, 10);
+    } else if (value && index === 5) {
+      // Move to first confirm PIN input when PIN is complete
+      setTimeout(() => {
+        if (this.confirmPinInputs && this.confirmPinInputs.length > 0) {
+          this.confirmPinInputs.first.nativeElement.focus();
+        }
+      }, 10);
+    }
+  }
+
+  onConfirmPinDigitInput(event: any, index: number): void {
+    const value = event.target.value;
+    
+    // Only allow single digit
+    if (value.length > 1) {
+      event.target.value = value.slice(-1);
+    }
+    
+    // Only allow numeric input
+    if (value && !/^[0-9]$/.test(value)) {
+      event.target.value = '';
+      return;
+    }
+    
+    // Update form control value
+    this.pinForm.get(`confirmPin${index}`)?.setValue(value);
+    
+    // Move to next input if current is filled
+    if (value && index < 5) {
+      setTimeout(() => {
+        if (this.confirmPinInputs && this.confirmPinInputs.length > index + 1) {
+          const nextInput = this.confirmPinInputs.toArray()[index + 1];
+          if (nextInput) {
+            nextInput.nativeElement.focus();
+            nextInput.nativeElement.select();
+            return;
+          }
+        }
+        
+        const nextInput = document.querySelector(`input[formControlName="confirmPin${index + 1}"]`) as HTMLInputElement;
+        if (nextInput) {
+          nextInput.focus();
+          nextInput.select();
+        }
+      }, 10);
+    }
+    
+    // Trigger validation check
+    this.pinForm.updateValueAndValidity();
+  }
+
+  onPinKeyDown(event: KeyboardEvent, index: number, isConfirm: boolean = false): void {
+    const input = event.target as HTMLInputElement;
+    const inputs = isConfirm ? this.confirmPinInputs : this.pinInputs;
+    const prefix = isConfirm ? 'confirmPin' : 'pin';
+    
+    // Handle backspace
+    if (event.key === 'Backspace') {
+      const currentValue = input.value;
+      if (!currentValue && index > 0) {
+        // Move to previous input if current is empty
+        if (inputs && inputs.length > index) {
+          const prevInput = inputs.toArray()[index - 1];
+          if (prevInput) {
+            prevInput.nativeElement.focus();
+          }
+        }
+      } else if (!currentValue && index === 0 && isConfirm) {
+        // Move to last PIN input if at first confirm PIN input
+        setTimeout(() => {
+          if (this.pinInputs && this.pinInputs.length > 0) {
+            this.pinInputs.last.nativeElement.focus();
+          }
+        }, 10);
+      }
+    }
+    
+    // Handle arrow keys
+    if (event.key === 'ArrowLeft' && index > 0) {
+      if (inputs && inputs.length > index) {
+        const prevInput = inputs.toArray()[index - 1];
+        if (prevInput) {
+          prevInput.nativeElement.focus();
+        }
+      }
+    }
+    
+    if (event.key === 'ArrowRight' && index < 5) {
+      if (inputs && inputs.length > index + 1) {
+        const nextInput = inputs.toArray()[index + 1];
+        if (nextInput) {
+          nextInput.nativeElement.focus();
+        }
+      }
+    }
+  }
+
+  onPinPaste(event: ClipboardEvent, isConfirm: boolean = false): void {
+    event.preventDefault();
+    const pastedData = event.clipboardData?.getData('text') || '';
+    const digits = pastedData.replace(/\D/g, '').slice(0, 6);
+    const prefix = isConfirm ? 'confirmPin' : 'pin';
+    const inputs = isConfirm ? this.confirmPinInputs : this.pinInputs;
+    
+    // Clear all inputs first
+    for (let i = 0; i < 6; i++) {
+      this.pinForm.get(`${prefix}${i}`)?.setValue('');
+    }
+    
+    // Fill inputs with pasted digits
+    for (let i = 0; i < digits.length && i < 6; i++) {
+      this.pinForm.get(`${prefix}${i}`)?.setValue(digits[i]);
+    }
+    
+    // Focus on the next empty input or last input
+    const nextEmptyIndex = digits.length < 6 ? digits.length : 5;
+    setTimeout(() => {
+      if (inputs && inputs.length > nextEmptyIndex) {
+        inputs.toArray()[nextEmptyIndex].nativeElement.focus();
+      }
+      
+      // Trigger validation
+      this.pinForm.updateValueAndValidity();
+    }, 0);
+  }
+
   // Create PIN
   createPin(): void {
     if (this.pinForm.invalid || !this.customerData) {
@@ -360,7 +697,10 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
     }
 
     this.isCreatingPin = true;
-    const pin = this.pinForm.get('pin')?.value;
+    // Combine all 6 PIN digits into a single PIN string
+    const pin = this.pinDigits.map(index => 
+      this.pinForm.get(`pin${index}`)?.value
+    ).join('');
 
     this.registerCustomerService.createPin(this.customerData.customer.id, pin).subscribe({
       next: (response) => {
@@ -435,7 +775,10 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
     this.couponCode2 = '';
     this.couponCode3 = '';
     this.customerData = null;
-    this.otpForm.reset();
+    // Clear all OTP inputs
+    for (let i = 0; i < 6; i++) {
+      this.otpForm.get(`digit${i}`)?.setValue('');
+    }
     this.pinForm.reset();
     if (this.resendTimerInterval) {
       clearInterval(this.resendTimerInterval);
@@ -446,7 +789,21 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
 
   goBackToOtpVerification(): void {
     this.currentStep = 'otp-verification';
-    this.otpForm.reset();
+    // Clear all OTP inputs
+    for (let i = 0; i < 6; i++) {
+      this.otpForm.get(`digit${i}`)?.setValue('');
+    }
+    // Clear all PIN inputs
+    for (let i = 0; i < 6; i++) {
+      this.pinForm.get(`pin${i}`)?.setValue('');
+      this.pinForm.get(`confirmPin${i}`)?.setValue('');
+    }
+    // Focus on first input when returning to OTP step
+    setTimeout(() => {
+      if (this.otpInputs && this.otpInputs.length > 0) {
+        this.otpInputs.first.nativeElement.focus();
+      }
+    }, 100);
   }
 
   goToSignIn(): void {
@@ -505,14 +862,17 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
   }
 
   get otpControl() {
-    return this.otpForm.get('otp');
+    // Return the first digit control for validation display purposes
+    return this.otpForm.get('digit0');
   }
 
   get pinControl() {
-    return this.pinForm.get('pin');
+    // Return the first PIN digit control for validation display purposes
+    return this.pinForm.get('pin0');
   }
 
   get confirmPinControl() {
-    return this.pinForm.get('confirmPin');
+    // Return the first confirm PIN digit control for validation display purposes
+    return this.pinForm.get('confirmPin0');
   }
 }

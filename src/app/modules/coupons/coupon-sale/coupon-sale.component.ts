@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -24,6 +24,8 @@ type PaymentMethod = 'Cash' | 'Card' | 'UPI';
   styleUrls: ['./coupon-sale.component.scss']
 })
 export class CouponSaleComponent implements OnInit, OnDestroy {
+  @ViewChildren('otpInput') otpInputs!: QueryList<ElementRef>;
+  
   currentStep: Step = 'verify';
   verificationMethod: VerificationMethod = 'email';
   
@@ -38,6 +40,7 @@ export class CouponSaleComponent implements OnInit, OnDestroy {
   resendTimer: number = 0; // in seconds
   resendTimerInterval: any;
   canResend = false;
+  otpDigits: number[] = [0, 1, 2, 3, 4, 5];
   
   // Step 3: Coupon Code Form
   couponForm: FormGroup;
@@ -82,9 +85,14 @@ export class CouponSaleComponent implements OnInit, OnDestroy {
       countryCode: ['+971', [Validators.required]]
     });
 
-    // Initialize OTP form
+    // Initialize OTP form with individual digit controls
     this.otpForm = this.fb.group({
-      otp: ['', [Validators.required, Validators.pattern(/^[0-9]{6}$/)]]
+      digit0: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      digit1: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      digit2: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      digit3: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      digit4: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
+      digit5: ['', [Validators.required, Validators.pattern(/[0-9]/)]]
     });
 
     // Initialize coupon form
@@ -217,6 +225,123 @@ export class CouponSaleComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Step 2: OTP Input Handlers
+  onOtpDigitInput(event: any, index: number): void {
+    const value = event.target.value;
+    
+    // Only allow single digit
+    if (value.length > 1) {
+      event.target.value = value.slice(-1);
+    }
+    
+    // Only allow numeric input
+    if (value && !/^[0-9]$/.test(value)) {
+      event.target.value = '';
+      return;
+    }
+    
+    // Update form control value
+    this.otpForm.get(`digit${index}`)?.setValue(value);
+    
+    // Move to next input if current is filled
+    if (value && index < 5) {
+      setTimeout(() => {
+        if (this.otpInputs && this.otpInputs.length > index + 1) {
+          const nextInput = this.otpInputs.toArray()[index + 1];
+          if (nextInput) {
+            nextInput.nativeElement.focus();
+            nextInput.nativeElement.select();
+            return;
+          }
+        }
+        
+        const nextInput = document.querySelector(`input[formControlName="digit${index + 1}"]`) as HTMLInputElement;
+        if (nextInput) {
+          nextInput.focus();
+          nextInput.select();
+        }
+      }, 10);
+    }
+    
+    // Auto-verify when all digits are filled
+    if (this.isAllOtpDigitsFilled()) {
+      setTimeout(() => {
+        this.verifyOtp();
+      }, 200);
+    }
+  }
+
+  onOtpKeyDown(event: KeyboardEvent, index: number): void {
+    const input = event.target as HTMLInputElement;
+    
+    // Handle backspace
+    if (event.key === 'Backspace') {
+      const currentValue = input.value;
+      if (!currentValue && index > 0) {
+        const prevInput = this.otpInputs.toArray()[index - 1];
+        if (prevInput) {
+          prevInput.nativeElement.focus();
+        }
+      }
+    }
+    
+    // Handle arrow keys
+    if (event.key === 'ArrowLeft' && index > 0) {
+      const prevInput = this.otpInputs.toArray()[index - 1];
+      if (prevInput) {
+        prevInput.nativeElement.focus();
+      }
+    }
+    
+    if (event.key === 'ArrowRight' && index < 5) {
+      const nextInput = this.otpInputs.toArray()[index + 1];
+      if (nextInput) {
+        nextInput.nativeElement.focus();
+      }
+    }
+    
+    // Handle Enter key
+    if (event.key === 'Enter') {
+      if (this.isAllOtpDigitsFilled()) {
+        this.verifyOtp();
+      }
+    }
+  }
+
+  onOtpPaste(event: ClipboardEvent): void {
+    event.preventDefault();
+    const pastedData = event.clipboardData?.getData('text') || '';
+    const digits = pastedData.replace(/\D/g, '').slice(0, 6);
+    
+    // Clear all inputs first
+    for (let i = 0; i < 6; i++) {
+      this.otpForm.get(`digit${i}`)?.setValue('');
+    }
+    
+    // Fill inputs with pasted digits
+    for (let i = 0; i < digits.length; i++) {
+      this.otpForm.get(`digit${i}`)?.setValue(digits[i]);
+    }
+    
+    // Focus on the last filled input or first empty input
+    const focusIndex = Math.min(digits.length, 5);
+    setTimeout(() => {
+      if (this.otpInputs && this.otpInputs.length > focusIndex) {
+        this.otpInputs.toArray()[focusIndex].nativeElement.focus();
+      }
+    }, 0);
+  }
+
+  isAllOtpDigitsFilled(): boolean {
+    for (let i = 0; i < 6; i++) {
+      const digitValue = this.otpForm.get(`digit${i}`)?.value;
+      if (!digitValue || digitValue === '') {
+        return false;
+      }
+    }
+    return true;
+  }
+
   // Step 2: Verify OTP
   verifyOtp(): void {
     if (this.otpForm.invalid) {
@@ -224,7 +349,17 @@ export class CouponSaleComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const otp = this.otpForm.get('otp')?.value;
+    // Combine all digits into a single OTP string
+    let otp = '';
+    for (let i = 0; i < 6; i++) {
+      otp += this.otpForm.get(`digit${i}`)?.value || '';
+    }
+
+    if (otp.length !== 6) {
+      this.toastr.error('Please enter complete 6-digit OTP', 'Error');
+      return;
+    }
+
     const request = this.verificationMethod === 'email'
       ? this.couponSaleService.verifyEmailOtp(this.verifiedEmail, otp)
       : this.couponSaleService.verifyPhoneOtp(this.verifiedPhone, otp);
@@ -288,7 +423,10 @@ export class CouponSaleComponent implements OnInit, OnDestroy {
     request.subscribe({
       next: (response) => {
         if (response.success) {
-          this.otpForm.patchValue({ otp: '' });
+          // Clear all OTP inputs
+          for (let i = 0; i < 6; i++) {
+            this.otpForm.get(`digit${i}`)?.setValue('');
+          }
           this.startResendTimer();
           this.toastr.success('OTP resent successfully', 'Success');
         } else {
@@ -566,6 +704,10 @@ export class CouponSaleComponent implements OnInit, OnDestroy {
       this.currentStep = 'verify';
       this.otpSent = false;
       this.otpForm.reset();
+      // Clear all OTP inputs
+      for (let i = 0; i < 6; i++) {
+        this.otpForm.get(`digit${i}`)?.setValue('');
+      }
       if (this.resendTimerInterval) {
         clearInterval(this.resendTimerInterval);
       }
@@ -585,6 +727,10 @@ export class CouponSaleComponent implements OnInit, OnDestroy {
   resetAllForms(): void {
     this.verifyForm.reset();
     this.otpForm.reset();
+    // Clear all OTP inputs
+    for (let i = 0; i < 6; i++) {
+      this.otpForm.get(`digit${i}`)?.setValue('');
+    }
     this.couponForm.reset();
     this.customerDetailsForm.reset();
     this.verifyDetailsForm.reset();
@@ -622,7 +768,8 @@ export class CouponSaleComponent implements OnInit, OnDestroy {
   }
 
   get otpControl() {
-    return this.otpForm.get('otp');
+    // Return first digit control for validation display
+    return this.otpForm.get('digit0');
   }
 
   get firstNameControl() {

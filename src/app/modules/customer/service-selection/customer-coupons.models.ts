@@ -7,6 +7,7 @@ export interface Product {
   icon: string | null;
   displayOrder: number;
   isActive: boolean;
+  isRedeemed: boolean;
 }
 
 export interface Scheme {

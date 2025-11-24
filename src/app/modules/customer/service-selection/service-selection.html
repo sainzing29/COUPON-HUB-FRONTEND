@@ -14,7 +14,7 @@
           routerLink="/customer/service-selection"
           class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2 bg-white text-purple-600">
           <span class="material-icons text-sm">home</span>
-          <span>Service Status</span>
+          <span>Purchased Coupons</span>
         </a>
         <a 
           routerLink="/customer/locations"
@@ -62,7 +62,7 @@
             </div>
             <div class="flex items-center space-x-3">
               <button 
-                (click)="viewInvoice()"
+                (click)="viewInvoice(coupon)"
                 class="px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white">
                 <span class="material-icons text-sm">receipt</span>
                 <span>Invoice</span>
@@ -88,23 +88,23 @@
                 *ngFor="let product of coupon.products; let i = index" 
                 [@fadeInUp]="getAnimationState(coupon.id)"
                 [style.animation-delay]="getAnimationState(coupon.id) === 'in' ? (i * 100 + 'ms') : '0ms'"
-                class="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200"
+                class="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200 flex flex-col h-full"
                 [class]="getServiceCardClass(i)">
-                <div class="flex items-start space-x-3 mb-3">
-                  <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white bg-purple-600">
+                <div class="flex items-start space-x-3 mb-3 flex-1">
+                  <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white bg-purple-600 flex-shrink-0">
                     {{ product.displayOrder || (i + 1) }}
                   </div>
-                  <div class="flex-1">
+                  <div class="flex-1 min-w-0">
                     <h5 class="text-base font-semibold text-gray-900 mb-1">{{ product.name }}</h5>
-                    <p class="text-xs text-gray-600 mb-2">{{ product.description }}</p>
+                    <p class="text-xs text-gray-600">{{ product.description }}</p>
                   </div>
                 </div>
                 
-                <div class="flex justify-end">
-                  <div class="px-3 py-1 text-xs font-medium rounded-lg flex items-center space-x-1 min-w-[100px] justify-center"
-                       [class]="product.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'">
-                    <span class="material-icons text-xs">{{ product.isActive ? 'check_circle' : 'cancel' }}</span>
-                    <span class="font-semibold">{{ product.isActive ? 'Active' : 'Inactive' }}</span>
+                <div class="flex justify-end mt-auto pt-2">
+                  <div class="px-3 py-1 text-xs font-medium rounded-lg flex items-center space-x-1 min-w-[120px] justify-center"
+                       [class]="product.isRedeemed ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'">
+                    <span class="material-icons text-xs">{{ product.isRedeemed ? 'check_circle' : 'radio_button_unchecked' }}</span>
+                    <span class="font-semibold">{{ product.isRedeemed ? 'Redeemed' : 'Not Redeemed' }}</span>
                   </div>
                 </div>
               </div>
@@ -112,16 +112,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Back Button -->
-    <div class="flex justify-center">
-      <button 
-        (click)="goBack()"
-        class="px-6 py-3 text-purple-600 hover:text-purple-500 hover:bg-purple-50 rounded-lg transition-colors duration-200 flex items-center space-x-2">
-        <span class="material-icons">arrow_back</span>
-        <span>Back to {{ isLoginFlow ? 'Login' : 'Registration' }}</span>
-      </button>
     </div>
   </div>
 </div>

@@ -4,6 +4,34 @@
   @apply min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col;
 }
 
+// Country code selector height matching
+::ng-deep app-country-code-selector.country-code-wrapper-custom {
+  .form-select.country-code-select {
+    height: 42px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    line-height: 1.5;
+  }
+}
+
+// Prevent autofill styling on PIN inputs
+input[type="password"][formControlName^="pin"] {
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus,
+  &:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-text-fill-color: #111827 !important;
+    box-shadow: 0 0 0 30px white inset !important;
+    background-color: white !important;
+  }
+  
+  &[readonly] {
+    background-color: white !important;
+    cursor: text;
+  }
+}
+
 // Header Section
 .header-section {
   @apply py-8 px-6 text-center;
@@ -179,6 +207,7 @@
     transform: translateY(0);
   }
 }
+
 
 
 

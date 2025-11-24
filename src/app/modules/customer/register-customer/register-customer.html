@@ -145,27 +145,27 @@
       </div>
 
       <form [formGroup]="otpForm" (ngSubmit)="verifyOtp()" class="space-y-6">
-        <!-- OTP Input -->
+        <!-- OTP Input (6 separate inputs) -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
+          <label class="block text-sm font-medium text-gray-700 mb-3 text-center">
             Enter 6-digit OTP <span class="text-red-500">*</span>
           </label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span class="material-icons text-gray-400 text-sm">lock</span>
-            </div>
+          <div class="flex justify-center space-x-3">
             <input
+              *ngFor="let digit of otpDigits; let i = index"
+              #otpInput
               type="text"
-              formControlName="otp"
-              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-center text-lg tracking-widest transition-colors duration-200"
-              placeholder="000000"
-              maxlength="6"
-              [class.border-red-500]="otpControl?.invalid && otpControl?.touched">
+              maxlength="1"
+              [formControlName]="'digit' + i"
+              class="w-12 h-12 text-center text-lg font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
+              [class.border-red-500]="otpForm.get('digit' + i)?.invalid && otpForm.get('digit' + i)?.touched"
+              (input)="onOtpDigitInput($event, i)"
+              (keydown)="onOtpKeyDown($event, i)"
+              (paste)="onOtpPaste($event)">
           </div>
-          <div *ngIf="otpControl?.invalid && otpControl?.touched" 
-               class="text-red-500 text-xs mt-1">
-            <span *ngIf="otpControl?.errors?.['required']">OTP is required</span>
-            <span *ngIf="otpControl?.errors?.['pattern']">Please enter a valid 6-digit OTP</span>
+          <div *ngIf="otpForm.invalid && otpForm.touched" 
+               class="text-red-500 text-xs mt-2 text-center">
+            <span>Please enter a valid 6-digit OTP</span>
           </div>
         </div>
 
@@ -226,50 +226,51 @@
       </div>
 
       <form [formGroup]="pinForm" (ngSubmit)="createPin()" class="space-y-6">
-        <div class="space-y-4">
-          <!-- PIN Input -->
+        <div class="space-y-6">
+          <!-- PIN Input (6 separate inputs) -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-gray-700 mb-3 text-center">
               Enter 6-digit PIN <span class="text-red-500">*</span>
             </label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span class="material-icons text-gray-400 text-sm">lock</span>
-              </div>
+            <div class="flex justify-center space-x-3">
               <input
+                *ngFor="let digit of pinDigits; let i = index"
+                #pinInput
                 type="password"
-                formControlName="pin"
-                class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-center text-lg tracking-widest transition-colors duration-200"
-                placeholder="000000"
-                maxlength="6"
-                [class.border-red-500]="pinControl?.invalid && pinControl?.touched">
+                maxlength="1"
+                [formControlName]="'pin' + i"
+                class="w-12 h-12 text-center text-lg font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
+                [class.border-red-500]="pinForm.get('pin' + i)?.invalid && pinForm.get('pin' + i)?.touched"
+                (input)="onPinDigitInput($event, i)"
+                (keydown)="onPinKeyDown($event, i, false)"
+                (paste)="onPinPaste($event, false)">
             </div>
-            <div *ngIf="pinControl?.invalid && pinControl?.touched" 
-                 class="text-red-500 text-xs mt-1">
-              <span *ngIf="pinControl?.errors?.['required']">PIN is required</span>
-              <span *ngIf="pinControl?.errors?.['pattern']">Please enter a valid 6-digit PIN</span>
+            <div *ngIf="pinForm.get('pin0')?.invalid && pinForm.get('pin0')?.touched" 
+                 class="text-red-500 text-xs mt-2 text-center">
+              <span>Please enter a valid 6-digit PIN</span>
             </div>
           </div>
 
-          <!-- Confirm PIN Input -->
+          <!-- Confirm PIN Input (6 separate inputs) -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-gray-700 mb-3 text-center">
               Confirm 6-digit PIN <span class="text-red-500">*</span>
             </label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span class="material-icons text-gray-400 text-sm">lock</span>
-              </div>
+            <div class="flex justify-center space-x-3">
               <input
+                *ngFor="let digit of pinDigits; let i = index"
+                #confirmPinInput
                 type="password"
-                formControlName="confirmPin"
-                class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-center text-lg tracking-widest transition-colors duration-200"
-                placeholder="000000"
-                maxlength="6"
-                [class.border-red-500]="confirmPinControl?.invalid && confirmPinControl?.touched">
+                maxlength="1"
+                [formControlName]="'confirmPin' + i"
+                class="w-12 h-12 text-center text-lg font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
+                [class.border-red-500]="pinForm.get('confirmPin' + i)?.invalid && pinForm.get('confirmPin' + i)?.touched"
+                (input)="onConfirmPinDigitInput($event, i)"
+                (keydown)="onPinKeyDown($event, i, true)"
+                (paste)="onPinPaste($event, true)">
             </div>
             <div *ngIf="confirmPinControl?.invalid && confirmPinControl?.touched" 
-                 class="text-red-500 text-xs mt-1">
+                 class="text-red-500 text-xs mt-2 text-center">
               <span *ngIf="confirmPinControl?.errors?.['required']">Please confirm your PIN</span>
               <span *ngIf="confirmPinControl?.errors?.['pinMismatch']">PINs do not match</span>
             </div>

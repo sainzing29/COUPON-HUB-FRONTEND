@@ -182,15 +182,19 @@ export class ServiceSelectionComponent implements OnInit {
   }
 
 
-  viewInvoice(): void {
-    // Navigate to customer invoice page with coupon details
+  viewInvoice(coupon?: Coupon): void {
+    // Use provided coupon or fallback to selectedCoupon
+    const targetCoupon = coupon || this.selectedCoupon;
+    
+    if (!targetCoupon) {
+      this.toastr.error('Coupon not found', 'Error');
+      return;
+    }
+    
+    // Navigate to customer invoice page with coupon code
     this.router.navigate(['/customer/invoice'], {
       queryParams: {
-        couponNumber: this.selectedCoupon?.couponNumber,
-        customerName: this.customerName,
-        customerEmail: this.customerEmail,
-        customerPhone: this.customerPhone,
-        customerAddress: this.customerAddress
+        couponCode: targetCoupon.couponNumber
       }
     });
   }

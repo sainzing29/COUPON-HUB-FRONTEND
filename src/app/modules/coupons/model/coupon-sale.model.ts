@@ -105,6 +105,7 @@ export interface InvoiceDetailResponse {
       icon: string | null;
       displayOrder: number;
       isActive: boolean;
+      isRedeemed: boolean;
     }>;
   };
 }

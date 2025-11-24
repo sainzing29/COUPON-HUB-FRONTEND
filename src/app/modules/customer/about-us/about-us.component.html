@@ -14,7 +14,7 @@
           routerLink="/customer/service-selection"
           class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2 bg-white/20 text-white hover:bg-white/30">
           <span class="material-icons text-sm">home</span>
-          <span>Service Status</span>
+          <span>Purchased Coupons</span>
         </a>
         <a 
           routerLink="/customer/locations"
@@ -31,8 +31,16 @@
       </nav>
     </div>
 
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex items-center justify-center min-h-[400px]">
+      <div class="text-center">
+        <span class="material-icons animate-spin text-white text-4xl mb-4">refresh</span>
+        <p class="text-white">Loading company information...</p>
+      </div>
+    </div>
+
     <!-- About Us Content -->
-    <div class="bg-white rounded-lg shadow-lg p-8">
+    <div *ngIf="!isLoading" class="bg-white rounded-lg shadow-lg p-8">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <!-- Contact Information -->
         <div>
@@ -42,16 +50,16 @@
           </h4>
           
           <div class="space-y-4">
-            <div class="flex items-start space-x-3">
+            <div class="flex items-start space-x-3" *ngIf="aboutUsInfo.address">
               <span class="material-icons text-purple-600 text-sm mt-1">location_on</span>
               <div>
                 <p class="text-sm font-medium text-gray-900">Address</p>
                 <p class="text-sm text-gray-700">{{ aboutUsInfo.address }}</p>
-                <p class="text-sm text-gray-600">P.O Box: {{ aboutUsInfo.poBox }}</p>
+                <p class="text-sm text-gray-600" *ngIf="aboutUsInfo.poBox">P.O Box: {{ aboutUsInfo.poBox }}</p>
               </div>
             </div>
             
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-3" *ngIf="aboutUsInfo.phone">
               <span class="material-icons text-purple-600 text-sm">phone</span>
               <div>
                 <p class="text-sm font-medium text-gray-900">Phone</p>
@@ -59,7 +67,7 @@
               </div>
             </div>
             
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-3" *ngIf="aboutUsInfo.email">
               <span class="material-icons text-purple-600 text-sm">email</span>
               <div>
                 <p class="text-sm font-medium text-gray-900">Email</p>
@@ -70,7 +78,7 @@
         </div>
         
         <!-- Map View -->
-        <div>
+        <!-- <div>
           <h4 class="text-xl font-semibold text-gray-900 mb-6 flex items-center space-x-2">
             <span class="material-icons text-purple-600">map</span>
             <span>Find Us</span>
@@ -89,7 +97,7 @@
               <span>Get Directions</span>
             </button>
           </div>
-        </div>
+        </div> -->
       </div>
       
       <!-- Company Description -->
@@ -128,7 +136,7 @@
               <span class="material-icons text-purple-600">support_agent</span>
               <h5 class="font-semibold text-gray-900">Customer Support</h5>
             </div>
-            <p class="text-sm text-gray-600">24/7 customer support to assist you with any queries or service requests.</p>
+            <p class="text-sm text-gray-600">Customer support to assist you with any queries or service requests.</p>
           </div>
         </div>
       </div>
@@ -140,7 +148,7 @@
         (click)="goBack()"
         class="px-6 py-3 text-purple-600 hover:text-purple-500 hover:bg-purple-50 rounded-lg transition-colors duration-200 flex items-center space-x-2">
         <span class="material-icons">arrow_back</span>
-        <span>Back to Service Status</span>
+        <span>Back to Coupons</span>
       </button>
     </div>
   </div>

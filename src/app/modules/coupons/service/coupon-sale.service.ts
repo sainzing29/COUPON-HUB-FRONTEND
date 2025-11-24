@@ -124,5 +124,12 @@ export class CouponSaleService {
   getInvoiceDetailsByNumber(invoiceNumber: string): Observable<InvoiceDetailResponse> {
     return this.apiService.get<InvoiceDetailResponse>(`/invoices/number/${invoiceNumber}/detail`);
   }
+
+  /**
+   * Get invoice details by coupon code
+   */
+  getInvoiceDetailsByCouponCode(couponCode: string): Observable<InvoiceDetailResponse> {
+    return this.apiService.get<InvoiceDetailResponse>(`/invoices/coupon/${couponCode}/detail`);
+  }
 }
 

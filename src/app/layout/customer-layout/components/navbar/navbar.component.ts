@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { CustomerAuthService } from '../../../../modules/customer/services/customer-auth.service';
+import { TokenService } from '../../../../core/services/token.service';
 
 @Component({
   selector: 'app-customer-navbar',
@@ -19,16 +20,46 @@ export class CustomerNavbarComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private customerAuthService: CustomerAuthService
+    private customerAuthService: CustomerAuthService,
+    private tokenService: TokenService
   ) { }
 
   ngOnInit(): void {
-    // Get customer data from route parameters
+    // Load customer data from localStorage (from token)
+    const userData = this.tokenService.getUser();
+    if (userData) {
+      // Get customer name - try multiple fields
+      const firstName = userData.firstName || '';
+      const lastName = userData.lastName || '';
+      const fullName = userData.name || (firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || 'Customer');
+      this.customerName = firstName;
+      this.customerEmail = userData.email || '';
+      this.customerPhone = userData.mobileNumber || '';
+    }
+
+    // Fallback to route parameters if localStorage doesn't have data
     this.route.queryParams.subscribe(params => {
-      this.customerName = params['customerName'] || 'Customer';
-      this.customerEmail = params['email'] || '';
-      this.customerPhone = params['phone'] || '';
+      if (!this.customerName || this.customerName === 'Customer') {
+        this.customerName = params['customerName'] || this.customerName || 'Customer';
+      }
+      if (!this.customerEmail) {
+        this.customerEmail = params['email'] || this.customerEmail;
+      }
+      if (!this.customerPhone) {
+        this.customerPhone = params['phone'] || this.customerPhone;
+      }
     });
+  }
+
+  getUserInitials(): string {
+    if (!this.customerName || this.customerName === 'Customer') {
+      return 'C';
+    }
+    const names = this.customerName.trim().split(' ');
+    if (names.length >= 2) {
+      return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+    }
+    return this.customerName[0].toUpperCase();
   }
 
   toggleUserDropdown(): void {

@@ -11,6 +11,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { ActivatedRoute, Router } from '@angular/router';
 import { CustomerService, Customer, CustomerDetailResponse, CustomerCoupon, CustomerService as CustomerServiceData, CustomerInvoice } from '../../services/customer.service';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { CountryCodeSelectorComponent } from '../../components/country-code-selector/country-code-selector.component';
 
 @Component({
   selector: 'app-customer-profile',
@@ -24,7 +25,8 @@ import { trigger, transition, style, animate } from '@angular/animations';
     MatChipsModule,
     MatTooltipModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CountryCodeSelectorComponent
   ],
   templateUrl: './customer-profile.component.html',
   styleUrls: ['./customer-profile.component.scss'],
@@ -57,6 +59,7 @@ export class CustomerProfileComponent implements OnInit {
   // Edit form
   editForm: FormGroup;
   isEditMode = false;
+  selectedCountryCode = '+971'; // Default to UAE
 
   constructor(
     private route: ActivatedRoute,
@@ -69,7 +72,8 @@ export class CustomerProfileComponent implements OnInit {
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      mobileNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]]
+      countryCode: ['+971', [Validators.required]], // Default to UAE
+      mobileNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{7,15}$/)]]
     });
   }
 
@@ -100,11 +104,33 @@ export class CustomerProfileComponent implements OnInit {
 
   private populateEditForm(): void {
     if (this.customer) {
+      // Extract country code and phone number from mobileNumber
+      const mobileNumber = this.customer.mobileNumber || '';
+      const countryCodeMatch = mobileNumber.match(/^(\+\d{1,4})/);
+      let countryCode = '+971'; // Default to UAE
+      let phoneNumber = mobileNumber;
+      
+      if (countryCodeMatch) {
+        countryCode = countryCodeMatch[1];
+        phoneNumber = mobileNumber.replace(countryCode, '').trim();
+      } else if (mobileNumber.startsWith('+')) {
+        // If it starts with + but doesn't match, try to extract
+        const plusIndex = mobileNumber.indexOf('+');
+        const spaceIndex = mobileNumber.indexOf(' ', plusIndex);
+        if (spaceIndex > plusIndex) {
+          countryCode = mobileNumber.substring(plusIndex, spaceIndex);
+          phoneNumber = mobileNumber.substring(spaceIndex + 1).trim();
+        }
+      }
+      
+      this.selectedCountryCode = countryCode;
+      
       this.editForm.patchValue({
         firstName: this.customer.firstName,
         lastName: this.customer.lastName,
         email: this.customer.email,
-        mobileNumber: this.customer.mobileNumber
+        countryCode: countryCode,
+        mobileNumber: phoneNumber
       });
     }
   }
@@ -116,9 +142,17 @@ export class CustomerProfileComponent implements OnInit {
   onSave(): void {
     if (this.editForm.valid && this.customer) {
       const formValue = this.editForm.value;
+      // Combine country code with mobile number
+      const fullMobileNumber = formValue.countryCode 
+        ? `${formValue.countryCode}${formValue.mobileNumber}` 
+        : formValue.mobileNumber;
+      
       const updatedCustomer = {
         ...this.customer,
-        ...formValue,
+        firstName: formValue.firstName,
+        lastName: formValue.lastName,
+        email: formValue.email,
+        mobileNumber: fullMobileNumber,
         fullName: `${formValue.firstName} ${formValue.lastName}`
       };
       
@@ -160,7 +194,7 @@ export class CustomerProfileComponent implements OnInit {
         return `${this.getFieldLabel(fieldName)} must be at least ${field.errors['minlength'].requiredLength} characters`;
       }
       if (field.errors['pattern']) {
-        return 'Please enter a valid 10-digit mobile number';
+        return 'Please enter a valid phone number (7-15 digits)';
       }
     }
     return '';
