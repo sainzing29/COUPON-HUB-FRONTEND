@@ -1,5 +1,30 @@
 // Customer registration models
 
+export interface VerifyCouponResponse {
+  coupon: {
+    couponId: number;
+    couponCode: string;
+    status: string;
+    createdAt: string;
+    purchaseDate: string;
+    expiryDate: string;
+    customerId: number;
+    isLinkedToCustomer: boolean;
+  };
+  customer: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    fullName: string;
+    email: string;
+    mobileNumber: string;
+    googleId: string | null;
+    createdAt: string;
+    isActive: boolean;
+  } | null;
+  hasPin: boolean;
+}
+
 export interface CustomerByCouponResponse {
   customer: {
     id: number;

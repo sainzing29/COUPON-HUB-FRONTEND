@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
 import { 
   CustomerByCouponResponse, 
+  VerifyCouponResponse,
   VerifyOtpRequest, 
   VerifyOtpResponse, 
   CreatePinRequest, 
@@ -17,7 +18,14 @@ export class RegisterCustomerService {
   constructor(private apiService: ApiService) {}
 
   /**
-   * Get customer by coupon code
+   * Verify coupon code
+   */
+  verifyCoupon(couponCode: string): Observable<VerifyCouponResponse> {
+    return this.apiService.get<VerifyCouponResponse>(`/customers/verify-coupon/${couponCode}`);
+  }
+
+  /**
+   * Get customer by coupon code (legacy - kept for backward compatibility)
    */
   getCustomerByCoupon(couponCode: string, otpMethod: 'email' | 'phone' = 'email'): Observable<CustomerByCouponResponse> {
     const params = new HttpParams().set('otpMethod', otpMethod);

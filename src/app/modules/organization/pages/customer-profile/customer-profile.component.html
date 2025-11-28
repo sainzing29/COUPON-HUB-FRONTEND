@@ -175,6 +175,7 @@
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purchase Date</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiry Date</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Remaining Days</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
@@ -199,6 +200,16 @@
                       {{ coupon.remainingDays }} {{ coupon.remainingDays === 1 ? 'day' : 'days' }}
                     </span>
                     <span *ngIf="coupon.remainingDays === undefined || coupon.remainingDays === null" class="text-gray-400">-</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <button
+                      *ngIf="coupon.scheme"
+                      (click)="viewProducts(coupon)"
+                      type="button"
+                      class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 hover:text-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                      View available products
+                    </button>
+                    <span *ngIf="!coupon.scheme" class="text-gray-400 text-sm">-</span>
                   </td>
                 </tr>
               </tbody>
@@ -308,6 +319,72 @@
         </div>
       </mat-tab>
     </mat-tab-group>
+  </div>
+</div>
+
+<!-- Products Modal -->
+<div *ngIf="showProductsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" (click)="closeProductsModal()">
+  <div class="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-auto" (click)="$event.stopPropagation()">
+    <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+      <h2 class="text-xl font-semibold text-gray-900">Available Products - {{ selectedCouponForProducts?.couponCode }}</h2>
+      <button
+        (click)="closeProductsModal()"
+        class="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded"
+        aria-label="Close modal">
+        <i class="bi bi-x-lg text-xl"></i>
+      </button>
+    </div>
+    
+    <div class="p-6">
+      <div *ngIf="selectedCouponForProducts?.scheme" class="mb-6">
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ selectedCouponForProducts?.scheme?.name }}</h3>
+        <p class="text-sm text-gray-600">{{ selectedCouponForProducts?.scheme?.description }}</p>
+      </div>
+
+      <div *ngIf="hasProducts()" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div 
+            *ngFor="let product of getProductsForSelectedCoupon(); let i = index" 
+            class="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200 flex flex-col h-full"
+            [class]="getProductCardClass(i)">
+            <div class="flex items-start space-x-3 mb-3 flex-1">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white bg-purple-600 flex-shrink-0">
+                {{ product.displayOrder || (i + 1) }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <h5 class="text-base font-semibold text-gray-900 mb-1">{{ product.name }}</h5>
+                <p class="text-xs text-gray-600 mb-2">{{ product.description }}</p>
+                <div *ngIf="product.isRedeemed && product.redemptionDate" class="text-xs text-gray-500 mt-1">
+                  <span class="font-medium">Redeemed on:</span> {{ formatDate(product.redemptionDate) }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex justify-end mt-auto pt-2">
+              <div class="px-3 py-1.5 text-xs font-medium rounded-lg flex items-center space-x-1.5 min-w-[120px] justify-center"
+                   [class]="product.isRedeemed ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'">
+                <i class="bi" [class]="product.isRedeemed ? 'bi-check-circle-fill text-green-600' : 'bi-circle text-gray-400'"></i>
+                <span class="font-semibold">{{ product.isRedeemed ? 'Redeemed' : 'Available' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!selectedCouponForProducts?.scheme?.products || selectedCouponForProducts?.scheme?.products?.length === 0" 
+           class="text-center py-12 text-gray-500">
+        <i class="bi bi-inbox text-4xl text-gray-300 mb-3"></i>
+        <p class="text-lg font-medium">No products available for this coupon.</p>
+      </div>
+    </div>
+
+    <div class="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end">
+      <button
+        (click)="closeProductsModal()"
+        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
+        Close
+      </button>
+    </div>
   </div>
 </div>
 

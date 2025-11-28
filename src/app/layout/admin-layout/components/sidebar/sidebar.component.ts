@@ -66,7 +66,7 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
       permission: ['ExportCoupons', 'CouponStatusChange', 'GenerateCoupons', 'CouponScheme', 'CouponSale'],
       submenu: [
         { id: 'coupons-list', label: 'Coupons', icon: 'list', route: '/organization/coupons', active: false, hasSubmenu: false, permission: ['ExportCoupons', 'CouponStatusChange'] },
-        { id: 'coupon-sale', label: 'Coupon Sale', icon: 'shopping_cart', route: '/organization/coupons/coupon-sale', active: false, hasSubmenu: false, permission: ['CouponSale'] },
+        // { id: 'coupon-sale', label: 'Coupon Sale', icon: 'shopping_cart', route: '/organization/coupons/coupon-sale', active: false, hasSubmenu: false, permission: ['CouponSale'] },
         { id: 'generate-coupons', label: 'Generate Coupons', icon: 'add_circle', route: '/organization/coupons/generate-coupons', active: false, hasSubmenu: false, permission: ['GenerateCoupons'] },
         { id: 'batches', label: 'Batch History', icon: 'history', route: '/organization/coupons/batches', active: false, hasSubmenu: false, permission: ['GenerateCoupons'] },
         { id: 'coupon-schemes', label: 'Coupon Schemes', icon: 'category', route: '/organization/coupons/coupon-schemes', active: false, hasSubmenu: false, permission: ['CouponScheme'] }

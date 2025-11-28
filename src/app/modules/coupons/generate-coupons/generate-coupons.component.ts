@@ -10,6 +10,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { CouponService, GenerateResponse } from '../service/coupon.service';
 import { BatchService } from '../service/batch.service';
+import { CouponSchemeService } from '../service/coupon-scheme.service';
+import { CouponScheme } from '../model/coupon-scheme.model';
 
 @Component({
   selector: 'app-generate-coupons',
@@ -37,6 +39,8 @@ export class GenerateCouponsComponent implements OnInit {
   previewTo = '';
   isGenerating = false;
   isPrintedMarked = false;
+  schemes: CouponScheme[] = [];
+  isLoadingSchemes = false;
 
   sequenceWidthOptions = [
     { value: 1, label: '1 (1)' },
@@ -51,11 +55,28 @@ export class GenerateCouponsComponent implements OnInit {
     private fb: FormBuilder,
     private couponService: CouponService,
     private batchService: BatchService,
+    private couponSchemeService: CouponSchemeService,
     private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
+    this.loadActiveSchemes();
+  }
+
+  private loadActiveSchemes(): void {
+    this.isLoadingSchemes = true;
+    this.couponSchemeService.getActiveCouponSchemes().subscribe({
+      next: (schemes) => {
+        this.schemes = schemes;
+        this.isLoadingSchemes = false;
+      },
+      error: (error) => {
+        console.error('Error loading schemes:', error);
+        this.toastr.error('Failed to load coupon schemes', 'Error');
+        this.isLoadingSchemes = false;
+      }
+    });
   }
 
   private initializeForm(): void {
@@ -69,6 +90,7 @@ export class GenerateCouponsComponent implements OnInit {
       prefix: [{ value: 'CES', disabled: true }, Validators.required],
       period: [{ value: defaultPeriod, disabled: true }, Validators.required],
       sequenceWidth: [{ value: 6, disabled: true }, Validators.required],
+      schemeId: [null, Validators.required],
       quantity: [10, [Validators.required, Validators.min(10), Validators.max(5000)]],
       batchName: [defaultBatchName, [Validators.maxLength(100)]],
       notes: ['']
@@ -153,6 +175,7 @@ export class GenerateCouponsComponent implements OnInit {
       prefix: 'CES',
       period: this.couponForm.get('period')?.value, // Already in MMYY format (e.g., "1225")
       sequenceWidth: this.couponForm.get('sequenceWidth')?.value || 6,
+      schemeId: this.couponForm.get('schemeId')?.value,
       quantity: this.couponForm.get('quantity')?.value,
       batchName: this.couponForm.get('batchName')?.value,
       notes: this.couponForm.get('notes')?.value

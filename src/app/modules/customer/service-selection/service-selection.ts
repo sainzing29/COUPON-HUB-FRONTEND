@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { CustomerAuthService } from '../services/customer-auth.service';
 import { TokenService } from '../../../core/services/token.service';
-import { CustomerCouponsService } from './customer-coupons.service';
+import { CustomerCouponsService } from '../services/customer-coupons.service';
 import { CustomerCoupon, Product } from './customer-coupons.models';
 import { ToastrService } from 'ngx-toastr';
 

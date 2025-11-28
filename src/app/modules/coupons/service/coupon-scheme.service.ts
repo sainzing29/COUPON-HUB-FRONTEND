@@ -36,5 +36,9 @@ export class CouponSchemeService {
   toggleCouponSchemeActive(id: number): Observable<CouponScheme> {
     return this.apiService.patch<CouponScheme>(`/coupons/schemes/${id}/toggle-active`, {});
   }
+
+  getActiveCouponSchemes(): Observable<CouponScheme[]> {
+    return this.apiService.get<CouponScheme[]>('/coupons/schemes/active');
+  }
 }
 

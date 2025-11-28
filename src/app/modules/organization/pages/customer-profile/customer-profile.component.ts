@@ -9,9 +9,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ToastrService } from 'ngx-toastr';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CustomerService, Customer, CustomerDetailResponse, CustomerCoupon, CustomerService as CustomerServiceData, CustomerInvoice } from '../../services/customer.service';
+import { CustomerService, Customer, CustomerDetailResponse, CustomerCoupon, CustomerService as CustomerServiceData, CustomerInvoice, CouponSchemeProduct } from '../../services/customer.service';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { CountryCodeSelectorComponent } from '../../components/country-code-selector/country-code-selector.component';
+import { CountryCodeSelectorComponent, COUNTRY_CODES } from '../../components/country-code-selector/country-code-selector.component';
 
 @Component({
   selector: 'app-customer-profile',
@@ -61,6 +61,10 @@ export class CustomerProfileComponent implements OnInit {
   isEditMode = false;
   selectedCountryCode = '+971'; // Default to UAE
 
+  // Products modal
+  showProductsModal = false;
+  selectedCouponForProducts: CustomerCoupon | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -92,6 +96,8 @@ export class CustomerProfileComponent implements OnInit {
         this.coupons = response.coupons || [];
         this.services = response.services || [];
         this.invoices = response.invoices || [];
+        console.log('Loaded coupons:', this.coupons);
+        console.log('First coupon scheme:', this.coupons[0]?.scheme);
         this.populateEditForm();
       },
       error: (error) => {
@@ -105,21 +111,33 @@ export class CustomerProfileComponent implements OnInit {
   private populateEditForm(): void {
     if (this.customer) {
       // Extract country code and phone number from mobileNumber
-      const mobileNumber = this.customer.mobileNumber || '';
-      const countryCodeMatch = mobileNumber.match(/^(\+\d{1,4})/);
+      let mobileNumber = this.customer.mobileNumber || '';
       let countryCode = '+971'; // Default to UAE
       let phoneNumber = mobileNumber;
       
-      if (countryCodeMatch) {
-        countryCode = countryCodeMatch[1];
-        phoneNumber = mobileNumber.replace(countryCode, '').trim();
-      } else if (mobileNumber.startsWith('+')) {
-        // If it starts with + but doesn't match, try to extract
-        const plusIndex = mobileNumber.indexOf('+');
-        const spaceIndex = mobileNumber.indexOf(' ', plusIndex);
-        if (spaceIndex > plusIndex) {
-          countryCode = mobileNumber.substring(plusIndex, spaceIndex);
-          phoneNumber = mobileNumber.substring(spaceIndex + 1).trim();
+      // Normalize: ensure it starts with + for matching
+      if (!mobileNumber.startsWith('+') && mobileNumber.length > 0) {
+        // If it doesn't start with +, try to find a country code match
+        // Sort country codes by length (longest first) to match correctly
+        const allCountryCodes = COUNTRY_CODES.map(c => c.code).sort((a, b) => b.length - a.length);
+        
+        for (const code of allCountryCodes) {
+          const codeWithoutPlus = code.substring(1); // Remove the + sign
+          if (mobileNumber.startsWith(codeWithoutPlus)) {
+            countryCode = code;
+            phoneNumber = mobileNumber.substring(codeWithoutPlus.length);
+            break;
+          }
+        }
+      } else {
+        // If it starts with +, use the same logic as contact-verification
+        const allCountryCodes = COUNTRY_CODES.map(c => c.code).sort((a, b) => b.length - a.length);
+        for (const code of allCountryCodes) {
+          if (mobileNumber.startsWith(code)) {
+            countryCode = code;
+            phoneNumber = mobileNumber.substring(code.length);
+            break;
+          }
         }
       }
       
@@ -130,7 +148,7 @@ export class CustomerProfileComponent implements OnInit {
         lastName: this.customer.lastName,
         email: this.customer.email,
         countryCode: countryCode,
-        mobileNumber: phoneNumber
+        mobileNumber: phoneNumber.trim()
       });
     }
   }
@@ -263,5 +281,36 @@ export class CustomerProfileComponent implements OnInit {
 
   getInProgressServicesCount(): number {
     return this.services.filter(s => s.status?.toLowerCase() === 'in progress').length;
+  }
+
+  viewProducts(coupon: CustomerCoupon): void {
+    this.selectedCouponForProducts = coupon;
+    this.showProductsModal = true;
+  }
+
+  closeProductsModal(): void {
+    this.showProductsModal = false;
+    this.selectedCouponForProducts = null;
+  }
+
+  getProductsForSelectedCoupon(): CouponSchemeProduct[] {
+    return this.selectedCouponForProducts?.scheme?.products || [];
+  }
+
+  hasProducts(): boolean {
+    const products = this.selectedCouponForProducts?.scheme?.products;
+    return products ? products.length > 0 : false;
+  }
+
+  getProductCardClass(index: number): string {
+    const classes = [
+      'product-1',
+      'product-2',
+      'product-3',
+      'product-4',
+      'product-5',
+      'product-6'
+    ];
+    return classes[index % classes.length] || 'product-1';
   }
 }

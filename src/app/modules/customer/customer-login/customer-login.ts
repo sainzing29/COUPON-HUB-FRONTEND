@@ -24,8 +24,8 @@ export class CustomerLoginComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
   showSuccess = false;
-  pinDigits: number[] = [0, 1, 2, 3, 4, 5];
-  pinInputsReadonly: boolean[] = [true, true, true, true, true, true]; // Start as readonly to prevent autofill
+  pinDigits: number[] = [0, 1, 2, 3];
+  pinInputsReadonly: boolean[] = [true, true, true, true]; // Start as readonly to prevent autofill
   loginMethod: 'email' | 'phone' = 'phone'; // Default to phone
   selectedCountryCode: string = '+971'; // Default to UAE
 
@@ -45,13 +45,11 @@ export class CustomerLoginComponent implements OnInit {
       pin0: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
       pin1: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
       pin2: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
-      pin3: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
-      pin4: ['', [Validators.required, Validators.pattern(/[0-9]/)]],
-      pin5: ['', [Validators.required, Validators.pattern(/[0-9]/)]]
+      pin3: ['', [Validators.required, Validators.pattern(/[0-9]/)]]
     });
 
     // Ensure all PIN fields start empty
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 4; i++) {
       this.loginForm.get(`pin${i}`)?.setValue('', { emitEvent: false });
     }
 
@@ -146,7 +144,7 @@ export class CustomerLoginComponent implements OnInit {
     this.loginForm.get(`pin${index}`)?.setValue(value);
     
     // Move to next input if current is filled
-    if (value && index < 5) {
+    if (value && index < 3) {
       setTimeout(() => {
         if (this.pinInputs && this.pinInputs.length > index + 1) {
           const nextInput = this.pinInputs.toArray()[index + 1];
@@ -198,7 +196,7 @@ export class CustomerLoginComponent implements OnInit {
       }
     }
     
-    if (event.key === 'ArrowRight' && index < 5) {
+    if (event.key === 'ArrowRight' && index < 3) {
       if (this.pinInputs && this.pinInputs.length > index + 1) {
         const nextInput = this.pinInputs.toArray()[index + 1];
         if (nextInput) {
@@ -211,25 +209,25 @@ export class CustomerLoginComponent implements OnInit {
   onPinPaste(event: ClipboardEvent): void {
     event.preventDefault();
     const pastedData = event.clipboardData?.getData('text') || '';
-    const digits = pastedData.replace(/\D/g, '').slice(0, 6);
+    const digits = pastedData.replace(/\D/g, '').slice(0, 4);
     
     // Remove readonly from all inputs
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 4; i++) {
       this.pinInputsReadonly[i] = false;
     }
     
     // Clear all inputs first
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 4; i++) {
       this.loginForm.get(`pin${i}`)?.setValue('');
     }
     
     // Fill inputs with pasted digits
-    for (let i = 0; i < digits.length && i < 6; i++) {
+    for (let i = 0; i < digits.length && i < 4; i++) {
       this.loginForm.get(`pin${i}`)?.setValue(digits[i]);
     }
     
     // Focus on the next empty input or last input
-    const nextEmptyIndex = digits.length < 6 ? digits.length : 5;
+    const nextEmptyIndex = digits.length < 4 ? digits.length : 3;
     setTimeout(() => {
       if (this.pinInputs && this.pinInputs.length > nextEmptyIndex) {
         this.pinInputs.toArray()[nextEmptyIndex].nativeElement.focus();
@@ -252,7 +250,7 @@ export class CustomerLoginComponent implements OnInit {
       // Get form data
       const formData = this.loginForm.value;
       
-      // Combine all 6 PIN digits into a single PIN string
+      // Combine all 4 PIN digits into a single PIN string
       const pin = this.pinDigits.map(index => 
         this.loginForm.get(`pin${index}`)?.value
       ).join('');

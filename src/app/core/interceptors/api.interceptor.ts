@@ -147,5 +147,10 @@ function handleError(error: HttpErrorResponse, environmentService: EnvironmentSe
   // You can add global error handling here (e.g., show toast notification)
   // this.notificationService.showError(errorMessage);
 
-  return throwError(() => new Error(errorMessage));
+  // Create error object with message and status
+  const customError: any = new Error(errorMessage);
+  customError.status = error.status;
+  customError.error = error.error;
+  
+  return throwError(() => customError);
 }

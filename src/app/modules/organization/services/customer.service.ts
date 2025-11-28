@@ -30,6 +30,27 @@ export interface CustomerUpdateRequest {
   mobileNumber?: string;
 }
 
+export interface CouponSchemeProduct {
+  id: number;
+  name: string;
+  description: string;
+  icon: string | null;
+  displayOrder: number;
+  isActive: boolean;
+  isRedeemed: boolean;
+  redemptionDate: string | null;
+  redemptionStatus: number;
+}
+
+export interface CouponScheme {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  isActive: boolean;
+  products: CouponSchemeProduct[];
+}
+
 export interface CustomerCoupon {
   remainingDays?: number;
   couponId: number;
@@ -38,6 +59,9 @@ export interface CustomerCoupon {
   status: string;
   purchaseDate: string;
   expiryDate: string;
+  totalServices?: number;
+  usedServices?: number;
+  scheme?: CouponScheme;
 }
 
 export interface CustomerService {

@@ -32,6 +32,7 @@ export interface GenerateRequest {
   prefix: string;
   sequenceWidth: number;
   quantity: number;
+  schemeId?: number;
   batchName?: string;
   notes?: string;
 }

@@ -4,6 +4,27 @@
   @apply min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col;
 }
 
+// Ensure country code dropdowns are visible in contact verification
+::ng-deep app-contact-verification {
+  overflow: visible !important;
+  
+  > div {
+    overflow: visible !important;
+  }
+  
+  app-country-code-selector {
+    .country-code-wrapper {
+      position: relative;
+      z-index: 1000; // Very high z-index to ensure dropdown appears above everything
+      
+      select.country-code-select {
+        position: relative;
+        z-index: 1001;
+      }
+    }
+  }
+}
+
 // Header Section
 .header-section {
   @apply py-8 px-6 text-center;
