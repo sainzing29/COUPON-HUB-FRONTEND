@@ -2,7 +2,7 @@
   <!-- Gradient Overlay with Lower Opacity -->
   <div class="absolute inset-0" style="background: linear-gradient(-45deg, rgba(91, 207, 242, 0.6) 20%, rgba(65, 125, 210, 0.6) 50%, rgba(0, 169, 224, 0.6) 100%);"></div>
   
-  <div class="max-w-sm w-full bg-white rounded-2xl shadow-2xl p-8 space-y-8 relative z-10">
+  <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 space-y-8 relative z-10">
     <!-- Header -->
     <div class="text-center">
       <div class="mx-auto h-16 w-auto flex items-center justify-center mb-4">
@@ -11,8 +11,8 @@
           alt="CES Warranty Logo" 
           class="h-16 w-auto object-contain">
       </div>
-      <h2 class="text-xl font-semibold text-gray-700 mb-2">Customer Login</h2>
-      <p class="text-sm text-gray-600 mb-4">Enter your email or phone and PIN to access your services</p>
+      <h2 class="text-xl font-semibold text-gray-700 mb-2">Forgot PIN</h2>
+      <p class="text-sm text-gray-600 mb-4">Enter your email or phone number to receive a PIN reset link</p>
     </div>
 
     <!-- Success Message -->
@@ -39,30 +39,30 @@
       </div>
     </div>
 
-    <!-- Login Form -->
-    <form class="mt-8 space-y-6" [formGroup]="loginForm" (ngSubmit)="submitLogin()">
+    <!-- Forgot PIN Form -->
+    <form class="mt-8 space-y-6" [formGroup]="forgotPinForm" (ngSubmit)="submitRequest()">
       <div class="space-y-4">
-        <!-- Login Method Selection (Radio Buttons) -->
+        <!-- Reset Method Selection (Radio Buttons) -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-3">
-            Login Method <span class="text-red-500">*</span>
+            Reset Method <span class="text-red-500">*</span>
           </label>
           <div class="flex space-x-6">
             <label class="flex items-center cursor-pointer">
               <input
                 type="radio"
-                formControlName="loginMethod"
+                formControlName="resetMethod"
                 value="phone"
-                (change)="onLoginMethodChange()"
+                (change)="onResetMethodChange()"
                 class="w-4 h-4 text-purple-600 border-gray-300 focus:ring-purple-500">
               <span class="ml-2 text-sm text-gray-700">Phone</span>
             </label>
             <label class="flex items-center cursor-pointer">
               <input
                 type="radio"
-                formControlName="loginMethod"
+                formControlName="resetMethod"
                 value="email"
-                (change)="onLoginMethodChange()"
+                (change)="onResetMethodChange()"
                 class="w-4 h-4 text-purple-600 border-gray-300 focus:ring-purple-500">
               <span class="ml-2 text-sm text-gray-700">Email</span>
             </label>
@@ -70,7 +70,7 @@
         </div>
 
         <!-- Phone Number Field (shown when phone is selected) -->
-        <div *ngIf="loginMethod === 'phone'">
+        <div *ngIf="resetMethod === 'phone'">
           <label class="block text-sm font-medium text-gray-700 mb-1">
             Phone Number <span class="text-red-500">*</span>
           </label>
@@ -78,8 +78,8 @@
             <!-- Country Code Selector -->
             <app-country-code-selector
               id="countryCode"
-              [value]="loginForm.get('countryCode')?.value || '+971'"
-              (valueChange)="loginForm.get('countryCode')?.setValue($event); selectedCountryCode = $event"
+              [value]="forgotPinForm.get('countryCode')?.value || '+971'"
+              (valueChange)="forgotPinForm.get('countryCode')?.setValue($event); selectedCountryCode = $event"
               class="country-code-wrapper-custom">
             </app-country-code-selector>
             <!-- Phone Number Input -->
@@ -104,7 +104,7 @@
         </div>
 
         <!-- Email Field (shown when email is selected) -->
-        <div *ngIf="loginMethod === 'email'">
+        <div *ngIf="resetMethod === 'email'">
           <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
             Email Address <span class="text-red-500">*</span>
           </label>
@@ -126,43 +126,13 @@
             <span *ngIf="emailControl?.errors?.['email']">Please enter a valid email address</span>
           </p>
         </div>
-
-        <!-- PIN Field (4 separate inputs) -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-3 text-center">
-            PIN <span class="text-red-500">*</span>
-          </label>
-          <div class="flex justify-center space-x-3">
-            <input
-              *ngFor="let digit of pinDigits; let i = index"
-              #pinInput
-              type="password"
-              maxlength="1"
-              [formControlName]="'pin' + i"
-              [readonly]="pinInputsReadonly[i]"
-              class="w-12 h-12 text-center text-lg font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
-              [class.border-red-500]="loginForm.get('pin' + i)?.invalid && loginForm.get('pin' + i)?.touched"
-              (input)="onPinDigitInput($event, i)"
-              (keydown)="onPinKeyDown($event, i)"
-              (paste)="onPinPaste($event)"
-              (focus)="onPinFocus(i)"
-              autocomplete="one-time-code"
-              [attr.data-index]="i"
-              [attr.data-lpignore]="true"
-              [attr.data-form-type]="'other'">
-          </div>
-          <div *ngIf="loginForm.get('pin0')?.invalid && loginForm.get('pin0')?.touched" 
-               class="text-red-500 text-xs mt-2 text-center">
-            <span>Please enter a valid 4-digit PIN</span>
-          </div>
-        </div>
       </div>
 
       <!-- Submit Button -->
       <div>
         <button
           type="submit"
-          [disabled]="loginForm.invalid || isSubmitting"
+          [disabled]="forgotPinForm.invalid || isSubmitting"
           class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
           style="background-color: var(--button-primary-bg);"
           onmouseover="this.style.backgroundColor='var(--button-primary-hover)'"
@@ -170,44 +140,23 @@
           onfocus="this.style.backgroundColor='var(--button-primary-focus)'"
           onblur="this.style.backgroundColor='var(--button-primary-bg)'">
           <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-            <span class="material-icons text-white text-sm" *ngIf="!isSubmitting">login</span>
+            <span class="material-icons text-white text-sm" *ngIf="!isSubmitting">send</span>
             <span class="material-icons text-white text-sm animate-spin" *ngIf="isSubmitting">refresh</span>
           </span>
-          {{ isSubmitting ? 'Logging in...' : 'Login' }}
+          {{ isSubmitting ? 'Sending...' : 'Send Reset Link' }}
         </button>
       </div>
     </form>
 
-    <!-- Alternative Actions -->
+    <!-- Back to Login -->
     <div class="text-center">
-      <div class="mt-4">
-        <button 
-          (click)="goToForgotPin()"
-          class="text-sm text-purple-600 hover:text-purple-700 font-medium transition-colors duration-200">
-          Forgot PIN?
-        </button>
-      </div>
-      
-      <div class="mt-6">
-        <button 
-          (click)="goToRegister()"
-          class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
-          <span class="material-icons text-sm mr-2">person_add</span>
-          New Customer? Register Here
-        </button>
-      </div>
+      <button 
+        (click)="goToLogin()"
+        class="text-sm text-purple-600 hover:text-purple-700 font-medium transition-colors duration-200 flex items-center justify-center space-x-1">
+        <span class="material-icons text-sm">arrow_back</span>
+        <span>Back to Login</span>
+      </button>
     </div>
   </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
 

@@ -186,6 +186,33 @@ export class CustomerAuthService {
       }, 1000);
     });
   }
+
+  /**
+   * Request PIN reset - sends reset token to customer's email or mobile number
+   */
+  requestPinReset(email?: string, mobileNumber?: string): Observable<{ message: string }> {
+    const payload: any = {};
+    if (email) {
+      payload.email = email;
+    } else if (mobileNumber) {
+      payload.mobileNumber = mobileNumber;
+    }
+    return this.apiService.post<{ message: string }>('/Auth/customer-forgot-pin', payload);
+  }
+
+  /**
+   * Validate PIN reset token
+   */
+  validatePinResetToken(token: string): Observable<{ isValid: boolean; customer?: any }> {
+    return this.apiService.post<{ isValid: boolean; customer?: any }>('/customers/validate-pin-reset-token', { token });
+  }
+
+  /**
+   * Reset PIN using token
+   */
+  resetPin(token: string, pin: string): Observable<{ message: string }> {
+    return this.apiService.post<{ message: string }>('/customers/reset-pin', { token, pin });
+  }
 }
 
 

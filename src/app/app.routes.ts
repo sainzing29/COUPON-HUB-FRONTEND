@@ -21,6 +21,18 @@ export const routes: Routes = [
     loadComponent: () => import('./modules/customer/otp-verification/otp-verification').then(m => m.OtpVerificationComponent)
   },
   {
+    path: 'customer/forgot-pin',
+    loadComponent: () => import('./modules/customer/forgot-pin/forgot-pin.component').then(m => m.ForgotPinComponent)
+  },
+  {
+    path: 'customer/reset-pin',
+    loadComponent: () => import('./modules/customer/reset-pin/reset-pin.component').then(m => m.ResetPinComponent)
+  },
+  {
+    path: 'reset-pin',
+    loadComponent: () => import('./modules/customer/reset-pin/reset-pin.component').then(m => m.ResetPinComponent)
+  },
+  {
     path: 'customer',
     loadComponent: () => import('./layout/customer-layout/customer-layout.component').then(m => m.CustomerLayoutComponent),
     children: [

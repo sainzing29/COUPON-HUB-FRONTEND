@@ -334,6 +334,18 @@ export class CustomerLoginComponent implements OnInit {
     this.router.navigate(['/customer/register']);
   }
 
+  goToForgotPin(): void {
+    // Pre-fill email if available
+    const email = this.loginForm.get('email')?.value;
+    if (email && this.loginMethod === 'email') {
+      this.router.navigate(['/customer/forgot-pin'], {
+        queryParams: { email: email }
+      });
+    } else {
+      this.router.navigate(['/customer/forgot-pin']);
+    }
+  }
+
   // Getters for form validation
   get emailControl() {
     return this.loginForm.get('email');
