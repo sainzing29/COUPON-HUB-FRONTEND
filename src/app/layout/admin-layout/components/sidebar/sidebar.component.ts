@@ -73,6 +73,7 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
       ]
     },
     { id: 'redeem-service', label: 'Redeem Service', icon: 'local_offer', route: '/organization/redemption/coupon-redemption', active: false, hasSubmenu: false, permission: ['RadeemCoupon'] },
+    { id: 'redemption-history', label: 'Redemption History', icon: 'history', route: '/organization/redemption/redemptions', active: false, hasSubmenu: false, permission: ['RadeemCoupon'] },
     // { id: 'invoices', label: 'Invoices & Payments', icon: 'receipt', route: '/organization/invoices', active: false, hasSubmenu: false, permission: ['FinancialData'] },
     { 
       id: 'configuration', 

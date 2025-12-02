@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { VerifyCustomerComponent } from '../verify-customer/verify-customer.component';
-import { CustomerCouponsComponent } from '../customer-coupons/customer-coupons.component';
-import { VerifyOtpResponse, RedemptionResponse } from './coupon-redemption.model';
+import { VerifyCustomerComponent } from '../../components/verify-customer/verify-customer.component';
+import { CustomerCouponsComponent } from '../../components/customer-coupons/customer-coupons.component';
+import { VerifyOtpResponse, RedemptionResponse } from '../../models/coupon-redemption.model';
 
 type Step = 'verify' | 'chooseCoupon' | 'redeem';
 

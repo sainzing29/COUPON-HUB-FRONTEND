@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CouponRedemptionService } from '../pages/coupon-redemption.service';
-import { Coupon, Product, CreateRedemptionRequest, RedemptionResponse } from '../pages/coupon-redemption.model';
+import { CouponRedemptionService } from '../../services/coupon-redemption.service';
+import { Coupon, Product, CreateRedemptionRequest, RedemptionResponse } from '../../models/coupon-redemption.model';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';

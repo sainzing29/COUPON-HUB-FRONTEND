@@ -166,8 +166,20 @@ export const routes: Routes = [
       },
       {
         path: 'redemption/coupon-redemption',
-        loadComponent: () => import('./modules/redemption/components/pages/coupon-redemption.component').then(m => m.CouponRedemptionComponent),
+        loadComponent: () => import('./modules/redemption/pages/coupon-redemption/coupon-redemption.component').then(m => m.CouponRedemptionComponent),
         canActivate: [permissionGuard]
+      },
+      {
+        path: 'redemption/redemptions',
+        loadComponent: () => import('./modules/redemption/pages/redemption-history/redemption-history.component').then(m => m.RedemptionHistoryComponent),
+        canActivate: [permissionGuard],
+        data: { permission: 'RadeemCoupon' }
+      },
+      {
+        path: 'redemption/redemptions/:id',
+        loadComponent: () => import('./modules/redemption/components/redemption-view/redemption-view.component').then(m => m.RedemptionViewComponent),
+        canActivate: [permissionGuard],
+        data: { permission: 'RadeemCoupon' }
       },
       {
         path: 'coupons/invoice-view',

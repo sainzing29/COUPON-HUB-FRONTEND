@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy, Output, EventEmitter, ViewChildren, Query
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CouponRedemptionService } from '../pages/coupon-redemption.service';
-import { VerifyCustomerRequest, VerifyCustomerResponse, VerifyOtpRequest, VerifyOtpResponse } from '../pages/coupon-redemption.model';
+import { CouponRedemptionService } from '../../services/coupon-redemption.service';
+import { VerifyCustomerRequest, VerifyCustomerResponse, VerifyOtpRequest, VerifyOtpResponse } from '../../models/coupon-redemption.model';
 import { ToastrService } from 'ngx-toastr';
 import { CountryCodeSelectorComponent } from '../../../organization/components/country-code-selector/country-code-selector.component';
 
@@ -110,7 +110,10 @@ export class VerifyCustomerComponent implements OnInit, OnDestroy {
     } else if (formValue.email) {
       identifier = formValue.email;
     } else if (formValue.phone) {
-      identifier = formValue.phone;
+      // Combine country code with phone number
+      const countryCode = formValue.countryCode || '+971';
+      const phoneNumber = formValue.phone.trim();
+      identifier = `${countryCode}${phoneNumber}`;
     }
 
     const request: VerifyCustomerRequest = {
@@ -169,8 +172,9 @@ export class VerifyCustomerComponent implements OnInit, OnDestroy {
       identifier = formValue.email;
     } else if (formValue.phone) {
       // Combine country code with phone number
-      const countryCode = formValue.countryCode || this.selectedCountryCode;
-      identifier = countryCode + formValue.phone;
+      const countryCode = formValue.countryCode || '+971';
+      const phoneNumber = formValue.phone.trim();
+      identifier = `${countryCode}${phoneNumber}`;
     }
 
     const request: VerifyCustomerRequest = {

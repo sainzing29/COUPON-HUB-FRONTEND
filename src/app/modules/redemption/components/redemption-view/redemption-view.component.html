@@ -1,0 +1,179 @@
+<div class="redemption-view-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading && !redemption" class="flex items-center justify-center py-12">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+
+  <!-- Redemption Details -->
+  <div *ngIf="!isLoading && redemption" class="space-y-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <button
+          (click)="goBack()"
+          class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+          <i class="bi bi-arrow-left text-xl"></i>
+        </button>
+        <h1 class="text-2xl font-semibold text-gray-900">Redemption Details</h1>
+      </div>
+      <button
+        *ngIf="redemption.status === 0"
+        (click)="openCancelDialog()"
+        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 text-sm font-medium transition-colors">
+        Cancel Redemption
+      </button>
+    </div>
+
+    <!-- Details Card -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Customer Information -->
+        <div class="space-y-4">
+          <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Customer Information</h2>
+          <div>
+            <label class="block text-sm font-medium text-gray-500 mb-1">Customer Name</label>
+            <p class="text-sm text-gray-900">{{ redemption.customerName }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-500 mb-1">Customer ID</label>
+            <p class="text-sm text-gray-900">{{ redemption.customerId }}</p>
+          </div>
+        </div>
+
+        <!-- Redemption Information -->
+        <div class="space-y-4">
+          <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Redemption Information</h2>
+          <div>
+            <label class="block text-sm font-medium text-gray-500 mb-1">Redemption Date</label>
+            <p class="text-sm text-gray-900">{{ formatDate(redemption.redemptionDate) }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-500 mb-1">Status</label>
+            <span
+              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold"
+              [ngClass]="getStatusColorClass(redemption.status)">
+              {{ getStatusLabel(redemption.status) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Coupon Information -->
+        <div class="space-y-4">
+          <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Coupon Information</h2>
+          <div>
+            <label class="block text-sm font-medium text-gray-500 mb-1">Coupon Code</label>
+            <p class="text-sm font-mono text-gray-900">{{ redemption.couponCode }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-500 mb-1">Coupon ID</label>
+            <p class="text-sm text-gray-900">{{ redemption.couponId }}</p>
+          </div>
+        </div>
+
+        <!-- Product Information -->
+        <div class="space-y-4">
+          <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Product Information</h2>
+          <div>
+            <label class="block text-sm font-medium text-gray-500 mb-1">Product Name</label>
+            <p class="text-sm text-gray-900">{{ redemption.productName }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-500 mb-1">Product ID</label>
+            <p class="text-sm text-gray-900">{{ redemption.productId }}</p>
+          </div>
+        </div>
+
+        <!-- Service Center Information -->
+        <div class="space-y-4">
+          <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Service Center Information</h2>
+          <div>
+            <label class="block text-sm font-medium text-gray-500 mb-1">Service Center Name</label>
+            <p class="text-sm text-gray-900">{{ redemption.serviceCenterName }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-500 mb-1">Service Center ID</label>
+            <p class="text-sm text-gray-900">{{ redemption.serviceCenterId }}</p>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="space-y-4">
+          <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Notes</h2>
+          <div>
+            <p class="text-sm text-gray-900 whitespace-pre-wrap">{{ redemption.notes || 'No notes available' }}</p>
+          </div>
+        </div>
+
+        <!-- Cancellation Information (if cancelled) -->
+        <div *ngIf="redemption.status === 1" class="space-y-4">
+          <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Cancellation Information</h2>
+          <div *ngIf="redemption.cancelledAt">
+            <label class="block text-sm font-medium text-gray-500 mb-1">Cancelled At</label>
+            <p class="text-sm text-gray-900">{{ formatDate(redemption.cancelledAt) }}</p>
+          </div>
+          <div *ngIf="redemption.cancellationReason">
+            <label class="block text-sm font-medium text-gray-500 mb-1">Cancellation Reason</label>
+            <p class="text-sm text-gray-900 whitespace-pre-wrap">{{ redemption.cancellationReason }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cancel Redemption Dialog -->
+  <div 
+    *ngIf="showCancelDialog" 
+    class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center"
+    (click)="closeCancelDialog()">
+    <div 
+      class="relative bg-white rounded-lg shadow-xl max-w-lg w-full mx-4"
+      (click)="$event.stopPropagation()">
+      
+      <!-- Dialog Header -->
+      <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">Cancel Redemption</h3>
+        <button 
+          (click)="closeCancelDialog()"
+          class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <!-- Dialog Body -->
+      <div class="px-6 py-4">
+        <p class="text-gray-700 mb-4">Please enter the reason for cancelling this redemption:</p>
+        <div>
+          <label for="cancellationReason" class="block text-sm font-medium text-gray-700 mb-2">
+            Cancellation Reason *
+          </label>
+          <textarea
+            id="cancellationReason"
+            [(ngModel)]="cancellationReason"
+            rows="6"
+            placeholder="Enter cancellation reason..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 resize-none"
+            [class.border-red-500]="!cancellationReason.trim() && showCancelDialog">
+          </textarea>
+          <p class="text-xs text-gray-500 mt-1">This reason will be saved with the redemption record.</p>
+        </div>
+      </div>
+
+      <!-- Dialog Footer -->
+      <div class="flex justify-end space-x-3 px-6 py-4 border-t border-gray-200">
+        <button
+          (click)="closeCancelDialog()"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200">
+          Cancel
+        </button>
+        <button
+          (click)="cancelRedemption()"
+          [disabled]="!cancellationReason.trim() || isLoading"
+          class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+          <span *ngIf="!isLoading">Submit</span>
+          <span *ngIf="isLoading">Submitting...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

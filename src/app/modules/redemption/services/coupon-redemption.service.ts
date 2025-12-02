@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiService } from '../../../../core/services/api.service';
+import { ApiService } from '../../../core/services/api.service';
 import {
   VerifyCustomerRequest,
   VerifyCustomerResponse,
@@ -8,8 +8,9 @@ import {
   VerifyOtpResponse,
   Product,
   CreateRedemptionRequest,
-  RedemptionResponse
-} from './coupon-redemption.model';
+  RedemptionResponse,
+  RedemptionHistory
+} from '../models/coupon-redemption.model';
 
 @Injectable({
   providedIn: 'root'
@@ -43,6 +44,35 @@ export class CouponRedemptionService {
    */
   createRedemption(request: CreateRedemptionRequest): Observable<RedemptionResponse> {
     return this.apiService.post<RedemptionResponse>('/serviceredemptions', request);
+  }
+
+  /**
+   * Get redemption history list
+   */
+  getRedemptionHistory(): Observable<RedemptionHistory[]> {
+    return this.apiService.get<RedemptionHistory[]>('/serviceredemptions');
+  }
+
+  /**
+   * Get redemption by ID
+   */
+  getRedemptionById(id: number): Observable<RedemptionHistory> {
+    return this.apiService.get<RedemptionHistory>(`/serviceredemptions/${id}`);
+  }
+
+  /**
+   * Cancel redemption
+   */
+  cancelRedemption(id: number, cancellationReason: string, cancelledByUserId?: number): Observable<{ message: string }> {
+    const payload: { cancellationReason: string; cancelledByUserId?: number } = {
+      cancellationReason: cancellationReason
+    };
+    
+    if (cancelledByUserId !== undefined && cancelledByUserId !== null) {
+      payload.cancelledByUserId = cancelledByUserId;
+    }
+    
+    return this.apiService.post<{ message: string }>(`/serviceredemptions/${id}/cancel`, payload);
   }
 }
 

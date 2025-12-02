@@ -79,3 +79,21 @@ export interface RedemptionResponse {
   cancelledByUserId: number | null;
 }
 
+export interface RedemptionHistory {
+  id: number;
+  couponId: number;
+  couponCode: string;
+  serviceCenterId: number;
+  serviceCenterName: string;
+  customerId: number;
+  customerName: string;
+  productId: number;
+  productName: string;
+  redemptionDate: string;
+  notes: string;
+  status: number; // 0 = Redeemed, 1 = Cancelled
+  cancelledAt: string | null;
+  cancellationReason: string | null;
+  cancelledByUserId: number | null;
+}
+
