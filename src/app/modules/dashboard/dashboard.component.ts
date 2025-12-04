@@ -44,8 +44,8 @@ export class DashboardComponent implements OnInit {
   chartData: DashboardChartData | null = null;
   isLoading = false;
   errorMessage = '';
-  couponSoldGrowth = 0;
-  revenueGrowth = 0;
+  couponActivationGrowth = 0;
+  servicesCompletedGrowth = 0;
 
   // Chart.js configurations
   public salesChartOptions: ChartConfiguration['options'] = {
@@ -273,10 +273,16 @@ export class DashboardComponent implements OnInit {
     this.dashboardService.getDashboardStats().subscribe({
       next: (stats: DashboardStats) => {
         this.dashboardStats = stats;
-        this.couponSoldGrowth = ((this.dashboardStats.couponsSoldThisMonth - this.dashboardStats.couponsSoldLastMonth)
-         / (this.dashboardStats.couponsSoldLastMonth == 0 ? 1 : this.dashboardStats.couponsSoldLastMonth)) * 100
-        this.revenueGrowth = ((this.dashboardStats.revenueThisMonth - this.dashboardStats.revenueLastMonth)
-         / (this.dashboardStats.revenueLastMonth == 0 ? 1 : this.dashboardStats.revenueLastMonth)) * 100
+        
+        // Calculate coupon activation growth percentage
+        const activationGrowth = ((this.dashboardStats.newActivationsThisMonth - this.dashboardStats.newActivationsLastMonth)
+          / Math.max(1, this.dashboardStats.newActivationsLastMonth)) * 100;
+        this.couponActivationGrowth = Math.round(activationGrowth * 100) / 100; // Round to 2 decimal places
+        
+        // Calculate services completed growth percentage
+        const servicesGrowth = ((this.dashboardStats.servicesCompletedThisMonth - this.dashboardStats.servicesCompletedLastMonth)
+          / Math.max(1, this.dashboardStats.servicesCompletedLastMonth)) * 100;
+        this.servicesCompletedGrowth = Math.round(servicesGrowth * 100) / 100; // Round to 2 decimal places
 
         this.isLoading = false;
         console.log('Dashboard stats loaded:', stats);
@@ -499,13 +505,18 @@ export class DashboardComponent implements OnInit {
     if (!this.dashboardStats) return null;
 
     return {
-      totalCouponsSold: this.formatNumber(this.dashboardStats.totalCouponsSold),
-      couponsSoldLastMonth: this.formatNumber(this.dashboardStats.couponsSoldLastMonth),
+      totalCouponsGenerated: this.formatNumber(this.dashboardStats.totalCouponsGenerated),
+      totalCouponsActivated: this.formatNumber(this.dashboardStats.totalCouponsActivated),
+      newActivationsThisMonth: this.formatNumber(this.dashboardStats.newActivationsThisMonth),
+      newActivationsLastMonth: this.formatNumber(this.dashboardStats.newActivationsLastMonth),
       activeCoupons: this.formatNumber(this.dashboardStats.activeCoupons),
+      completedCoupons: this.formatNumber(this.dashboardStats.completedCoupons),
+      expiredCoupons: this.formatNumber(this.dashboardStats.expiredCoupons),
       servicesCompleted: this.formatNumber(this.dashboardStats.servicesCompleted),
       servicesCompletedThisMonth: this.formatNumber(this.dashboardStats.servicesCompletedThisMonth),
-      totalRevenue: this.formatCurrency(this.dashboardStats.totalRevenue),
-      revenueThisMonth: this.formatCurrency(this.dashboardStats.revenueThisMonth)
+      servicesCompletedLastMonth: this.formatNumber(this.dashboardStats.servicesCompletedLastMonth),
+      totalCustomers: this.formatNumber(this.dashboardStats.totalCustomers),
+      newCustomersThisMonth: this.formatNumber(this.dashboardStats.newCustomersThisMonth)
     };
   }
 }

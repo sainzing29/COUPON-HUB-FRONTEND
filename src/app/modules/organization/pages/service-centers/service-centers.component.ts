@@ -145,16 +145,8 @@ export class ServiceCentersComponent implements OnInit {
     this.isEditMode = true;
     this.editingServiceCenter = serviceCenter;
     
-    // Extract country code and phone number from contactNumber if it includes country code
-    let countryCode = '+971'; // Default
-    let contactNumber = serviceCenter.contactNumber;
-    
-    // Check if contactNumber starts with a country code
-    const matchedCountry = COUNTRY_CODES.find(cc => contactNumber.startsWith(cc.code));
-    if (matchedCountry) {
-      countryCode = matchedCountry.code;
-      contactNumber = contactNumber.substring(matchedCountry.code.length).trim();
-    }
+    // Use countryCode from serviceCenter directly (now separate property)
+    const countryCode = serviceCenter.countryCode || '+971'; // Default to UAE
     
     this.selectedCountryCode = countryCode;
     
@@ -162,7 +154,7 @@ export class ServiceCentersComponent implements OnInit {
       name: serviceCenter.name,
       address: serviceCenter.address,
       countryCode: countryCode,
-      contactNumber: contactNumber
+      contactNumber: serviceCenter.contactNumber
     });
     this.showAddServiceCenterForm = true;
   }
@@ -241,13 +233,7 @@ export class ServiceCentersComponent implements OnInit {
     if (this.serviceCenterForm.valid) {
       const formValue = { ...this.serviceCenterForm.value };
       
-      // Combine country code with contact number
-      if (formValue.countryCode && formValue.contactNumber) {
-        formValue.contactNumber = `${formValue.countryCode}${formValue.contactNumber}`;
-      }
-      
-      // Remove countryCode from formValue as backend might not expect it
-      delete formValue.countryCode;
+      // countryCode is now sent separately, no need to combine
       
       if (this.isEditMode && this.editingServiceCenter) {
         // Update existing service center

@@ -210,16 +210,8 @@ export class UsersComponent implements OnInit {
     this.editingUser = user;
     this.allowEmailChange = false;
     
-    // Extract country code and phone number from mobileNumber if it includes country code
-    let countryCode = '+971'; // Default
-    let mobileNumber = user.mobileNumber || '';
-    
-    // Check if mobileNumber starts with a country code
-    const matchedCountry = COUNTRY_CODES.find(cc => mobileNumber.startsWith(cc.code));
-    if (matchedCountry) {
-      countryCode = matchedCountry.code;
-      mobileNumber = mobileNumber.substring(matchedCountry.code.length).trim();
-    }
+    // Use countryCode from user directly (now separate property)
+    const countryCode = user.countryCode || '+971'; // Default to UAE
     
     this.selectedCountryCode = countryCode;
     
@@ -228,7 +220,7 @@ export class UsersComponent implements OnInit {
       lastName: user.lastName,
       email: user.email,
       countryCode: countryCode,
-      mobileNumber: mobileNumber,
+      mobileNumber: user.mobileNumber,
       role: user.roleName, // Set role from selected user
       serviceCenterId: user.serviceCenterId || ''
     });
@@ -348,13 +340,7 @@ export class UsersComponent implements OnInit {
       
       const formValue = this.userForm.value;
       
-      // Combine country code with mobile number
-      if (formValue.countryCode && formValue.mobileNumber) {
-        formValue.mobileNumber = `${formValue.countryCode}${formValue.mobileNumber}`;
-      }
-      
-      // Remove countryCode from formValue as backend might not expect it
-      delete formValue.countryCode;
+      // countryCode is now sent separately, no need to combine
       
       // Remove role from formValue when creating user (not needed in add API)
       if (!this.isEditMode) {

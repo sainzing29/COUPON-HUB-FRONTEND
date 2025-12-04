@@ -49,6 +49,13 @@ export class ApiService {
   }
 
   /**
+   * DELETE request with body
+   */
+  deleteWithBody<T>(endpoint: string, data: any): Observable<T> {
+    return this.http.delete<T>(endpoint, { body: data });
+  }
+
+  /**
    * GET request with query parameters
    */
   getWithParams<T>(endpoint: string, queryParams: any): Observable<T> {

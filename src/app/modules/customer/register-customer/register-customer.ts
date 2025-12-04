@@ -45,6 +45,7 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
     lastName: string;
     email: string;
     mobileNumber: string;
+    countryCode?: string;
   } | null = null;
 
   constructor(
@@ -308,7 +309,8 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
       firstName: customerData.firstName,
       lastName: customerData.lastName,
       email: customerData.email,
-      mobileNumber: customerData.mobileNumber
+      mobileNumber: customerData.mobileNumber,
+      countryCode: customerData.countryCode
     };
     this.createInvoice();
   }
@@ -325,6 +327,7 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
       lastName: this.verifiedCustomerData.lastName,
       email: this.verifiedCustomerData.email,
       mobileNumber: this.verifiedCustomerData.mobileNumber,
+      countryCode: this.verifiedCustomerData.countryCode,
       couponId: this.couponId,
       couponCode: this.verifiedCouponNumber,
       paymentMethod: 'Cash' // Default payment method

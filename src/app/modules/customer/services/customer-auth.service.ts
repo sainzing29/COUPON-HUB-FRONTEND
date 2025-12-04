@@ -14,6 +14,7 @@ export interface CustomerData {
 export interface CustomerLoginRequest {
   email?: string;
   mobileNumber?: string;
+  countryCode?: string;
   pin: string;
 }
 
@@ -154,6 +155,8 @@ export class CustomerAuthService {
   // Logout customer
   logout(): void {
     this.clearCustomer();
+    // Clear token from TokenService
+    // Note: TokenService should be injected if needed, but for now we'll rely on clearCustomer
   }
 
   // Clear customer data

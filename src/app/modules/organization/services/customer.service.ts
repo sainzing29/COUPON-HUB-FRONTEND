@@ -9,6 +9,7 @@ export interface Customer {
   fullName: string;
   email: string;
   mobileNumber: string;
+  countryCode?: string;
   isActive: boolean;
   createdAt: string;
   couponCount: number;
@@ -21,13 +22,26 @@ export interface CustomerCreateRequest {
   lastName: string;
   email: string;
   mobileNumber: string;
+  countryCode?: string;
 }
 
 export interface CustomerUpdateRequest {
+  id?: number;
   firstName?: string;
   lastName?: string;
   email?: string;
   mobileNumber?: string;
+  countryCode?: string;
+}
+
+export interface CustomerDeleteRequest {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  mobileNumber: string;
+  countryCode: string;
+  googleId: string | null;
 }
 
 export interface CouponSchemeProduct {
@@ -118,8 +132,8 @@ export class CustomerService {
   }
 
   // Delete customer
-  deleteCustomer(id: number): Observable<void> {
-    return this.apiService.delete<void>(`/customers/${id}`);
+  deleteCustomer(id: number, customer: CustomerDeleteRequest): Observable<void> {
+    return this.apiService.deleteWithBody<void>(`/customers/${id}`, customer);
   }
 
   // Toggle customer status

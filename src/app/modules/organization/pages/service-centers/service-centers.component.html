@@ -93,7 +93,7 @@
 
             <!-- Contact Column -->
             <td class="px-4 py-2 whitespace-nowrap">
-              <div class="text-sm text-gray-900">{{ center.contactNumber }}</div>
+              <div class="text-sm text-gray-900">{{ (center.countryCode || '') + center.contactNumber }}</div>
             </td>
 
             <!-- Actions Column -->
@@ -263,6 +263,7 @@
                   id="contactNumber"
                   formControlName="contactNumber" 
                   placeholder="Enter contact number"
+                  maxlength="12"
                   class="form-input"
                   [class.error]="getFieldError('contactNumber')">
               </div>

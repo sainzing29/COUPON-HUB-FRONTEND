@@ -1,7 +1,10 @@
 // Models for Service Redemption Flow
 
 export interface VerifyCustomerRequest {
-  identifier: string; // coupon/email/phone
+  identifier?: string; // coupon/email
+  email?: string;
+  phone?: string;
+  countryCode?: string;
   otpSendOption: 'email' | 'phone';
 }
 
@@ -10,6 +13,7 @@ export interface VerifyCustomerResponse {
   customerName: string;
   email: string;
   mobileNumber: string;
+  countryCode?: string;
   otpSentTo: 'email' | 'phone';
   message: string;
 }
@@ -17,6 +21,7 @@ export interface VerifyCustomerResponse {
 export interface VerifyOtpRequest {
   email?: string;
   phone?: string;
+  countryCode?: string;
   otpCode: string;
 }
 
@@ -38,6 +43,7 @@ export interface VerifyOtpResponse {
   customerName: string;
   email: string;
   mobileNumber: string;
+  countryCode?: string;
   coupons: Coupon[];
 }
 

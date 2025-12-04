@@ -9,7 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ToastrService } from 'ngx-toastr';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CustomerService, Customer, CustomerDetailResponse, CustomerCoupon, CustomerService as CustomerServiceData, CustomerInvoice, CouponSchemeProduct } from '../../services/customer.service';
+import { CustomerService, Customer, CustomerUpdateRequest, CustomerDetailResponse, CustomerCoupon, CustomerService as CustomerServiceData, CustomerInvoice, CouponSchemeProduct } from '../../services/customer.service';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { CountryCodeSelectorComponent, COUNTRY_CODES } from '../../components/country-code-selector/country-code-selector.component';
 
@@ -110,36 +110,8 @@ export class CustomerProfileComponent implements OnInit {
 
   private populateEditForm(): void {
     if (this.customer) {
-      // Extract country code and phone number from mobileNumber
-      let mobileNumber = this.customer.mobileNumber || '';
-      let countryCode = '+971'; // Default to UAE
-      let phoneNumber = mobileNumber;
-      
-      // Normalize: ensure it starts with + for matching
-      if (!mobileNumber.startsWith('+') && mobileNumber.length > 0) {
-        // If it doesn't start with +, try to find a country code match
-        // Sort country codes by length (longest first) to match correctly
-        const allCountryCodes = COUNTRY_CODES.map(c => c.code).sort((a, b) => b.length - a.length);
-        
-        for (const code of allCountryCodes) {
-          const codeWithoutPlus = code.substring(1); // Remove the + sign
-          if (mobileNumber.startsWith(codeWithoutPlus)) {
-            countryCode = code;
-            phoneNumber = mobileNumber.substring(codeWithoutPlus.length);
-            break;
-          }
-        }
-      } else {
-        // If it starts with +, use the same logic as contact-verification
-        const allCountryCodes = COUNTRY_CODES.map(c => c.code).sort((a, b) => b.length - a.length);
-        for (const code of allCountryCodes) {
-          if (mobileNumber.startsWith(code)) {
-            countryCode = code;
-            phoneNumber = mobileNumber.substring(code.length);
-            break;
-          }
-        }
-      }
+      // Use countryCode from customer directly (now separate property)
+      const countryCode = this.customer.countryCode || '+971'; // Default to UAE
       
       this.selectedCountryCode = countryCode;
       
@@ -148,7 +120,7 @@ export class CustomerProfileComponent implements OnInit {
         lastName: this.customer.lastName,
         email: this.customer.email,
         countryCode: countryCode,
-        mobileNumber: phoneNumber.trim()
+        mobileNumber: this.customer.mobileNumber
       });
     }
   }
@@ -160,24 +132,31 @@ export class CustomerProfileComponent implements OnInit {
   onSave(): void {
     if (this.editForm.valid && this.customer) {
       const formValue = this.editForm.value;
-      // Combine country code with mobile number
-      const fullMobileNumber = formValue.countryCode 
-        ? `${formValue.countryCode}${formValue.mobileNumber}` 
-        : formValue.mobileNumber;
       
-      const updatedCustomer = {
-        ...this.customer,
+      // Prepare update request with countryCode as separate property
+      const updateRequest: CustomerUpdateRequest = {
+        id: this.customer.id,
         firstName: formValue.firstName,
         lastName: formValue.lastName,
         email: formValue.email,
-        mobileNumber: fullMobileNumber,
-        fullName: `${formValue.firstName} ${formValue.lastName}`
+        mobileNumber: formValue.mobileNumber,
+        countryCode: formValue.countryCode
       };
       
-      this.customer = updatedCustomer;
-      this.isEditMode = false;
-      
-      this.toastr.success('Customer updated successfully', 'Success');
+      // Call API to update customer
+      this.customerService.updateCustomer(this.customer.id, updateRequest).subscribe({
+        next: (updatedCustomer) => {
+          this.customer = updatedCustomer;
+          this.isEditMode = false;
+          this.toastr.success('Customer updated successfully', 'Success');
+          // Reload customer details to get latest data
+          this.loadCustomerDetails(this.customer.id);
+        },
+        error: (error) => {
+          console.error('Error updating customer:', error);
+          this.toastr.error(error.error?.message || 'Error updating customer', 'Error');
+        }
+      });
     } else {
       this.markFormGroupTouched();
     }

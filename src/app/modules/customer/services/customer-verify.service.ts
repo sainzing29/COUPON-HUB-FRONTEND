@@ -80,6 +80,7 @@ export interface CustomerByMobileResponse {
   fullName: string;
   email: string;
   mobileNumber: string;
+  countryCode?: string;
   googleId: string | null;
   createdAt: string;
   isActive: boolean;

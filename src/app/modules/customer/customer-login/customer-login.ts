@@ -263,10 +263,11 @@ export class CustomerLoginComponent implements OnInit {
       if (this.loginMethod === 'email') {
         loginRequest.email = formData.email.trim();
       } else {
-        // Combine country code with phone number
+        // Send countryCode and mobileNumber separately
         const countryCode = formData.countryCode || '+971';
         const phoneNumber = formData.phone.trim();
-        loginRequest.mobileNumber = `${countryCode}${phoneNumber}`;
+        loginRequest.mobileNumber = phoneNumber;
+        loginRequest.countryCode = countryCode;
       }
       
       // Call customer login API

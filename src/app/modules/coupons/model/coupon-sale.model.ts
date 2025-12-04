@@ -23,6 +23,7 @@ export interface CreateInvoiceRequest {
   lastName: string;
   email: string;
   mobileNumber: string;
+  countryCode?: string;
   couponId: number;
   schemeId?: number;
   paymentMethod: 'Cash' | 'Card' | 'UPI';

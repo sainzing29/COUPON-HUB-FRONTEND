@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { permissionGuard } from './core/guards/permission.guard';
+import { customerAuthGuard } from './core/guards/customer-auth.guard';
 
 export const routes: Routes = [
   {
@@ -35,26 +36,32 @@ export const routes: Routes = [
   {
     path: 'customer',
     loadComponent: () => import('./layout/customer-layout/customer-layout.component').then(m => m.CustomerLayoutComponent),
+    canActivate: [customerAuthGuard],
     children: [
       {
         path: 'service-selection',
-        loadComponent: () => import('./modules/customer/service-selection/service-selection').then(m => m.ServiceSelectionComponent)
+        loadComponent: () => import('./modules/customer/service-selection/service-selection').then(m => m.ServiceSelectionComponent),
+        canActivate: [customerAuthGuard]
       },
       {
         path: 'locations',
-        loadComponent: () => import('./modules/customer/locations/locations.component').then(m => m.LocationsComponent)
+        loadComponent: () => import('./modules/customer/locations/locations.component').then(m => m.LocationsComponent),
+        canActivate: [customerAuthGuard]
       },
       {
         path: 'about-us',
-        loadComponent: () => import('./modules/customer/about-us/about-us.component').then(m => m.AboutUsComponent)
+        loadComponent: () => import('./modules/customer/about-us/about-us.component').then(m => m.AboutUsComponent),
+        canActivate: [customerAuthGuard]
       },
       {
         path: 'invoice',
-        loadComponent: () => import('./modules/customer/customer-invoice/customer-invoice').then(m => m.CustomerInvoiceComponent)
+        loadComponent: () => import('./modules/customer/customer-invoice/customer-invoice').then(m => m.CustomerInvoiceComponent),
+        canActivate: [customerAuthGuard]
       },
       {
         path: 'privacy-policy',
-        loadComponent: () => import('./modules/customer/privacy-policy/privacy-policy.component').then(m => m.PrivacyPolicyComponent)
+        loadComponent: () => import('./modules/customer/privacy-policy/privacy-policy.component').then(m => m.PrivacyPolicyComponent),
+        canActivate: [customerAuthGuard]
       }
     ]
   },

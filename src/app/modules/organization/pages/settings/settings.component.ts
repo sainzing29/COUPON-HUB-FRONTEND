@@ -123,13 +123,9 @@ export class SettingsComponent implements OnInit {
     let phoneNumber = config.companyPhone || '';
     let countryCode = '+971'; // Default to UAE
     
-    if (phoneNumber) {
-      // Check if phoneNumber starts with a country code
-      const matchedCountry = COUNTRY_CODES.find(cc => phoneNumber.startsWith(cc.code));
-      if (matchedCountry) {
-        countryCode = matchedCountry.code;
-        phoneNumber = phoneNumber.substring(matchedCountry.code.length).trim();
-      }
+    // Use countryCode from config directly (now separate property)
+    if (config.countryCode) {
+      countryCode = config.countryCode;
     }
     
     this.selectedCountryCode = countryCode;
@@ -146,7 +142,7 @@ export class SettingsComponent implements OnInit {
       companyZip: config.companyZip || null,
       companyCountry: config.companyCountry || null,
       countryCode: countryCode,
-      companyPhone: phoneNumber || null,
+      companyPhone: config.companyPhone || null,
       companyEmail: config.companyEmail || null
     });
 
@@ -187,13 +183,8 @@ export class SettingsComponent implements OnInit {
     const emailValues = this.emailForm.value;
     const couponValues = this.couponForm.value;
 
-    // Combine country code and phone number
-    let companyPhone = null;
-    if (generalValues.countryCode && generalValues.companyPhone) {
-      companyPhone = `${generalValues.countryCode}${generalValues.companyPhone}`;
-    } else if (generalValues.companyPhone) {
-      companyPhone = generalValues.companyPhone;
-    }
+    // countryCode is now sent separately, no need to combine
+    const companyPhone = generalValues.companyPhone || null;
 
     return {
       companyName: generalValues.companyName,
@@ -206,6 +197,7 @@ export class SettingsComponent implements OnInit {
       companyZip: generalValues.companyZip || null,
       companyCountry: generalValues.companyCountry || null,
       companyPhone: companyPhone,
+      countryCode: generalValues.countryCode || null,
       companyEmail: generalValues.companyEmail || null,
       sendGridApiKey: emailValues.sendGridApiKey || null,
       emailFromName: emailValues.emailFromName || null,

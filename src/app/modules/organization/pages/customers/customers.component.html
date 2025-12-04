@@ -83,7 +83,7 @@
 
             <!-- Mobile Column -->
             <td class="px-4 py-2 whitespace-nowrap">
-              <div class="text-sm text-gray-900">{{ customer.mobileNumber }}</div>
+              <div class="text-sm text-gray-900">{{ (customer.countryCode || '') + customer.mobileNumber }}</div>
             </td>
 
             <!-- Coupons Column -->
@@ -262,6 +262,7 @@
               id="mobileNumber"
               formControlName="mobileNumber" 
               placeholder="Enter mobile number"
+              maxlength="12"
               class="form-input"
               [class.error]="getFieldError('mobileNumber')">
             <div *ngIf="getFieldError('mobileNumber')" class="form-error">

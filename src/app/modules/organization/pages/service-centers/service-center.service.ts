@@ -7,6 +7,7 @@ export interface ServiceCenter {
   name: string;
   address: string;
   contactNumber: string;
+  countryCode?: string;
   isActive?: boolean;
   delStatus?: boolean;
   createdAt?: string;
@@ -17,6 +18,7 @@ export interface ServiceCenterCreateRequest {
   name: string;
   address: string;
   contactNumber: string;
+  countryCode?: string;
 }
 
 export interface ServiceCenterUpdateRequest {
@@ -24,6 +26,7 @@ export interface ServiceCenterUpdateRequest {
   name?: string;
   address?: string;
   contactNumber?: string;
+  countryCode?: string;
 }
 
 export interface ServiceCentersResponse {

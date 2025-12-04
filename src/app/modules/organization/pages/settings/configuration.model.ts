@@ -10,6 +10,7 @@ export interface Configuration {
   companyZip: string | null;
   companyCountry: string | null;
   companyPhone: string | null;
+  countryCode?: string;
   companyEmail: string | null;
   sendGridApiKey: string | null;
   emailFromName: string | null;
@@ -32,6 +33,7 @@ export interface ConfigurationRequest {
   companyZip: string | null;
   companyCountry: string | null;
   companyPhone: string | null;
+  countryCode?: string;
   companyEmail: string | null;
   sendGridApiKey: string | null;
   emailFromName: string | null;

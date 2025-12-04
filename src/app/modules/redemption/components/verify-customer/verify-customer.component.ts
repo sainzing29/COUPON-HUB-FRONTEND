@@ -102,24 +102,20 @@ export class VerifyCustomerComponent implements OnInit, OnDestroy {
     }
 
     const formValue = this.verifyForm.value;
-    let identifier = '';
+
+    const request: VerifyCustomerRequest = {
+      otpSendOption: this.otpSendOption
+    };
 
     // Determine identifier based on which field is filled
     if (formValue.couponNumber) {
-      identifier = formValue.couponNumber;
+      request.identifier = formValue.couponNumber;
     } else if (formValue.email) {
-      identifier = formValue.email;
+      request.email = formValue.email;
     } else if (formValue.phone) {
-      // Combine country code with phone number
-      const countryCode = formValue.countryCode || '+971';
-      const phoneNumber = formValue.phone.trim();
-      identifier = `${countryCode}${phoneNumber}`;
+      request.phone = formValue.phone.trim();
+      request.countryCode = formValue.countryCode || '+971';
     }
-
-    const request: VerifyCustomerRequest = {
-      identifier: identifier,
-      otpSendOption: this.otpSendOption
-    };
 
     this.isSendingOtp = true;
     this.couponRedemptionService.verifyCustomer(request).subscribe({
@@ -163,24 +159,20 @@ export class VerifyCustomerComponent implements OnInit, OnDestroy {
     }
 
     const formValue = this.verifyForm.value;
-    let identifier = '';
+
+    const request: VerifyCustomerRequest = {
+      otpSendOption: this.otpSendOption
+    };
 
     // Determine identifier based on which field is filled
     if (formValue.couponNumber) {
-      identifier = formValue.couponNumber;
+      request.identifier = formValue.couponNumber;
     } else if (formValue.email) {
-      identifier = formValue.email;
+      request.email = formValue.email;
     } else if (formValue.phone) {
-      // Combine country code with phone number
-      const countryCode = formValue.countryCode || '+971';
-      const phoneNumber = formValue.phone.trim();
-      identifier = `${countryCode}${phoneNumber}`;
+      request.phone = formValue.phone.trim();
+      request.countryCode = formValue.countryCode || '+971';
     }
-
-    const request: VerifyCustomerRequest = {
-      identifier: identifier,
-      otpSendOption: this.otpSendOption
-    };
 
     this.isResendingOtp = true;
     this.couponRedemptionService.verifyCustomer(request).subscribe({
@@ -216,9 +208,9 @@ export class VerifyCustomerComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Resend timer (3 minutes = 180 seconds)
+  // Resend timer (1 minute = 60 seconds)
   startResendTimer(): void {
-    this.resendTimer = 180; // 3 minutes
+    this.resendTimer = 60; // 1 minute
     this.canResend = false;
 
     // Clear existing interval if any
@@ -389,7 +381,11 @@ export class VerifyCustomerComponent implements OnInit, OnDestroy {
     if (this.otpSendOption === 'email') {
       request.email = this.verifyCustomerResponse.email;
     } else {
+      // For phone, use the phone number from response and countryCode from form
       request.phone = this.verifyCustomerResponse.mobileNumber;
+      // Get countryCode from form (user's input) or from response as fallback
+      const formValue = this.verifyForm.value;
+      request.countryCode = formValue.countryCode || this.verifyCustomerResponse.countryCode || '+971';
     }
 
     this.isVerifyingOtp = true;

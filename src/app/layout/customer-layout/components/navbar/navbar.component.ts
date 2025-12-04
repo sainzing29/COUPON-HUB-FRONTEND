@@ -77,6 +77,8 @@ export class CustomerNavbarComponent implements OnInit {
   }
 
   logout(): void {
+    // Clear token and customer data
+    this.tokenService.clearAuthData();
     this.customerAuthService.logout();
     this.router.navigate(['/customer/login']);
   }

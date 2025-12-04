@@ -609,12 +609,13 @@ export class ContactVerificationComponent implements OnInit, OnDestroy {
 
     this.isSubmittingCustomerForm = true;
     const formData = this.customerForm.value;
-    // Combine country code and phone number
+    // Send countryCode and mobileNumber as separate fields
     const customerData = {
       firstName: formData.firstName,
       lastName: formData.lastName,
       email: formData.email,
-      mobileNumber: `${formData.countryCode}${formData.phone}`
+      mobileNumber: formData.phone,
+      countryCode: formData.countryCode
     };
     this.customerFormSubmit.emit(customerData);
   }
@@ -625,11 +626,26 @@ export class ContactVerificationComponent implements OnInit, OnDestroy {
 
   addCouponToExistingCustomer(): void {
     if (this.customerData) {
+      // Extract countryCode and mobileNumber if mobileNumber includes country code
+      let mobileNumber = this.customerData.mobileNumber;
+      let countryCode = this.customerData.countryCode || this.selectedCountryCode;
+      
+      // If countryCode is not available and mobileNumber starts with +, try to extract it
+      if (!this.customerData.countryCode && mobileNumber.startsWith('+')) {
+        // Try to extract country code (common patterns: +971, +1, etc.)
+        const match = mobileNumber.match(/^(\+\d{1,3})/);
+        if (match) {
+          countryCode = match[1];
+          mobileNumber = mobileNumber.substring(match[1].length);
+        }
+      }
+      
       this.customerFormSubmit.emit({
         firstName: this.customerData.firstName,
         lastName: this.customerData.lastName,
         email: this.customerData.email,
-        mobileNumber: this.customerData.mobileNumber
+        mobileNumber: mobileNumber,
+        countryCode: countryCode
       });
     }
   }

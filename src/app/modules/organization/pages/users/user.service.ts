@@ -9,6 +9,7 @@ export interface User {
   lastName: string;
   email: string;
   mobileNumber: string;
+  countryCode?: string;
   roleName: string;
   status: number; // 0 = Deactivated, 1 = Invited, 2 = Active, 3 = Deleted
   createdAt: string;
@@ -30,6 +31,7 @@ export interface UserCreateRequest {
   lastName: string;
   email: string;
   mobileNumber: string;
+  countryCode?: string;
   passwordHash: string;
   serviceCenterId?: number;
   isActive: boolean;
@@ -40,6 +42,7 @@ export interface UserUpdateRequest {
   lastName?: string;
   email?: string;
   mobileNumber?: string;
+  countryCode?: string;
   roleName?: string;
   serviceCenterId?: number;
   status?: number;

@@ -131,7 +131,7 @@
                 </div>
                 <div>
                   <div class="text-sm font-medium text-gray-900">{{ user.firstName | camelCase }} {{ user.lastName | camelCase }}</div>
-                  <div class="text-sm text-gray-500">{{ user.mobileNumber }}</div>
+                  <div class="text-sm text-gray-500">{{ (user.countryCode || '') + user.mobileNumber }}</div>
                 </div>
               </div>
             </td>
@@ -384,6 +384,7 @@
                   id="mobileNumber"
                   formControlName="mobileNumber" 
                   placeholder="Enter mobile number"
+                  maxlength="12"
                   class="form-input"
                   [class.error]="getFieldError('mobileNumber')">
               </div>

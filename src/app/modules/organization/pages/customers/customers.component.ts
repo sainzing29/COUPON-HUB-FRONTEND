@@ -12,7 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CustomerService, Customer } from '../../services/customer.service';
+import { CustomerService, Customer, CustomerDeleteRequest } from '../../services/customer.service';
 import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
@@ -384,12 +384,45 @@ export class CustomersComponent implements OnInit {
 
   onDeleteCustomer(customer: Customer): void {
     if (confirm(`Are you sure you want to delete ${customer.firstName} ${customer.lastName}?`)) {
-      // For now, delete locally. Replace with API call when backend is ready
-      this.customers = this.customers.filter(c => c.id !== customer.id);
-      this.filteredCustomers = this.filteredCustomers.filter(c => c.id !== customer.id);
-      this.updatePagination();
+      // Prepare delete request payload
+      // Note: Based on the API payload model, mobileNumber should include country code
+      // and countryCode should be just the number part (e.g., "971" not "+971")
+      let mobileNumberWithCountry = customer.mobileNumber;
+      let countryCodeOnly = customer.countryCode || '';
       
-      this.toastr.success('Customer deleted successfully', 'Success');
+      // If countryCode has "+", remove it for the payload
+      if (countryCodeOnly.startsWith('+')) {
+        countryCodeOnly = countryCodeOnly.substring(1);
+      }
+      
+      // If mobileNumber doesn't include country code, combine them
+      if (customer.countryCode && !customer.mobileNumber.startsWith('+') && !customer.mobileNumber.startsWith(customer.countryCode)) {
+        const countryCodeForMobile = customer.countryCode.startsWith('+') ? customer.countryCode : `+${customer.countryCode}`;
+        mobileNumberWithCountry = `${countryCodeForMobile}${customer.mobileNumber}`;
+      }
+      
+      const deleteRequest: CustomerDeleteRequest = {
+        id: customer.id,
+        firstName: customer.firstName,
+        lastName: customer.lastName,
+        email: customer.email,
+        mobileNumber: mobileNumberWithCountry,
+        countryCode: countryCodeOnly,
+        googleId: customer.googleId || null
+      };
+
+      this.customerService.deleteCustomer(customer.id, deleteRequest).subscribe({
+        next: () => {
+          this.customers = this.customers.filter(c => c.id !== customer.id);
+          this.filteredCustomers = this.filteredCustomers.filter(c => c.id !== customer.id);
+          this.updatePagination();
+          this.toastr.success('Customer deleted successfully', 'Success');
+        },
+        error: (error) => {
+          console.error('Error deleting customer:', error);
+          this.toastr.error(error.error?.message || 'Error deleting customer', 'Error');
+        }
+      });
     }
   }
 

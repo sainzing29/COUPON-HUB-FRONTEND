@@ -1,13 +1,16 @@
 export interface DashboardStats {
-  totalCouponsSold: number;
-  couponsSoldLastMonth: number;
-  couponsSoldThisMonth: number;
+  totalCouponsGenerated: number;
+  totalCouponsActivated: number;
+  newActivationsThisMonth: number;
+  newActivationsLastMonth: number;
   activeCoupons: number;
+  completedCoupons: number;
+  expiredCoupons: number;
   servicesCompleted: number;
   servicesCompletedThisMonth: number;
-  totalRevenue: number;
-  revenueThisMonth: number;
-  revenueLastMonth: number;
+  servicesCompletedLastMonth: number;
+  totalCustomers: number;
+  newCustomersThisMonth: number;
 }
 
 export interface SalesTrendData {
