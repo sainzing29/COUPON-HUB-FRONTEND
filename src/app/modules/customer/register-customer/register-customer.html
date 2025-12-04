@@ -16,15 +16,23 @@
       </div>
       <h2 class="text-xl font-semibold text-gray-700 mb-2">
         {{ currentStep === 'coupon-verification' ? 'Coupon Verification' : 
-           currentStep === 'contact-verification' ? 'Contact Verification' : 
+           currentStep === 'phone-verification' ? 'Phone Verification' : 
+           currentStep === 'email-verification' ? 'Email Verification' : 
+           currentStep === 'customer-details-add' ? 'Customer Details' : 
            currentStep === 'pin-creation' ? 'Create PIN' : 
            'Customer Registration' }}
       </h2>
       <p class="text-sm text-gray-500" *ngIf="currentStep === 'coupon-verification'">
         Enter your coupon number to continue
       </p>
-      <p class="text-sm text-gray-500" *ngIf="currentStep === 'contact-verification'">
-        Verify your contact information
+      <p class="text-sm text-gray-500" *ngIf="currentStep === 'phone-verification'">
+        Verify your phone number to continue
+      </p>
+      <p class="text-sm text-gray-500" *ngIf="currentStep === 'email-verification'">
+        Verify your email address to continue
+      </p>
+      <p class="text-sm text-gray-500" *ngIf="currentStep === 'customer-details-add'">
+        Please provide your details to continue
       </p>
       <p class="text-sm text-gray-500" *ngIf="currentStep === 'pin-creation'">
         Create a 4-digit PIN for your account
@@ -126,7 +134,7 @@
     </div>
 
     <!-- Contact Verification Step -->
-    <div *ngIf="currentStep === 'contact-verification'" class="space-y-6" style="overflow: visible;">
+    <div *ngIf="currentStep === 'phone-verification' || currentStep === 'email-verification'" class="space-y-6" style="overflow: visible;">
       <!-- Coupon Info Display -->
       <div class="bg-blue-50 border border-blue-200 rounded-lg p-4" *ngIf="verifiedCouponNumber">
         <div class="flex items-center">
@@ -136,12 +144,12 @@
             <p class="text-sm text-blue-600">Coupon Number: {{ verifiedCouponNumber }}</p>
           </div>
         </div>
-        <button 
+        <!-- <button 
           type="button"
           (click)="goBackToCouponVerification()"
           class="mt-2 text-sm text-blue-600 hover:text-blue-800 underline">
           Use different coupon
-        </button>
+        </button> -->
       </div>
 
       <!-- Contact Verification Component -->
@@ -151,7 +159,27 @@
           (phoneVerified)="onPhoneVerified($event)"
           (emailVerified)="onEmailVerified($event)"
           (customerFormSubmit)="onCustomerFormSubmit($event)"
-          (customerFormError)="onCustomerFormError()">
+          (customerFormError)="onCustomerFormError()"
+          (customerFormShown)="onCustomerFormShown()">
+        </app-contact-verification>
+      </div>
+    </div>
+
+    <!-- Customer Details Add Step -->
+    <div *ngIf="currentStep === 'customer-details-add'" class="space-y-6" style="overflow: visible;">
+      <!-- Contact Verification Component (showing customer form) -->
+      <div class="mt-6">
+        <app-contact-verification
+          [couponCode]="verifiedCouponNumber"
+          [showCustomerForm]="true"
+          [verifiedEmailInput]="verifiedEmailForForm"
+          [verifiedPhoneInput]="verifiedPhoneForForm"
+          [verifiedCountryCodeInput]="verifiedCountryCodeForForm"
+          (phoneVerified)="onPhoneVerified($event)"
+          (emailVerified)="onEmailVerified($event)"
+          (customerFormSubmit)="onCustomerFormSubmit($event)"
+          (customerFormError)="onCustomerFormError()"
+          (customerFormShown)="onCustomerFormShown()">
         </app-contact-verification>
       </div>
     </div>

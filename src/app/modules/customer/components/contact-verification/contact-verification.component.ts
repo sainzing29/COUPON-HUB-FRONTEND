@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChildren, QueryList, ElementRef, EventEmitter, Output, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges, SimpleChanges, ViewChildren, QueryList, ElementRef, EventEmitter, Output, Input } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -16,15 +16,20 @@ export type VerificationStep = 'phone' | 'email' | 'customer-found' | 'customer-
   templateUrl: './contact-verification.component.html',
   styleUrls: ['./contact-verification.component.scss']
 })
-export class ContactVerificationComponent implements OnInit, OnDestroy {
+export class ContactVerificationComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChildren('phoneOtpInput') phoneOtpInputs!: QueryList<ElementRef>;
   @ViewChildren('emailOtpInput') emailOtpInputs!: QueryList<ElementRef>;
   
   @Input() couponCode: string = '';
+  @Input() showCustomerForm: boolean = false; // Input to force show customer form
+  @Input() verifiedEmailInput: string = ''; // Verified email to populate customer form
+  @Input() verifiedPhoneInput: string = ''; // Verified phone to populate customer form
+  @Input() verifiedCountryCodeInput: string = '+971'; // Verified country code to populate customer form
   @Output() phoneVerified = new EventEmitter<{ phoneNumber: string; customer: CustomerByMobileResponse | null }>();
-  @Output() emailVerified = new EventEmitter<{ email: string }>();
+  @Output() emailVerified = new EventEmitter<{ email: string; phoneNumber?: string; countryCode?: string }>();
   @Output() customerFormSubmit = new EventEmitter<any>();
   @Output() customerFormError = new EventEmitter<void>();
+  @Output() customerFormShown = new EventEmitter<void>();
   
   currentStep: VerificationStep = 'phone';
   verificationType: VerificationType = 'phone';
@@ -109,6 +114,47 @@ export class ContactVerificationComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Initialize timers
+    if (this.showCustomerForm) {
+      this.currentStep = 'customer-form';
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['showCustomerForm'] && changes['showCustomerForm'].currentValue === true) {
+      this.currentStep = 'customer-form';
+      this.populateCustomerForm();
+    }
+    // Also populate if verified inputs change
+    if ((changes['verifiedEmailInput'] || changes['verifiedPhoneInput'] || changes['verifiedCountryCodeInput']) && this.showCustomerForm) {
+      this.populateCustomerForm();
+    }
+  }
+
+  private populateCustomerForm(): void {
+    if (this.showCustomerForm && this.verifiedEmailInput && this.verifiedPhoneInput) {
+      // Extract phone number from verifiedPhoneInput (remove country code if present)
+      let phoneNumber = this.verifiedPhoneInput;
+      let countryCode = this.verifiedCountryCodeInput || '+971';
+      
+      // If phone number includes country code, extract it
+      const countryCodes = COUNTRY_CODES.map(cc => cc.code).sort((a, b) => b.length - a.length);
+      for (const code of countryCodes) {
+        if (phoneNumber.startsWith(code)) {
+          countryCode = code;
+          phoneNumber = phoneNumber.substring(code.length);
+          break;
+        }
+      }
+      
+      this.customerForm.patchValue({
+        email: this.verifiedEmailInput,
+        countryCode: countryCode,
+        phone: phoneNumber
+      });
+      this.selectedCountryCode = countryCode;
+      this.verifiedEmail = this.verifiedEmailInput;
+      this.verifiedPhoneNumber = this.verifiedPhoneInput;
+    }
   }
 
   ngOnDestroy(): void {
@@ -502,7 +548,14 @@ export class ContactVerificationComponent implements OnInit, OnDestroy {
           });
           this.selectedCountryCode = countryCode;
           this.currentStep = 'customer-form';
-          this.emailVerified.emit({ email: this.verifiedEmail });
+          // Emit customerFormShown first to update parent step, then emailVerified
+          this.customerFormShown.emit();
+          // Emit email, phone, and country code for parent to store
+          this.emailVerified.emit({ 
+            email: this.verifiedEmail,
+            phoneNumber: this.verifiedPhoneNumber, // Full phone number with country code
+            countryCode: countryCode
+          });
         } else {
           this.toastr.error(response.message || 'Invalid OTP', 'Error');
           this.clearEmailOtp();

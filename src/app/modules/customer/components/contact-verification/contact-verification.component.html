@@ -2,39 +2,52 @@
   <!-- Phone Verification Section -->
   <div *ngIf="currentStep === 'phone'" class="space-y-4">
     <form [formGroup]="phoneForm" class="space-y-4">
-      <div class="flex items-center gap-3 flex-wrap">
-        <!-- Phone Input with Country Code -->
-        <div class="flex gap-2 items-center flex-[2] min-w-[300px]">
-          <app-country-code-selector
-            id="phoneCountryCode"
-            [value]="phoneForm.get('countryCode')?.value || '+971'"
-            (valueChange)="phoneForm.get('countryCode')?.setValue($event); selectedCountryCode = $event">
-          </app-country-code-selector>
-          <div class="flex-1">
-            <input
-              type="tel"
-              formControlName="phone"
-              placeholder="Enter phone number"
-              maxlength="12"
-              class="w-full h-[42px] px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
-              [class.border-red-500]="phoneControl?.invalid && phoneControl?.touched">
+      <!-- Phone Input Section - Hidden when OTP is sent -->
+      <div *ngIf="!phoneOtpSent" class="space-y-4">
+        <div class="flex items-center gap-3 flex-wrap">
+          <!-- Phone Input with Country Code -->
+          <div class="flex gap-2 items-center flex-[2] min-w-[300px]">
+            <app-country-code-selector
+              id="phoneCountryCode"
+              [value]="phoneForm.get('countryCode')?.value || '+971'"
+              (valueChange)="phoneForm.get('countryCode')?.setValue($event); selectedCountryCode = $event">
+            </app-country-code-selector>
+            <div class="flex-1">
+              <input
+                type="tel"
+                formControlName="phone"
+                placeholder="Enter phone number"
+                maxlength="12"
+                class="w-full h-[42px] px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
+                [class.border-red-500]="phoneControl?.invalid && phoneControl?.touched">
+            </div>
           </div>
         </div>
 
-      <!-- Send OTP Button -->
-      <button
-        *ngIf="!phoneOtpSent"
-        type="button"
-        (click)="sendPhoneOtp()"
-        [disabled]="phoneForm.invalid || isSendingPhoneOtp"
-        class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
-        <span class="material-icons text-sm" *ngIf="!isSendingPhoneOtp">send</span>
-        <span class="material-icons text-sm animate-spin" *ngIf="isSendingPhoneOtp">refresh</span>
-        <span>{{ isSendingPhoneOtp ? 'Sending...' : 'Send OTP' }}</span>
-      </button>
+        <!-- Send OTP Button -->
+        <button
+          type="button"
+          (click)="sendPhoneOtp()"
+          [disabled]="phoneForm.invalid || isSendingPhoneOtp"
+          class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
+          <span class="material-icons text-sm" *ngIf="!isSendingPhoneOtp">send</span>
+          <span class="material-icons text-sm animate-spin" *ngIf="isSendingPhoneOtp">refresh</span>
+          <span>{{ isSendingPhoneOtp ? 'Sending...' : 'Send OTP' }}</span>
+        </button>
+
+        <!-- Phone Validation Error -->
+        <p *ngIf="phoneControl?.invalid && phoneControl?.touched" class="text-sm text-red-600">
+          <span *ngIf="phoneControl?.errors?.['required']">Phone number is required</span>
+          <span *ngIf="phoneControl?.errors?.['pattern']">Please enter a valid phone number (7-15 digits)</span>
+        </p>
+      </div>
 
       <!-- OTP Inputs -->
       <div *ngIf="phoneOtpSent" class="space-y-3">
+        <!-- Phone Number Label -->
+        <div class="text-sm text-gray-600 mb-2">
+          <span class="font-medium">Phone:</span> {{ verifiedPhoneNumber }}
+        </div>
         <div class="flex items-center gap-3 flex-wrap">
           <form [formGroup]="phoneOtpForm" class="flex items-center gap-3 flex-wrap">
             <div class="flex space-x-2">
@@ -89,44 +102,50 @@
           </button>
         </div>
       </div>
-    </div>
-
-      <!-- Phone Validation Error -->
-      <p *ngIf="phoneControl?.invalid && phoneControl?.touched" class="text-sm text-red-600">
-        <span *ngIf="phoneControl?.errors?.['required']">Phone number is required</span>
-        <span *ngIf="phoneControl?.errors?.['pattern']">Please enter a valid phone number (7-15 digits)</span>
-      </p>
     </form>
   </div>
 
   <!-- Email Verification Section -->
   <div *ngIf="currentStep === 'email'" class="space-y-4">
     <form [formGroup]="emailForm" class="space-y-4">
-      <div class="flex items-center gap-3 flex-wrap">
-        <!-- Email Input -->
-        <div class="flex-1 min-w-[200px]">
-          <input
-            type="email"
-            formControlName="email"
-            placeholder="Enter email address"
-            class="w-full h-[42px] px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
-            [class.border-red-500]="emailControl?.invalid && emailControl?.touched">
+      <!-- Email Input Section - Hidden when OTP is sent -->
+      <div *ngIf="!emailOtpSent" class="space-y-4">
+        <div class="flex items-center gap-3 flex-wrap">
+          <!-- Email Input -->
+          <div class="flex-1 min-w-[200px]">
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="Enter email address"
+              class="w-full h-[42px] px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
+              [class.border-red-500]="emailControl?.invalid && emailControl?.touched">
+          </div>
         </div>
 
-      <!-- Send OTP Button -->
-      <button
-        *ngIf="!emailOtpSent"
-        type="button"
-        (click)="sendEmailOtp()"
-        [disabled]="emailForm.invalid || isSendingEmailOtp"
-        class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
-        <span class="material-icons text-sm" *ngIf="!isSendingEmailOtp">send</span>
-        <span class="material-icons text-sm animate-spin" *ngIf="isSendingEmailOtp">refresh</span>
-        <span>{{ isSendingEmailOtp ? 'Sending...' : 'Send OTP' }}</span>
-      </button>
+        <!-- Send OTP Button -->
+        <button
+          type="button"
+          (click)="sendEmailOtp()"
+          [disabled]="emailForm.invalid || isSendingEmailOtp"
+          class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
+          <span class="material-icons text-sm" *ngIf="!isSendingEmailOtp">send</span>
+          <span class="material-icons text-sm animate-spin" *ngIf="isSendingEmailOtp">refresh</span>
+          <span>{{ isSendingEmailOtp ? 'Sending...' : 'Send OTP' }}</span>
+        </button>
+
+        <!-- Email Validation Error -->
+        <p *ngIf="emailControl?.invalid && emailControl?.touched" class="text-sm text-red-600">
+          <span *ngIf="emailControl?.errors?.['required']">Email is required</span>
+          <span *ngIf="emailControl?.errors?.['email']">Please enter a valid email</span>
+        </p>
+      </div>
 
       <!-- OTP Inputs -->
       <div *ngIf="emailOtpSent" class="space-y-3">
+        <!-- Email Address Label -->
+        <div class="text-sm text-gray-600 mb-2">
+          <span class="font-medium">Email:</span> {{ verifiedEmail }}
+        </div>
         <div class="flex items-center gap-3 flex-wrap">
           <form [formGroup]="emailOtpForm" class="flex items-center gap-3 flex-wrap">
             <div class="flex space-x-2">
@@ -181,13 +200,6 @@
           </button>
         </div>
       </div>
-      </div>
-
-      <!-- Email Validation Error -->
-      <p *ngIf="emailControl?.invalid && emailControl?.touched" class="text-sm text-red-600">
-        <span *ngIf="emailControl?.errors?.['required']">Email is required</span>
-        <span *ngIf="emailControl?.errors?.['email']">Please enter a valid email</span>
-      </p>
     </form>
   </div>
 

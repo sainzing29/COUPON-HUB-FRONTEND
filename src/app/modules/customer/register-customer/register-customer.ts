@@ -25,7 +25,11 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
   @ViewChildren('confirmPinInput') confirmPinInputs!: QueryList<ElementRef>;
   @ViewChild(ContactVerificationComponent) contactVerificationComponent!: ContactVerificationComponent;
   
-  currentStep: 'coupon-verification' | 'contact-verification' | 'pin-creation' = 'coupon-verification';
+  currentStep: 'coupon-verification' | 'phone-verification' | 'email-verification' | 'customer-details-add' | 'pin-creation' = 'coupon-verification';
+  verificationType: 'phone' | 'email' = 'phone'; // Track verification type for header display
+  verifiedEmailForForm: string = ''; // Store verified email for customer form
+  verifiedPhoneForForm: string = ''; // Store verified phone for customer form
+  verifiedCountryCodeForForm: string = '+971'; // Store verified country code for customer form
   couponVerificationForm: FormGroup;
   pinForm: FormGroup;
   isSubmitting = false;
@@ -264,8 +268,9 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
               }, 100);
             }
           } else {
-            // Customer is null, proceed to contact verification
-            this.currentStep = 'contact-verification';
+            // Customer is null, proceed to phone verification
+            this.currentStep = 'phone-verification';
+            this.verificationType = 'phone'; // Default to phone verification
           }
         },
         error: (error) => {
@@ -288,6 +293,7 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
   onPhoneVerified(event: { phoneNumber: string; customer: CustomerByMobileResponse | null }): void {
     if (event.customer) {
       // Customer exists, create invoice with existing customer
+      this.verificationType = 'phone';
       this.verifiedCustomerData = {
         firstName: event.customer.firstName,
         lastName: event.customer.lastName,
@@ -296,12 +302,33 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
       };
       this.customerId = event.customer.id;
       this.createInvoice();
+    } else {
+      // If customer is null, contact verification component will proceed to email verification
+      // Update step and verification type to email so header shows correctly
+      this.currentStep = 'email-verification';
+      this.verificationType = 'email';
+      // Store verified phone for customer form
+      this.verifiedPhoneForForm = event.phoneNumber;
     }
-    // If customer is null, contact verification component will proceed to email verification
   }
 
-  onEmailVerified(event: { email: string }): void {
-    // Email verified, customer form will be shown in contact verification component
+  onEmailVerified(event: { email: string; phoneNumber?: string; countryCode?: string }): void {
+    // Update step to email verification when email verification step is reached
+    this.verificationType = 'email';
+    // Store verified email, phone, and country code for customer form
+    this.verifiedEmailForForm = event.email;
+    if (event.phoneNumber) {
+      this.verifiedPhoneForForm = event.phoneNumber;
+    }
+    if (event.countryCode) {
+      this.verifiedCountryCodeForForm = event.countryCode;
+    }
+    // Note: If customer form is shown immediately after, onCustomerFormShown will override this
+  }
+
+  onCustomerFormShown(): void {
+    // Update step to customer-details-add when customer form is shown
+    this.currentStep = 'customer-details-add';
   }
 
   onCustomerFormSubmit(customerData: any): void {
