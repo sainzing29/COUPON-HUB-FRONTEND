@@ -146,9 +146,9 @@ export class CustomerProfileComponent implements OnInit {
       // Call API to update customer
       this.customerService.updateCustomer(this.customer.id, updateRequest).subscribe({
         next: (updatedCustomer) => {
-          this.customer = updatedCustomer;
-          this.isEditMode = false;
-          this.toastr.success('Customer updated successfully', 'Success');
+      this.customer = updatedCustomer;
+      this.isEditMode = false;
+      this.toastr.success('Customer updated successfully', 'Success');
           // Reload customer details to get latest data
           this.loadCustomerDetails(this.customer.id);
         },

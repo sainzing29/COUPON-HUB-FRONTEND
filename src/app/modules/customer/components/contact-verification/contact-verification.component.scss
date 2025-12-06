@@ -31,3 +31,22 @@
   }
 }
 
+// reCAPTCHA v3 badge styling - only show on customer form section
+// Position it in bottom-left corner (default is bottom-right)
+::ng-deep .grecaptcha-badge {
+  visibility: visible !important;
+  opacity: 1 !important;
+  // Position in bottom-left corner
+  right: auto !important;
+  left: 20px !important;
+  bottom: 20px !important;
+  z-index: 9999 !important;
+}
+
+// Only show reCAPTCHA badge when customer form section is visible
+// Hide it on other steps (phone verification, email verification, etc.)
+:host:not(:has(.customer-form-section)) ::ng-deep .grecaptcha-badge {
+  display: none !important;
+  visibility: hidden !important;
+}
+

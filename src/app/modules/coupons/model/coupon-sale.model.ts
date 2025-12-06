@@ -27,6 +27,7 @@ export interface CreateInvoiceRequest {
   couponId: number;
   schemeId?: number;
   paymentMethod: 'Cash' | 'Card' | 'UPI';
+  captchaToken?: string;
 }
 
 export interface Invoice {

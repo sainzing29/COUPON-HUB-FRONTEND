@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CustomerVerifyService, SendPhoneOtpRequest, VerifyPhoneOtpRequest, ResendPhoneOtpRequest, SendEmailOtpRequest, VerifyEmailOtpRequest, ResendEmailOtpRequest, CustomerByMobileResponse } from '../../services/customer-verify.service';
 import { ToastrService } from 'ngx-toastr';
 import { CountryCodeSelectorComponent, COUNTRY_CODES } from '../../../../modules/organization/components/country-code-selector/country-code-selector.component';
+import { environment } from '../../../../../environments/environment';
 
 export type VerificationType = 'phone' | 'email';
 export type VerificationStep = 'phone' | 'email' | 'customer-found' | 'customer-form';
@@ -19,6 +20,7 @@ export type VerificationStep = 'phone' | 'email' | 'customer-found' | 'customer-
 export class ContactVerificationComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChildren('phoneOtpInput') phoneOtpInputs!: QueryList<ElementRef>;
   @ViewChildren('emailOtpInput') emailOtpInputs!: QueryList<ElementRef>;
+  @ViewChildren('recaptchaContainer') recaptchaContainer!: QueryList<ElementRef>;
   
   @Input() couponCode: string = '';
   @Input() showCustomerForm: boolean = false; // Input to force show customer form
@@ -65,6 +67,9 @@ export class ContactVerificationComponent implements OnInit, OnDestroy, OnChange
   // Customer form
   customerForm: FormGroup;
   isSubmittingCustomerForm = false;
+  recaptchaSiteKey: string = environment.recaptchaSiteKey;
+  captchaToken: string = '';
+  captchaLoaded: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -116,13 +121,30 @@ export class ContactVerificationComponent implements OnInit, OnDestroy, OnChange
     // Initialize timers
     if (this.showCustomerForm) {
       this.currentStep = 'customer-form';
+      this.populateCustomerForm();
+      // Load reCAPTCHA script only when customer form is shown
+      if (this.recaptchaSiteKey) {
+        this.loadRecaptchaScript();
+      }
     }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['showCustomerForm'] && changes['showCustomerForm'].currentValue === true) {
-      this.currentStep = 'customer-form';
-      this.populateCustomerForm();
+    if (changes['showCustomerForm']) {
+      if (changes['showCustomerForm'].currentValue === true) {
+        this.currentStep = 'customer-form';
+        this.populateCustomerForm();
+        // Load reCAPTCHA when customer form is shown
+        if (this.recaptchaSiteKey && !this.captchaLoaded) {
+          setTimeout(() => this.loadRecaptchaScript(), 100);
+        } else if (this.captchaLoaded) {
+          // Show badge if already loaded
+          setTimeout(() => this.showRecaptchaBadge(), 100);
+        }
+      } else {
+        // Hide badge when customer form is hidden
+        this.hideRecaptchaBadge();
+      }
     }
     // Also populate if verified inputs change
     if ((changes['verifiedEmailInput'] || changes['verifiedPhoneInput'] || changes['verifiedCountryCodeInput']) && this.showCustomerForm) {
@@ -164,6 +186,81 @@ export class ContactVerificationComponent implements OnInit, OnDestroy, OnChange
     if (this.resendEmailTimerInterval) {
       clearInterval(this.resendEmailTimerInterval);
     }
+    // Reset reCAPTCHA
+    this.captchaToken = '';
+    // Hide reCAPTCHA badge when component is destroyed
+    this.hideRecaptchaBadge();
+  }
+
+  private hideRecaptchaBadge(): void {
+    const badge = document.querySelector('.grecaptcha-badge') as HTMLElement;
+    if (badge) {
+      badge.style.display = 'none';
+      badge.style.visibility = 'hidden';
+    }
+  }
+
+  private showRecaptchaBadge(): void {
+    const badge = document.querySelector('.grecaptcha-badge') as HTMLElement;
+    if (badge) {
+      badge.style.display = 'block';
+      badge.style.visibility = 'visible';
+    }
+  }
+
+  private loadRecaptchaScript(): void {
+    if (this.captchaLoaded || (window as any).grecaptcha) {
+      this.captchaLoaded = true;
+      // Show badge if already loaded
+      setTimeout(() => this.showRecaptchaBadge(), 200);
+      return;
+    }
+
+    const script = document.createElement('script');
+    // Use reCAPTCHA v3 - render with site key directly
+    script.src = `https://www.google.com/recaptcha/api.js?render=${this.recaptchaSiteKey}`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      this.captchaLoaded = true;
+      // Show badge after script loads
+      setTimeout(() => this.showRecaptchaBadge(), 200);
+    };
+    document.head.appendChild(script);
+  }
+
+  private executeRecaptcha(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (!this.recaptchaSiteKey || !(window as any).grecaptcha) {
+        reject(new Error('reCAPTCHA not loaded'));
+        return;
+      }
+
+      // Execute reCAPTCHA v3
+      (window as any).grecaptcha.ready(() => {
+        (window as any).grecaptcha.execute(this.recaptchaSiteKey, { action: 'submit' })
+          .then((token: string) => {
+            resolve(token);
+          })
+          .catch((error: any) => {
+            console.error('reCAPTCHA error:', error);
+            reject(error);
+          });
+      });
+    });
+  }
+
+  onCaptchaResolved(token: string): void {
+    this.captchaToken = token;
+  }
+
+  onCaptchaError(): void {
+    this.captchaToken = '';
+    this.toastr.error('reCAPTCHA verification failed. Please try again.', 'Error');
+  }
+
+  onCaptchaExpired(): void {
+    this.captchaToken = '';
   }
 
   // Phone OTP Methods
@@ -548,6 +645,13 @@ export class ContactVerificationComponent implements OnInit, OnDestroy, OnChange
           });
           this.selectedCountryCode = countryCode;
           this.currentStep = 'customer-form';
+          // Load reCAPTCHA when customer form is shown
+          if (this.recaptchaSiteKey && !this.captchaLoaded) {
+            setTimeout(() => this.loadRecaptchaScript(), 100);
+          } else if (this.captchaLoaded) {
+            // Show badge if already loaded
+            setTimeout(() => this.showRecaptchaBadge(), 100);
+          }
           // Emit customerFormShown first to update parent step, then emailVerified
           this.customerFormShown.emit();
           // Emit email, phone, and country code for parent to store
@@ -654,12 +758,35 @@ export class ContactVerificationComponent implements OnInit, OnDestroy, OnChange
   }
 
   // Customer Form Methods
-  submitCustomerForm(): void {
+  async submitCustomerForm(): Promise<void> {
     if (this.customerForm.invalid) {
       this.markFormGroupTouched(this.customerForm);
       return;
     }
 
+    // Execute reCAPTCHA v3 if site key is provided
+    if (this.recaptchaSiteKey) {
+      if (!this.captchaLoaded) {
+        this.toastr.error('reCAPTCHA is loading. Please wait a moment and try again.', 'Error');
+        return;
+      }
+      
+      try {
+        // Execute reCAPTCHA v3 and get token
+        this.captchaToken = await this.executeRecaptcha();
+        this.submitFormWithCaptcha();
+      } catch (error) {
+        console.error('reCAPTCHA execution error:', error);
+        this.toastr.error('reCAPTCHA verification failed. Please try again.', 'Error');
+        this.onCaptchaError();
+      }
+    } else {
+      // No reCAPTCHA, submit directly
+      this.submitFormWithCaptcha();
+    }
+  }
+
+  private submitFormWithCaptcha(): void {
     this.isSubmittingCustomerForm = true;
     const formData = this.customerForm.value;
     // Send countryCode and mobileNumber as separate fields
@@ -668,7 +795,8 @@ export class ContactVerificationComponent implements OnInit, OnDestroy, OnChange
       lastName: formData.lastName,
       email: formData.email,
       mobileNumber: formData.phone,
-      countryCode: formData.countryCode
+      countryCode: formData.countryCode,
+      captchaToken: this.captchaToken || undefined
     };
     this.customerFormSubmit.emit(customerData);
   }

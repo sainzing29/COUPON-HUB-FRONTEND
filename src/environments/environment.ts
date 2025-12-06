@@ -4,6 +4,7 @@ export const environment = {
  //baseUrl: 'https://coupon-hub-backend-production.up.railway.app/api', 
   appName: 'Coupon Hub',
   version: '1.0.0',
-  debug: true
+  debug: true,
+  recaptchaSiteKey: '6Ldb3SIsAAAAAHRvgoBeObkCWQXqQ5y4n58_0KHq' // Add your reCAPTCHA site key here
 };
   

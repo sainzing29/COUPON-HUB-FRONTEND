@@ -413,10 +413,10 @@ export class CustomersComponent implements OnInit {
 
       this.customerService.deleteCustomer(customer.id, deleteRequest).subscribe({
         next: () => {
-          this.customers = this.customers.filter(c => c.id !== customer.id);
-          this.filteredCustomers = this.filteredCustomers.filter(c => c.id !== customer.id);
-          this.updatePagination();
-          this.toastr.success('Customer deleted successfully', 'Success');
+      this.customers = this.customers.filter(c => c.id !== customer.id);
+      this.filteredCustomers = this.filteredCustomers.filter(c => c.id !== customer.id);
+      this.updatePagination();
+      this.toastr.success('Customer deleted successfully', 'Success');
         },
         error: (error) => {
           console.error('Error deleting customer:', error);

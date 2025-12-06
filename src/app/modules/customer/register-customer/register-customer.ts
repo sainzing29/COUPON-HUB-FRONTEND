@@ -50,6 +50,7 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
     email: string;
     mobileNumber: string;
     countryCode?: string;
+    captchaToken?: string;
   } | null = null;
 
   constructor(
@@ -337,7 +338,8 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
       lastName: customerData.lastName,
       email: customerData.email,
       mobileNumber: customerData.mobileNumber,
-      countryCode: customerData.countryCode
+      countryCode: customerData.countryCode,
+      captchaToken: customerData.captchaToken
     };
     this.createInvoice();
   }
@@ -357,7 +359,8 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
       countryCode: this.verifiedCustomerData.countryCode,
       couponId: this.couponId,
       couponCode: this.verifiedCouponNumber,
-      paymentMethod: 'Cash' // Default payment method
+      paymentMethod: 'Cash', // Default payment method
+      captchaToken: this.verifiedCustomerData.captchaToken
     };
 
     this.customerRegisterService.registerCustomer(request).subscribe({
