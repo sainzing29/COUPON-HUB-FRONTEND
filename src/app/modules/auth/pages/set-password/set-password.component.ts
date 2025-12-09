@@ -137,7 +137,7 @@ export class SetPasswordComponent implements OnInit {
           
           // Redirect to login page after 2 seconds
           setTimeout(() => {
-            this.router.navigate(['/sign-in']);
+            this.router.navigate(['/admin-login']);
           }, 2000);
         },
         error: (error) => {

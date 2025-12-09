@@ -76,6 +76,19 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
     { id: 'redemption-history', label: 'Redemption History', icon: 'history', route: '/organization/redemption/redemptions', active: false, hasSubmenu: false, permission: ['RadeemCoupon'] },
     // { id: 'invoices', label: 'Invoices & Payments', icon: 'receipt', route: '/organization/invoices', active: false, hasSubmenu: false, permission: ['FinancialData'] },
     { 
+      id: 'reports', 
+      label: 'Reports', 
+      icon: 'assessment', 
+      route: '', 
+      active: false, 
+      hasSubmenu: true,
+      expanded: false,
+      permission: ['Reports'],
+      submenu: [
+        { id: 'coupon-generation-report', label: 'Coupon Generation', icon: 'description', route: '/reports/coupon-generation-report', active: false, hasSubmenu: false, permission: ['Reports'] }
+      ]
+    },
+    { 
       id: 'configuration', 
       label: 'Configuration', 
       icon: 'settings', 
@@ -87,22 +100,7 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
       submenu: [
         { id: 'settings', label: 'Settings', icon: 'tune', route: '/organization/settings', active: false, hasSubmenu: false, permission: ['Configuration'] }
       ]
-    },
-    // { 
-    //   id: 'reports', 
-    //   label: 'Reports', 
-    //   icon: 'assessment', 
-    //   route: '', 
-    //   active: false, 
-    //   hasSubmenu: true,
-    //   expanded: false,
-    //   permission: ['Reports'],
-    //   submenu: [
-    //     { id: 'sales-report', label: 'Sales Report', icon: 'assessment', route: '/reports/sales-report', active: false, hasSubmenu: false, permission: ['Reports'] },
-    //     { id: 'service-usage-report', label: 'Service Usage', icon: 'trending_up', route: '/reports/service-usage-report', active: false, hasSubmenu: false, permission: ['Reports'] },
-    //     { id: 'service-center-performance', label: 'Center Performance', icon: 'business_center', route: '/reports/service-center-performance', active: false, hasSubmenu: false, permission: ['Reports'] }
-    //   ]
-    // }
+    }
   ];
 
   menuItems: MenuItem[] = [];

@@ -1,11 +1,12 @@
 import { Routes } from '@angular/router';
 import { permissionGuard } from './core/guards/permission.guard';
 import { customerAuthGuard } from './core/guards/customer-auth.guard';
+import { provideDaterangepickerLocale } from 'ngx-daterangepicker-bootstrap';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: '/sign-in',
+    redirectTo: '/customer/login',
     pathMatch: 'full'
   },
   // Customer routes (outside admin layout)
@@ -66,7 +67,7 @@ export const routes: Routes = [
     ]
   },
   {
-    path: 'sign-in',
+    path: 'admin-login',
     loadComponent: () => import('./modules/auth/pages/sign-in/sign-in.component').then(m => m.SignInComponent)
   },
   {
@@ -220,26 +221,25 @@ export const routes: Routes = [
     path: 'reports',
     loadComponent: () => import('./layout/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent),
     canActivate: [permissionGuard],
+    providers: [
+      provideDaterangepickerLocale({
+        format: 'YYYY-MM-DD',
+        separator: ' - ',
+        applyLabel: 'Apply',
+        cancelLabel: 'Cancel',
+        clearLabel: 'Clear'
+      })
+    ],
     children: [
       {
-        path: 'sales-report',
-        loadComponent: () => import('./modules/reports/pages/sales-report/sales-report.component').then(m => m.SalesReportComponent),
-        canActivate: [permissionGuard]
-      },
-      {
-        path: 'service-usage-report',
-        loadComponent: () => import('./modules/reports/pages/service-usage-report/service-usage-report.component').then(m => m.ServiceUsageReportComponent),
-        canActivate: [permissionGuard]
-      },
-      {
-        path: 'service-center-performance',
-        loadComponent: () => import('./modules/reports/pages/service-center-performance/service-center-performance.component').then(m => m.ServiceCenterPerformanceComponent),
+        path: 'coupon-generation-report',
+        loadComponent: () => import('./modules/reports/pages/coupon-generation-report/coupon-generation-report.component').then(m => m.CouponGenerationReportComponent),
         canActivate: [permissionGuard]
       }
     ]
   },
   {
     path: '**',
-    redirectTo: '/sign-in'
+    redirectTo: '/customer/login'
   }
 ];

@@ -14,7 +14,7 @@ export const permissionGuard: CanActivateFn = (route: ActivatedRouteSnapshot) =>
 
   // Check if user is authenticated
   if (!authService.isLoggedIn()) {
-    router.navigate(['/sign-in']);
+    router.navigate(['/admin-login']);
     return false;
   }
 

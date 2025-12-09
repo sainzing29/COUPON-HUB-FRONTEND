@@ -42,7 +42,7 @@ export interface CustomerByCouponResponse {
     couponCode: string;
     price: number;
     status: string;
-    purchaseDate: string;
+    activationDate: string;
     expiryDate: string;
   }>;
   services: any[];

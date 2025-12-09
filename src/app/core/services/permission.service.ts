@@ -22,7 +22,7 @@ export class PermissionService {
     'CouponStatusChange': ['/organization/coupons'], // Status change is typically a feature within coupons list
     'CouponScheme': ['/organization/coupons/coupon-schemes'],
     'FinancialData': ['/organization/invoices'],
-    'Reports': ['/reports/sales-report', '/reports/service-usage-report', '/reports/service-center-performance'],
+    'Reports': ['/reports/coupon-generation-report', '/reports/sales-report', '/reports/service-usage-report', '/reports/service-center-performance'],
     'Configuration': ['/organization/settings'],
     'UserRoles': ['/organization/role-permissions']
   };
@@ -43,6 +43,7 @@ export class PermissionService {
     'invoices': ['FinancialData'],
     'settings': ['Configuration'],
     'reports': ['Reports'],
+    'coupon-generation-report': ['Reports'],
     'sales-report': ['Reports'],
     'service-usage-report': ['Reports'],
     'service-center-performance': ['Reports']

@@ -40,8 +40,9 @@ export class CouponsComponent implements OnInit {
   statusOptions = [
     { value: 'all', label: 'All Statuses' },
     { value: 'Unassigned', label: 'Unassigned' },
-    { value: 'Assigned', label: 'Assigned' },
-    { value: 'Used', label: 'Used' }
+    { value: 'Active', label: 'Active' },
+    { value: 'Completed', label: 'Completed' },
+    { value: 'Expired', label: 'Expired' }
   ];
 
   constructor(
@@ -108,10 +109,12 @@ export class CouponsComponent implements OnInit {
     switch (status) {
       case 'Unassigned':
         return 'bg-gray-100 text-gray-800';
-      case 'Assigned':
+      case 'Active':
         return 'bg-blue-100 text-blue-800';
-      case 'Used':
+      case 'Completed':
         return 'bg-green-100 text-green-800';
+      case 'Expired':
+        return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }

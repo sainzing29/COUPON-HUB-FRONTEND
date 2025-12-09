@@ -53,7 +53,7 @@ export class HeaderComponent implements OnInit {
   onLogout(): void {
     this.authService.logout();
     this.showUserMenu = false;
-    this.router.navigate(['/sign-in']);
+    this.router.navigate(['/admin-login']);
   }
 
   onProfileClick(): void {

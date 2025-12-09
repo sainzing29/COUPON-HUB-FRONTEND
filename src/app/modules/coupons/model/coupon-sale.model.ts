@@ -65,7 +65,7 @@ export interface InvoiceCoupon {
   schemeId: number;
   totalServices: number;
   usedServices: number;
-  purchaseDate: string;
+  activationDate: string;
   expiryDate: string;
   status: string;
 }

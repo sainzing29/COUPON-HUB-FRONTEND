@@ -71,7 +71,7 @@ export interface CustomerCoupon {
   couponCode: string;
   price: number;
   status: string;
-  purchaseDate: string;
+  activationDate: string;
   expiryDate: string;
   totalServices?: number;
   usedServices?: number;
