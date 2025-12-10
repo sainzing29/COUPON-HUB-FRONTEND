@@ -14,6 +14,7 @@
           Created Date Range
         </label>
         <input
+          #dateRangeInput
           type="text"
           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
           placeholder="Select date range"
@@ -201,21 +202,21 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr *ngFor="let item of reportData" class="hover:bg-gray-50">
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
+            <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-gray-900">
               {{ item.couponCode }}
             </td>
-            <td class="px-6 py-4 text-sm text-gray-900">
+            <td class="px-6 py-3 text-sm text-gray-900">
               <div>
                 <span class="font-semibold">#{{ item.batchNumber }}</span>
               </div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
               {{ item.schemeName || '-' }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
               {{ formatDate(item.createdDate) }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-6 py-3 whitespace-nowrap">
               <span
                 class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold"
                 [ngClass]="getStatusColorClass(item.status)"
@@ -223,15 +224,15 @@
                 {{ item.status }}
               </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
               <span *ngIf="item.assignedToCustomer" class="text-green-600">
                 <i class="bi bi-check-circle"></i> Yes
               </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
               {{ formatDate(item.activationDate) }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
               {{ formatDate(item.expiryDate) }}
             </td>
           </tr>

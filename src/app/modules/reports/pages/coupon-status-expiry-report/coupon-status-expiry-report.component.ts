@@ -3,26 +3,38 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTabsModule } from '@angular/material/tabs';
 import { NgxDaterangepickerBootstrapDirective } from 'ngx-daterangepicker-bootstrap';
-import { CouponGenerationReportService } from '../services/coupon-generation-report.service';
-import { CouponGenerationReportItem, CouponGenerationReportResponse, CouponGenerationReportFilters } from '../models/coupon-generation-report.model';
+import { CouponStatusExpiryReportService } from '../services/coupon-status-expiry-report.service';
+import { 
+  CouponStatusExpiryReportItem, 
+  CouponStatusExpiryReportResponse, 
+  CouponStatusExpiryReportFilters,
+  ExpiringSoonFilters,
+  ExpiredWithServicesLeftFilters
+} from '../models/coupon-status-expiry-report.model';
 import { CouponSchemeService } from '../../../coupons/service/coupon-scheme.service';
 import { CouponScheme } from '../../../coupons/model/coupon-scheme.model';
 
 @Component({
-  selector: 'app-coupon-generation-report',
+  selector: 'app-coupon-status-expiry-report',
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
     MatProgressSpinnerModule,
+    MatTabsModule,
     NgxDaterangepickerBootstrapDirective
   ],
-  templateUrl: './coupon-generation-report.component.html',
-  styleUrls: ['./coupon-generation-report.component.scss']
+  templateUrl: './coupon-status-expiry-report.component.html',
+  styleUrls: ['./coupon-status-expiry-report.component.scss']
 })
-export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
-  reportData: CouponGenerationReportItem[] = [];
+export class CouponStatusExpiryReportComponent implements OnInit, AfterViewInit {
+  // Tab management
+  selectedTabIndex = 0;
+
+  // Report data
+  reportData: CouponStatusExpiryReportItem[] = [];
   isLoading = false;
 
   // Pagination
@@ -33,21 +45,13 @@ export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
   hasPreviousPage = false;
   hasNextPage = false;
 
-  // Filters
-  filters: CouponGenerationReportFilters = {
-    pageNumber: 1,
-    pageSize: 10
-  };
-
-  // Filter form values
+  // Filters for "All Coupons" tab
   selectedStatus: number | null = null;
-  prefixFilter: string = '';
-  periodFilter: string = '';
-  batchIdFilter: number | null = null;
   schemeIdFilter: number | null = null;
+  selectedExpiryDateRange: any = '';
   
-  // Date range
-  selectedDateRange: any = '';
+  // Filter for "Expiring Soon" tab
+  daysUntilExpiry: number = 30;
 
   // Filter dropdown state
   showFilterDropdown = false;
@@ -63,12 +67,12 @@ export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
   schemes: CouponScheme[] = [];
 
   constructor(
-    private reportService: CouponGenerationReportService,
+    private reportService: CouponStatusExpiryReportService,
     private couponSchemeService: CouponSchemeService,
     private toastr: ToastrService
   ) {}
 
-  @ViewChild('dateRangeInput', { static: false }) dateRangeInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('expiryDateRangeInput', { static: false }) expiryDateRangeInput!: ElementRef<HTMLInputElement>;
 
   ngOnInit(): void {
     this.loadSchemes();
@@ -77,13 +81,19 @@ export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     // Clear the date range input value after view initialization
-    if (this.dateRangeInput) {
+    if (this.expiryDateRangeInput) {
       setTimeout(() => {
-        if (this.dateRangeInput?.nativeElement) {
-          this.dateRangeInput.nativeElement.value = '';
+        if (this.expiryDateRangeInput?.nativeElement) {
+          this.expiryDateRangeInput.nativeElement.value = '';
         }
       }, 0);
     }
+  }
+
+  onTabChange(index: number): void {
+    this.selectedTabIndex = index;
+    this.currentPage = 1;
+    this.loadReport();
   }
 
   loadSchemes(): void {
@@ -100,9 +110,21 @@ export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
 
   loadReport(): void {
     this.isLoading = true;
-    
-    // Build filters
-    const filters: CouponGenerationReportFilters = {
+
+    if (this.selectedTabIndex === 0) {
+      // All Coupons tab
+      this.loadAllCoupons();
+    } else if (this.selectedTabIndex === 1) {
+      // Expiring Soon tab
+      this.loadExpiringSoon();
+    } else if (this.selectedTabIndex === 2) {
+      // Expired With Services Left tab
+      this.loadExpiredWithServicesLeft();
+    }
+  }
+
+  loadAllCoupons(): void {
+    const filters: CouponStatusExpiryReportFilters = {
       pageNumber: this.currentPage,
       pageSize: this.pageSize
     };
@@ -110,29 +132,20 @@ export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
     if (this.selectedStatus !== null) {
       filters.status = this.selectedStatus;
     }
-    if (this.prefixFilter.trim()) {
-      filters.prefix = this.prefixFilter.trim();
-    }
-    if (this.periodFilter.trim()) {
-      filters.period = this.periodFilter.trim();
-    }
-    if (this.batchIdFilter !== null && this.batchIdFilter !== undefined) {
-      filters.batchId = this.batchIdFilter;
-    }
     if (this.schemeIdFilter !== null && this.schemeIdFilter !== undefined) {
       filters.schemeId = this.schemeIdFilter;
     }
     
     // Extract dates from date range
-    if (this.selectedDateRange && this.selectedDateRange.startDate) {
-      filters.couponCreatedDateFrom = this.formatDateForApi(this.selectedDateRange.startDate);
+    if (this.selectedExpiryDateRange && this.selectedExpiryDateRange.startDate) {
+      filters.expiryDateFrom = this.formatDateForApi(this.selectedExpiryDateRange.startDate);
     }
-    if (this.selectedDateRange && this.selectedDateRange.endDate) {
-      filters.couponCreatedDateTo = this.formatDateForApi(this.selectedDateRange.endDate);
+    if (this.selectedExpiryDateRange && this.selectedExpiryDateRange.endDate) {
+      filters.expiryDateTo = this.formatDateForApi(this.selectedExpiryDateRange.endDate);
     }
 
-    this.reportService.getCouponGenerationReport(filters).subscribe({
-      next: (response: CouponGenerationReportResponse) => {
+    this.reportService.getAllCoupons(filters).subscribe({
+      next: (response: CouponStatusExpiryReportResponse) => {
         this.reportData = response.items;
         this.totalCount = response.totalCount;
         this.currentPage = response.pageNumber;
@@ -144,7 +157,60 @@ export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
       },
       error: (error) => {
         console.error('Error loading report:', error);
-        this.toastr.error('Error loading coupon generation report', 'Error');
+        this.toastr.error('Error loading coupon status expiry report', 'Error');
+        this.reportData = [];
+        this.isLoading = false;
+      }
+    });
+  }
+
+  loadExpiringSoon(): void {
+    const filters: ExpiringSoonFilters = {
+      days: this.daysUntilExpiry,
+      pageNumber: this.currentPage,
+      pageSize: this.pageSize
+    };
+
+    this.reportService.getExpiringSoon(filters).subscribe({
+      next: (response: CouponStatusExpiryReportResponse) => {
+        this.reportData = response.items;
+        this.totalCount = response.totalCount;
+        this.currentPage = response.pageNumber;
+        this.pageSize = response.pageSize;
+        this.totalPages = response.totalPages;
+        this.hasPreviousPage = response.hasPreviousPage;
+        this.hasNextPage = response.hasNextPage;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading expiring soon report:', error);
+        this.toastr.error('Error loading expiring soon coupons', 'Error');
+        this.reportData = [];
+        this.isLoading = false;
+      }
+    });
+  }
+
+  loadExpiredWithServicesLeft(): void {
+    const filters: ExpiredWithServicesLeftFilters = {
+      pageNumber: this.currentPage,
+      pageSize: this.pageSize
+    };
+
+    this.reportService.getExpiredWithServicesLeft(filters).subscribe({
+      next: (response: CouponStatusExpiryReportResponse) => {
+        this.reportData = response.items;
+        this.totalCount = response.totalCount;
+        this.currentPage = response.pageNumber;
+        this.pageSize = response.pageSize;
+        this.totalPages = response.totalPages;
+        this.hasPreviousPage = response.hasPreviousPage;
+        this.hasNextPage = response.hasNextPage;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading expired with services left report:', error);
+        this.toastr.error('Error loading expired coupons with services left', 'Error');
         this.reportData = [];
         this.isLoading = false;
       }
@@ -157,12 +223,13 @@ export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
   }
 
   clearFilters(): void {
-    this.selectedStatus = null;
-    this.prefixFilter = '';
-    this.periodFilter = '';
-    this.batchIdFilter = null;
-    this.schemeIdFilter = null;
-    this.selectedDateRange = '';
+    if (this.selectedTabIndex === 0) {
+      this.selectedStatus = null;
+      this.schemeIdFilter = null;
+      this.selectedExpiryDateRange = '';
+    } else if (this.selectedTabIndex === 1) {
+      this.daysUntilExpiry = 30;
+    }
     this.currentPage = 1;
     this.loadReport();
   }
@@ -186,14 +253,14 @@ export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
     return `${year}-${month}-${day}`;
   }
 
-  onDateRangeChange(event: any): void {
+  onExpiryDateRangeChange(event: any): void {
     if (event && event.startDate && event.endDate) {
-      this.selectedDateRange = {
+      this.selectedExpiryDateRange = {
         startDate: event.startDate,
         endDate: event.endDate
       };
     } else {
-      this.selectedDateRange = '';
+      this.selectedExpiryDateRange = '';
     }
   }
 
@@ -255,4 +322,5 @@ export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
     return Math;
   }
 }
+
 

@@ -1,0 +1,362 @@
+<!-- Header -->
+<div class="mb-6">
+  <h1 class="text-2xl font-bold text-gray-900">Coupon Activation Report</h1>
+  <p class="text-gray-600 mt-1">View and filter coupon activation data</p>
+</div>
+
+<!-- KPI Cards -->
+<div *ngIf="!isLoadingKPIs && kpiData" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+  <!-- Total Activations Card -->
+  <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm font-medium text-gray-600">Total Activations</p>
+        <p class="text-3xl font-bold text-gray-900 mt-2">{{ kpiData.totalActivations }}</p>
+      </div>
+      <div class="bg-purple-100 rounded-full p-4">
+        <i class="bi bi-check-circle text-3xl text-purple-600"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Scheme Card -->
+  <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm font-medium text-gray-600">Top Scheme</p>
+        <p class="text-lg font-semibold text-gray-900 mt-2" *ngIf="kpiData.activationsPerScheme.length > 0">
+          {{ kpiData.activationsPerScheme[0].schemeName }}
+        </p>
+        <p class="text-sm text-gray-500 mt-1" *ngIf="kpiData.activationsPerScheme.length > 0">
+          {{ kpiData.activationsPerScheme[0].activationCount }} activations
+        </p>
+        <p class="text-sm text-gray-400 mt-2" *ngIf="kpiData.activationsPerScheme.length === 0">No data</p>
+      </div>
+      <div class="bg-blue-100 rounded-full p-4">
+        <i class="bi bi-tag text-3xl text-blue-600"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Service Center Card -->
+  <!-- <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm font-medium text-gray-600">Top Service Center</p>
+        <p class="text-lg font-semibold text-gray-900 mt-2" *ngIf="kpiData.activationsPerServiceCenter.length > 0">
+          {{ kpiData.activationsPerServiceCenter[0].serviceCenterName }}
+        </p>
+        <p class="text-sm text-gray-500 mt-1" *ngIf="kpiData.activationsPerServiceCenter.length > 0">
+          {{ kpiData.activationsPerServiceCenter[0].activationCount }} activations
+        </p>
+        <p class="text-sm text-gray-400 mt-2" *ngIf="kpiData.activationsPerServiceCenter.length === 0">No data</p>
+      </div>
+      <div class="bg-green-100 rounded-full p-4">
+        <i class="bi bi-building text-3xl text-green-600"></i>
+      </div>
+    </div>
+  </div> -->
+</div>
+
+<!-- KPI Loading State -->
+<div *ngIf="isLoadingKPIs" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+  <div *ngFor="let i of [1,2,3]" class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+    <div class="animate-pulse">
+      <div class="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+      <div class="h-8 bg-gray-200 rounded w-1/3"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Filters Section -->
+<div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+    <!-- Activation Date Range Filter -->
+    <div class="min-w-[230px] mr-4">
+      <label class="block text-sm font-medium text-gray-700 mb-1">
+        Activation Date Range
+      </label>
+      <input
+        #activationDateRangeInput
+        type="text"
+        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+        placeholder="Select date range"
+        ngxDaterangepickerBootstrap
+        [(ngModel)]="selectedActivationDateRange"
+        (datesUpdated)="onActivationDateRangeChange($event)"
+        [locale]="{ format: 'YYYY-MM-DD' }"
+        [autoApply]="true"
+        [showDropdowns]="true"
+        [singleDatePicker]="false"
+      />
+    </div>
+
+    <!-- Status Filter -->
+    <div>
+      <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-1">
+        Status
+      </label>
+      <select
+        id="status-filter"
+        [(ngModel)]="selectedStatus"
+        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+      >
+        <option *ngFor="let option of statusOptions" [ngValue]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+
+    <!-- More Filters Button -->
+    <div class="relative">
+      <label class="block text-sm font-medium text-gray-700 mb-1">
+        &nbsp;
+      </label>
+      <button
+        (click)="showFilterDropdown = !showFilterDropdown"
+        class="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+      >
+        <i class="bi bi-funnel"></i>
+        <span>More Filters</span>
+        <i class="bi" [class.bi-chevron-down]="!showFilterDropdown" [class.bi-chevron-up]="showFilterDropdown"></i>
+      </button>
+
+      <!-- Filter Dropdown -->
+      <div
+        *ngIf="showFilterDropdown"
+        class="absolute right-0 mt-2 w-[500px] bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4"
+        style="max-height: 400px; overflow-y: auto;"
+      >
+        <div class="grid grid-cols-1 gap-4">
+          <!-- Scheme Filter -->
+          <div>
+            <label for="scheme-filter" class="block text-sm font-medium text-gray-700 mb-1">
+              Scheme
+            </label>
+            <select
+              id="scheme-filter"
+              [(ngModel)]="schemeIdFilter"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+            >
+              <option [ngValue]="null">All Schemes</option>
+              <option *ngFor="let scheme of schemes" [ngValue]="scheme.id">
+                {{ scheme.name }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Customer Phone Filter -->
+          <div>
+            <label for="customer-phone-filter" class="block text-sm font-medium text-gray-700 mb-1">
+              Customer Phone
+            </label>
+            <input
+              type="text"
+              id="customer-phone-filter"
+              [(ngModel)]="customerPhoneFilter"
+              placeholder="e.g., 528825157"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+            />
+          </div>
+
+          <!-- Customer Email Filter -->
+          <div>
+            <label for="customer-email-filter" class="block text-sm font-medium text-gray-700 mb-1">
+              Customer Email
+            </label>
+            <input
+              type="email"
+              id="customer-email-filter"
+              [(ngModel)]="customerEmailFilter"
+              placeholder="e.g., john@example.com"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+            />
+          </div>
+        </div>
+
+        <!-- Filter Actions -->
+        <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-200">
+          <button
+            (click)="clearFilters()"
+            class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+          >
+            Clear Filters
+          </button>
+          <button
+            (click)="applyFilters(); showFilterDropdown = false"
+            class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+          >
+            Apply Filters
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Apply Filters Button -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">
+        &nbsp;
+      </label>
+      <button
+        (click)="applyFilters()"
+        class="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+      >
+        Apply Filters
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div *ngIf="isLoading" class="flex items-center justify-center py-12">
+  <mat-spinner diameter="48"></mat-spinner>
+</div>
+
+<!-- Empty State -->
+<div *ngIf="!isLoading && reportData.length === 0" class="bg-white rounded-lg shadow-sm p-12 text-center">
+  <i class="bi bi-inbox text-6xl text-gray-400 mb-4"></i>
+  <h3 class="text-lg font-semibold text-gray-900 mb-2">No data found</h3>
+  <p class="text-gray-600">No coupon activation data matches your filters.</p>
+</div>
+
+<!-- Report Table -->
+<div *ngIf="!isLoading && reportData.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Activation Date
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Coupon Code
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Customer Name
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Mobile Number
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Scheme Name
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Status
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Services Total / Remaining
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Expiry Date
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <tr *ngFor="let item of reportData" class="hover:bg-gray-50">
+          <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
+            {{ formatDate(item.activationDate) }}
+          </td>
+          <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-gray-900">
+            {{ item.couponCode }}
+          </td>
+          <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
+            {{ item.customerName || '-' }}
+          </td>
+          <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
+            {{ item.customerMobileWithCountryCode || item.customerMobile || '-' }}
+          </td>
+          <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
+            {{ item.schemeName || '-' }}
+          </td>
+          <td class="px-6 py-3 whitespace-nowrap">
+            <span
+              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold"
+              [ngClass]="getStatusColorClass(item.status)"
+            >
+              {{ item.status }}
+            </span>
+          </td>
+          <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
+            <div>
+              <span class="font-semibold">{{ item.servicesTotal }}</span>
+              <span class="text-gray-500"> / {{ item.servicesRemaining }}</span>
+            </div>
+          </td>
+          <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
+            {{ formatDate(item.expiryDate) }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+    <div class="flex-1 flex justify-between sm:hidden">
+      <button 
+        (click)="previousPage()"
+        [disabled]="!hasPreviousPage"
+        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+        Previous
+      </button>
+      <button 
+        (click)="nextPage()"
+        [disabled]="!hasNextPage"
+        class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+        Next
+      </button>
+    </div>
+    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+      <div>
+        <p class="text-sm text-gray-700">
+          Showing
+          <span class="font-medium">{{ (currentPage - 1) * pageSize + 1 }}</span>
+          to
+          <span class="font-medium">{{ Math.min(currentPage * pageSize, totalCount) }}</span>
+          of
+          <span class="font-medium">{{ totalCount }}</span>
+          results
+        </p>
+      </div>
+      <div>
+        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+          <button 
+            (click)="goToPage(1)"
+            [disabled]="!hasPreviousPage"
+            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="bi bi-chevron-double-left"></i>
+          </button>
+          <button 
+            (click)="previousPage()"
+            [disabled]="!hasPreviousPage"
+            class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          
+          <!-- Page Numbers -->
+          <button 
+            *ngFor="let page of getPageNumbers()"
+            (click)="goToPage(page)"
+            [class]="page === currentPage ? 'bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'"
+            class="relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+            {{ page }}
+          </button>
+          
+          <button 
+            (click)="nextPage()"
+            [disabled]="!hasNextPage"
+            class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+          <button 
+            (click)="goToPage(totalPages)"
+            [disabled]="!hasNextPage"
+            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="bi bi-chevron-double-right"></i>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+

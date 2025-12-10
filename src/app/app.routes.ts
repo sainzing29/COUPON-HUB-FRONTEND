@@ -235,6 +235,16 @@ export const routes: Routes = [
         path: 'coupon-generation-report',
         loadComponent: () => import('./modules/reports/pages/coupon-generation-report/coupon-generation-report.component').then(m => m.CouponGenerationReportComponent),
         canActivate: [permissionGuard]
+      },
+      {
+        path: 'coupon-status-expiry-report',
+        loadComponent: () => import('./modules/reports/pages/coupon-status-expiry-report/coupon-status-expiry-report.component').then(m => m.CouponStatusExpiryReportComponent),
+        canActivate: [permissionGuard]
+      },
+      {
+        path: 'coupon-activation-report',
+        loadComponent: () => import('./modules/reports/pages/coupon-activation-report/coupon-activation-report.component').then(m => m.CouponActivationReportComponent),
+        canActivate: [permissionGuard]
       }
     ]
   },

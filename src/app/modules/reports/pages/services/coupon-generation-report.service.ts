@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiService } from '../../../../../core/services/api.service';
-import { CouponGenerationReportResponse, CouponGenerationReportFilters } from '../coupon-generation-report.model';
+import { ApiService } from '../../../../core/services/api.service';
+import { CouponGenerationReportResponse, CouponGenerationReportFilters } from '../models/coupon-generation-report.model';
 
 @Injectable({
   providedIn: 'root'

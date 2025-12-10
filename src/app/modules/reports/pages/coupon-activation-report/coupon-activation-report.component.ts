@@ -4,13 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NgxDaterangepickerBootstrapDirective } from 'ngx-daterangepicker-bootstrap';
-import { CouponGenerationReportService } from '../services/coupon-generation-report.service';
-import { CouponGenerationReportItem, CouponGenerationReportResponse, CouponGenerationReportFilters } from '../models/coupon-generation-report.model';
+import { CouponActivationReportService } from '../services/coupon-activation-report.service';
+import { 
+  CouponActivationReportItem, 
+  CouponActivationReportResponse, 
+  CouponActivationReportFilters,
+  CouponActivationKPIResponse,
+  ActivationKPIFilters
+} from '../models/coupon-activation-report.model';
 import { CouponSchemeService } from '../../../coupons/service/coupon-scheme.service';
 import { CouponScheme } from '../../../coupons/model/coupon-scheme.model';
 
 @Component({
-  selector: 'app-coupon-generation-report',
+  selector: 'app-coupon-activation-report',
   standalone: true,
   imports: [
     CommonModule,
@@ -18,12 +24,16 @@ import { CouponScheme } from '../../../coupons/model/coupon-scheme.model';
     MatProgressSpinnerModule,
     NgxDaterangepickerBootstrapDirective
   ],
-  templateUrl: './coupon-generation-report.component.html',
-  styleUrls: ['./coupon-generation-report.component.scss']
+  templateUrl: './coupon-activation-report.component.html',
+  styleUrls: ['./coupon-activation-report.component.scss']
 })
-export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
-  reportData: CouponGenerationReportItem[] = [];
+export class CouponActivationReportComponent implements OnInit, AfterViewInit {
+  reportData: CouponActivationReportItem[] = [];
   isLoading = false;
+  isLoadingKPIs = false;
+
+  // KPI Data
+  kpiData: CouponActivationKPIResponse | null = null;
 
   // Pagination
   currentPage = 1;
@@ -33,28 +43,17 @@ export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
   hasPreviousPage = false;
   hasNextPage = false;
 
-  // Filters
-  filters: CouponGenerationReportFilters = {
-    pageNumber: 1,
-    pageSize: 10
-  };
-
   // Filter form values
-  selectedStatus: number | null = null;
-  prefixFilter: string = '';
-  periodFilter: string = '';
-  batchIdFilter: number | null = null;
+  selectedStatus: number | null = 1; // Default to Active
   schemeIdFilter: number | null = null;
-  
-  // Date range
-  selectedDateRange: any = '';
+  customerPhoneFilter: string = '';
+  customerEmailFilter: string = '';
+  selectedActivationDateRange: any = '';
 
   // Filter dropdown state
   showFilterDropdown = false;
 
   statusOptions = [
-    { value: null, label: 'All Statuses' },
-    { value: 0, label: 'Unassigned' },
     { value: 1, label: 'Active' },
     { value: 2, label: 'Completed' },
     { value: 3, label: 'Expired' }
@@ -63,24 +62,25 @@ export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
   schemes: CouponScheme[] = [];
 
   constructor(
-    private reportService: CouponGenerationReportService,
+    private reportService: CouponActivationReportService,
     private couponSchemeService: CouponSchemeService,
     private toastr: ToastrService
   ) {}
 
-  @ViewChild('dateRangeInput', { static: false }) dateRangeInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('activationDateRangeInput', { static: false }) activationDateRangeInput!: ElementRef<HTMLInputElement>;
 
   ngOnInit(): void {
     this.loadSchemes();
+    this.loadKPIs();
     this.loadReport();
   }
 
   ngAfterViewInit(): void {
     // Clear the date range input value after view initialization
-    if (this.dateRangeInput) {
+    if (this.activationDateRangeInput) {
       setTimeout(() => {
-        if (this.dateRangeInput?.nativeElement) {
-          this.dateRangeInput.nativeElement.value = '';
+        if (this.activationDateRangeInput?.nativeElement) {
+          this.activationDateRangeInput.nativeElement.value = '';
         }
       }, 0);
     }
@@ -98,11 +98,36 @@ export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
     });
   }
 
+  loadKPIs(): void {
+    this.isLoadingKPIs = true;
+    
+    const filters: ActivationKPIFilters = {};
+    
+    // Extract dates from date range for KPIs
+    if (this.selectedActivationDateRange && this.selectedActivationDateRange.startDate) {
+      filters.activationDateFrom = this.formatDateForApi(this.selectedActivationDateRange.startDate);
+    }
+    if (this.selectedActivationDateRange && this.selectedActivationDateRange.endDate) {
+      filters.activationDateTo = this.formatDateForApi(this.selectedActivationDateRange.endDate);
+    }
+
+    this.reportService.getCouponActivationKPIs(filters).subscribe({
+      next: (response: CouponActivationKPIResponse) => {
+        this.kpiData = response;
+        this.isLoadingKPIs = false;
+      },
+      error: (error) => {
+        console.error('Error loading KPIs:', error);
+        this.toastr.error('Error loading activation KPIs', 'Error');
+        this.isLoadingKPIs = false;
+      }
+    });
+  }
+
   loadReport(): void {
     this.isLoading = true;
     
-    // Build filters
-    const filters: CouponGenerationReportFilters = {
+    const filters: CouponActivationReportFilters = {
       pageNumber: this.currentPage,
       pageSize: this.pageSize
     };
@@ -110,29 +135,26 @@ export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
     if (this.selectedStatus !== null) {
       filters.status = this.selectedStatus;
     }
-    if (this.prefixFilter.trim()) {
-      filters.prefix = this.prefixFilter.trim();
-    }
-    if (this.periodFilter.trim()) {
-      filters.period = this.periodFilter.trim();
-    }
-    if (this.batchIdFilter !== null && this.batchIdFilter !== undefined) {
-      filters.batchId = this.batchIdFilter;
-    }
     if (this.schemeIdFilter !== null && this.schemeIdFilter !== undefined) {
       filters.schemeId = this.schemeIdFilter;
     }
+    if (this.customerPhoneFilter.trim()) {
+      filters.customerPhone = this.customerPhoneFilter.trim();
+    }
+    if (this.customerEmailFilter.trim()) {
+      filters.customerEmail = this.customerEmailFilter.trim();
+    }
     
     // Extract dates from date range
-    if (this.selectedDateRange && this.selectedDateRange.startDate) {
-      filters.couponCreatedDateFrom = this.formatDateForApi(this.selectedDateRange.startDate);
+    if (this.selectedActivationDateRange && this.selectedActivationDateRange.startDate) {
+      filters.activationDateFrom = this.formatDateForApi(this.selectedActivationDateRange.startDate);
     }
-    if (this.selectedDateRange && this.selectedDateRange.endDate) {
-      filters.couponCreatedDateTo = this.formatDateForApi(this.selectedDateRange.endDate);
+    if (this.selectedActivationDateRange && this.selectedActivationDateRange.endDate) {
+      filters.activationDateTo = this.formatDateForApi(this.selectedActivationDateRange.endDate);
     }
 
-    this.reportService.getCouponGenerationReport(filters).subscribe({
-      next: (response: CouponGenerationReportResponse) => {
+    this.reportService.getCouponActivationReport(filters).subscribe({
+      next: (response: CouponActivationReportResponse) => {
         this.reportData = response.items;
         this.totalCount = response.totalCount;
         this.currentPage = response.pageNumber;
@@ -144,7 +166,7 @@ export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
       },
       error: (error) => {
         console.error('Error loading report:', error);
-        this.toastr.error('Error loading coupon generation report', 'Error');
+        this.toastr.error('Error loading coupon activation report', 'Error');
         this.reportData = [];
         this.isLoading = false;
       }
@@ -153,17 +175,18 @@ export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
 
   applyFilters(): void {
     this.currentPage = 1;
+    this.loadKPIs();
     this.loadReport();
   }
 
   clearFilters(): void {
-    this.selectedStatus = null;
-    this.prefixFilter = '';
-    this.periodFilter = '';
-    this.batchIdFilter = null;
+    this.selectedStatus = 1; // Reset to Active
     this.schemeIdFilter = null;
-    this.selectedDateRange = '';
+    this.customerPhoneFilter = '';
+    this.customerEmailFilter = '';
+    this.selectedActivationDateRange = '';
     this.currentPage = 1;
+    this.loadKPIs();
     this.loadReport();
   }
 
@@ -186,14 +209,14 @@ export class CouponGenerationReportComponent implements OnInit, AfterViewInit {
     return `${year}-${month}-${day}`;
   }
 
-  onDateRangeChange(event: any): void {
+  onActivationDateRangeChange(event: any): void {
     if (event && event.startDate && event.endDate) {
-      this.selectedDateRange = {
+      this.selectedActivationDateRange = {
         startDate: event.startDate,
         endDate: event.endDate
       };
     } else {
-      this.selectedDateRange = '';
+      this.selectedActivationDateRange = '';
     }
   }
 

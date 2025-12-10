@@ -85,7 +85,9 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
       expanded: false,
       permission: ['Reports'],
       submenu: [
-        { id: 'coupon-generation-report', label: 'Coupon Generation', icon: 'description', route: '/reports/coupon-generation-report', active: false, hasSubmenu: false, permission: ['Reports'] }
+        { id: 'coupon-generation-report', label: 'Coupon Generation', icon: 'description', route: '/reports/coupon-generation-report', active: false, hasSubmenu: false, permission: ['Reports'] },
+        { id: 'coupon-status-expiry-report', label: 'Coupon Status & Expiry', icon: 'event', route: '/reports/coupon-status-expiry-report', active: false, hasSubmenu: false, permission: ['Reports'] },
+        { id: 'coupon-activation-report', label: 'Coupon Activation', icon: 'check_circle', route: '/reports/coupon-activation-report', active: false, hasSubmenu: false, permission: ['Reports'] }
       ]
     },
     { 
