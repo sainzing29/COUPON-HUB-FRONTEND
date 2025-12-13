@@ -245,6 +245,16 @@ export const routes: Routes = [
         path: 'coupon-activation-report',
         loadComponent: () => import('./modules/reports/pages/coupon-activation-report/coupon-activation-report.component').then(m => m.CouponActivationReportComponent),
         canActivate: [permissionGuard]
+      },
+      {
+        path: 'customer-report',
+        loadComponent: () => import('./modules/reports/pages/customer-report/customer-report.component').then(m => m.CustomerReportComponent),
+        canActivate: [permissionGuard]
+      },
+      {
+        path: 'redemption-report',
+        loadComponent: () => import('./modules/reports/pages/redemption-report/redemption-report.component').then(m => m.RedemptionReportComponent),
+        canActivate: [permissionGuard]
       }
     ]
   },

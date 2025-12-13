@@ -94,22 +94,22 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr *ngFor="let coupon of paginatedCoupons" class="hover:bg-gray-50">
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
+            <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-gray-900">
               {{ coupon.couponCode }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 font-mono">
               {{ coupon.prefix }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
               {{ formatPeriod(coupon.period) }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
               {{ coupon.totalServices }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
               {{ coupon.usedServices }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-6 py-3 whitespace-nowrap">
               <span
                 class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold"
                 [ngClass]="getStatusColorClass(coupon.status)"
@@ -117,7 +117,7 @@
                 {{ coupon.status }}
               </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
               <span *ngIf="coupon.printed" class="text-green-600">
                 <i class="bi bi-check-circle"></i> Yes
               </span>
@@ -125,11 +125,11 @@
                 <i class="bi bi-x-circle"></i> No
               </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
               <span *ngIf="coupon.printBatchId">#{{ coupon.printBatchId }}</span>
               <span *ngIf="!coupon.printBatchId" class="text-gray-400">-</span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
               {{ formatDate(coupon.createdAt) }}
             </td>
           </tr>
