@@ -41,10 +41,15 @@ export class RedemptionReportComponent implements OnInit, AfterViewInit {
   serviceCenterIdFilter: number | null = null;
   selectedRedemptionDateRange: any = '';
 
+  // Filter dropdown state
+  showFilterDropdown = false;
+
   statusOptions = [
-    { value: null, label: 'All' },
+    { value: null, label: 'All Statuses' },
+    { value: 0, label: 'Unassigned' },
+    { value: 1, label: 'Active' },
     { value: 2, label: 'Completed' },
-    { value: 1, label: 'Active' }
+    { value: 3, label: 'Expired' }
   ];
 
   serviceCenters: ServiceCenter[] = [];

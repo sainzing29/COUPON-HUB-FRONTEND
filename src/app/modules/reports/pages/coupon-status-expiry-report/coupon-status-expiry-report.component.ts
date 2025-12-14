@@ -53,6 +53,9 @@ export class CouponStatusExpiryReportComponent implements OnInit, AfterViewInit 
   // Filter for "Expiring Soon" tab
   daysUntilExpiry: number = 30;
 
+  // Filter dropdown state
+  showFilterDropdown = false;
+
   statusOptions = [
     { value: null, label: 'All Statuses' },
     { value: 0, label: 'Unassigned' },

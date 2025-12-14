@@ -232,6 +232,11 @@ export const routes: Routes = [
     ],
     children: [
       {
+        path: '',
+        redirectTo: 'coupon-generation-report',
+        pathMatch: 'full'
+      },
+      {
         path: 'coupon-generation-report',
         loadComponent: () => import('./modules/reports/pages/coupon-generation-report/coupon-generation-report.component').then(m => m.CouponGenerationReportComponent),
         canActivate: [permissionGuard]
