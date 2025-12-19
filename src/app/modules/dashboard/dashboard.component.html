@@ -88,4 +88,43 @@
     </div>
   </div>
 
+  <!-- Charts Section - First Row: Active Coupons By Month & Coupon Status Distribution -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+    <!-- Line Chart: Active Coupon Count by Month -->
+    <div class="bg-white rounded-lg shadow-card p-6" [@fadeInUp]>
+      <div class="h-80">
+        <canvas baseChart
+          [data]="activeCouponChartData"
+          [type]="lineChartType"
+          [options]="activeCouponChartOptions">
+        </canvas>
+      </div>
+    </div>
+
+    <!-- Donut Chart: Coupon Status Distribution -->
+    <div class="bg-white rounded-lg shadow-card p-6" [@fadeInUp]>
+      <div class="h-80">
+        <canvas baseChart
+          [data]="couponStatusChartData"
+          [type]="donutChartType"
+          [options]="couponStatusChartOptions">
+        </canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section - Second Row: Service Redemptions by Month -->
+  <div class="flex justify-center mt-6">
+    <!-- Line Chart: Service Redemptions by Month -->
+    <div class="bg-white rounded-lg shadow-card p-6 w-full lg:w-1/2" [@fadeInUp]>
+      <div class="h-80">
+        <canvas baseChart
+          [data]="serviceRedemptionsChartData"
+          [type]="lineChartType"
+          [options]="serviceRedemptionsChartOptions">
+        </canvas>
+      </div>
+    </div>
+  </div>
+
 </div>

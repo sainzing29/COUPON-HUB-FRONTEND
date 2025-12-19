@@ -15,14 +15,50 @@
   -webkit-font-smoothing: antialiased;
 }
 
-// Header styling using CSS variables (defined in themes.css)
-header {
-  background-color: var(--header-bg-primary) !important;
-  border-color: var(--header-border-primary) !important;
-  box-shadow: 0 1px 3px var(--header-shadow);
+// Header styling - White background (overrides global theme)
+header.header-container {
+  background-color: #FFFFFF !important;
+  border-color: #E5E7EB !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   
-  // All header elements will automatically use the CSS variables
-  // No need for hardcoded colors - they're defined globally in themes.css
+  // Override all text colors for white background
+  h5, .text-gray-900, .text-lg {
+    color: #111827 !important;
+  }
+  
+  // Override icon colors for white background
+  .material-icons {
+    color: #374151 !important;
+    
+    &.text-gray-700 {
+      color: #374151 !important;
+    }
+  }
+  
+  // Override hover states for white background
+  button:hover, .hover\:bg-gray-100:hover {
+    background-color: #F3F4F6 !important;
+  }
+  
+  // Override any purple background classes
+  .bg-purple-900,
+  .bg-purple-800,
+  .bg-purple-700 {
+    background-color: transparent !important;
+  }
+  
+  // Override purple text classes
+  .text-purple-100,
+  .text-purple-200,
+  .text-purple-300 {
+    color: #374151 !important;
+  }
+  
+  // Override purple border classes
+  .border-purple-700,
+  .border-purple-600 {
+    border-color: #E5E7EB !important;
+  }
 }
 
 // Header positioning based on sidebar state

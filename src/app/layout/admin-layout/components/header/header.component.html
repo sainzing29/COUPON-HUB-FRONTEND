@@ -1,5 +1,5 @@
 <!-- Header -->
-<header class="bg-purple-900 shadow-sm border-b border-purple-700 px-4 py-1 fixed top-0 right-0 z-30 header-container" 
+<header class="bg-white shadow-sm border-b border-gray-200 px-4 py-1 fixed top-0 right-0 z-30 header-container" 
          [class.header-sidebar-closed]="!sidebarOpen"
          [class.header-sidebar-open]="sidebarOpen">
   <div class="flex items-center justify-between h-12">
@@ -7,11 +7,11 @@
     <div class="flex items-center space-x-3">
       <button 
         (click)="onToggleSidebar()"
-        class="p-2 rounded-lg hover:bg-purple-800 transition-colors duration-200 flex items-center justify-center">
-        <span class="material-icons text-purple-200 text-xl">menu</span>
+        class="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center">
+        <span class="material-icons text-gray-700 text-xl">menu</span>
       </button>
       <div class="flex items-center">
-        <h5 class="text-lg font-semibold text-purple-100 leading-tight">Welcome {{ getUserFirstName() }}</h5>
+        <h5 class="text-lg font-semibold text-gray-900 leading-tight">Welcome {{ getUserFirstName() }}</h5>
       </div>
     </div>
 
@@ -47,12 +47,12 @@
         <div class="relative user-menu-container">
           <button 
             (click)="onAccountClick()"
-            class="p-2.5 rounded-lg hover:bg-purple-800 transition-colors duration-200 flex items-center space-x-2">
+            class="p-2.5 rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center space-x-2">
             <!-- User Avatar -->
             <div class="w-8 h-8 bg-gradient-to-r bg-[#ffcd00] text-white rounded-full flex items-center justify-center text-sm font-semibold shadow-sm">
               {{ getUserInitials() }}
             </div>
-            <span class="material-icons text-purple-200 text-lg">keyboard_arrow_down</span>
+            <span class="material-icons text-gray-700 text-lg">keyboard_arrow_down</span>
           </button>
 
           <!-- Dropdown Menu -->
@@ -97,9 +97,9 @@
         <!-- Settings Button -->
         <button 
           (click)="onThemeSettingsClick()"
-          class="p-2.5 rounded-lg hover:bg-purple-800 transition-colors duration-200 flex items-center justify-center"
+          class="p-2.5 rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center"
           matTooltip="Theme Settings">
-          <span class="material-icons text-purple-200 text-lg">settings</span>
+          <span class="material-icons text-gray-700 text-lg">settings</span>
         </button>
       </div>
     </div>

@@ -1,3 +1,24 @@
+export interface ActiveCouponCountByMonth {
+  month: string;
+  monthFull: string;
+  year: number;
+  activatedCouponsCount: number;
+}
+
+export interface ServiceRedemptionsByMonth {
+  month: string;
+  monthFull: string;
+  year: number;
+  servicesRedeemedCount: number;
+}
+
+export interface CouponStatusCounts {
+  unassigned: number;
+  active: number;
+  completed: number;
+  expired: number;
+}
+
 export interface DashboardStats {
   totalCouponsGenerated: number;
   totalCouponsActivated: number;
@@ -11,6 +32,9 @@ export interface DashboardStats {
   servicesCompletedLastMonth: number;
   totalCustomers: number;
   newCustomersThisMonth: number;
+  activeCouponCountByMonth: ActiveCouponCountByMonth[];
+  serviceRedemptionsByMonth: ServiceRedemptionsByMonth[];
+  couponStatusCounts: CouponStatusCounts;
 }
 
 export interface SalesTrendData {
