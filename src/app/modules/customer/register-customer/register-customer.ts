@@ -62,12 +62,13 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
     private couponSaleService: CouponSaleService,
     private customerRegisterService: CustomerRegisterService
   ) {
-    // Coupon verification form with separate inputs (4-4-5 format)
+    // Coupon verification form with separate inputs (4-5-4 format) and single input for mobile
     this.couponVerificationForm = this.fb.group({
-      couponCode1: ['', [Validators.required, Validators.pattern(/^[A-Z0-9]{4}$/)]],
-      couponCode2: ['', [Validators.required, Validators.pattern(/^[A-Z0-9]{4}$/)]],
-      couponCode3: ['', [Validators.required, Validators.pattern(/^[A-Z0-9]{5}$/)]]
-    });
+      couponCode1: ['', []],
+      couponCode2: ['', []],
+      couponCode3: ['', []],
+      fullCouponCode: ['', []]
+    }, { validators: this.couponCodeValidator });
 
     // PIN form with 4 separate inputs for PIN and Confirm PIN
     this.pinForm = this.fb.group({
@@ -91,6 +92,65 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
     // Timers are handled in contact-verification component
   }
 
+
+  // Coupon code validator - validates either full code or three parts
+  couponCodeValidator(form: FormGroup) {
+    const fullCode = form.get('fullCouponCode')?.value || '';
+    const code1 = form.get('couponCode1')?.value || '';
+    const code2 = form.get('couponCode2')?.value || '';
+    const code3 = form.get('couponCode3')?.value || '';
+
+    // If full code is provided, validate it (13 characters for 4-5-4 format)
+    if (fullCode) {
+      const cleaned = fullCode.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+      if (cleaned.length === 13 && /^[A-Z0-9]{13}$/.test(cleaned)) {
+        // Valid full code, clear errors on parts
+        form.get('couponCode1')?.setErrors(null);
+        form.get('couponCode2')?.setErrors(null);
+        form.get('couponCode3')?.setErrors(null);
+        form.get('fullCouponCode')?.setErrors(null);
+        return null;
+      } else {
+        form.get('fullCouponCode')?.setErrors({ invalidCoupon: true });
+        return { invalidCoupon: true };
+      }
+    }
+
+    // If three parts are provided, validate them (4-5-4 format)
+    if (code1 || code2 || code3) {
+      const isValid1 = !code1 || /^[A-Z0-9]{4}$/.test(code1);
+      const isValid2 = !code2 || /^[A-Z0-9]{5}$/.test(code2);
+      const isValid3 = !code3 || /^[A-Z0-9]{4}$/.test(code3);
+
+      if (!isValid1) {
+        form.get('couponCode1')?.setErrors({ invalidCoupon: true });
+      } else {
+        form.get('couponCode1')?.setErrors(null);
+      }
+
+      if (!isValid2) {
+        form.get('couponCode2')?.setErrors({ invalidCoupon: true });
+      } else {
+        form.get('couponCode2')?.setErrors(null);
+      }
+
+      if (!isValid3) {
+        form.get('couponCode3')?.setErrors({ invalidCoupon: true });
+      } else {
+        form.get('couponCode3')?.setErrors(null);
+      }
+
+      // Check if all three parts are complete
+      if (code1 && code2 && code3 && isValid1 && isValid2 && isValid3) {
+        return null;
+      } else if (code1 || code2 || code3) {
+        return { incomplete: true };
+      }
+    }
+
+    // No input provided
+    return { required: true };
+  }
 
   // PIN match validator
   pinMatchValidator(form: FormGroup) {
@@ -121,11 +181,37 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  // Coupon Code Input Handlers
+  // Handle full coupon code input (for mobile) - 13 characters (4-5-4 format)
+  onFullCouponCodeInput(event: any): void {
+    const value = event.target.value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+    const trimmedValue = value.substring(0, 13);
+    
+    // Update form control
+    this.couponVerificationForm.patchValue({ fullCouponCode: trimmedValue }, { emitEvent: false });
+    
+    // Also sync to three-part inputs for consistency (4-5-4 format)
+    if (trimmedValue.length >= 4) {
+      this.couponCode1 = trimmedValue.substring(0, 4);
+      this.couponVerificationForm.patchValue({ couponCode1: this.couponCode1 }, { emitEvent: false });
+    }
+    if (trimmedValue.length >= 9) {
+      this.couponCode2 = trimmedValue.substring(4, 9);
+      this.couponVerificationForm.patchValue({ couponCode2: this.couponCode2 }, { emitEvent: false });
+    }
+    if (trimmedValue.length >= 13) {
+      this.couponCode3 = trimmedValue.substring(9, 13);
+      this.couponVerificationForm.patchValue({ couponCode3: this.couponCode3 }, { emitEvent: false });
+    }
+    
+    // Trigger validation
+    this.couponVerificationForm.updateValueAndValidity();
+  }
+
+  // Coupon Code Input Handlers (4-5-4 format)
   onCouponCodeInput(event: any, part: number): void {
     // Allow alphanumeric characters and convert to uppercase
     const value = event.target.value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
-    const maxLength = part === 3 ? 5 : 4;
+    const maxLength = part === 2 ? 5 : 4; // Part 1: 4 chars, Part 2: 5 chars, Part 3: 4 chars
     const trimmedValue = value.substring(0, maxLength);
     
     // Update form control
@@ -141,7 +227,7 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
     } else if (part === 2) {
       this.couponVerificationForm.patchValue({ couponCode2: trimmedValue }, { emitEvent: false });
       this.couponCode2 = trimmedValue;
-      if (trimmedValue.length === 4) {
+      if (trimmedValue.length === 5) {
         setTimeout(() => {
           const nextInput = document.querySelector(`input[data-part="3"]`) as HTMLInputElement;
           nextInput?.focus();
@@ -151,6 +237,13 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
       this.couponVerificationForm.patchValue({ couponCode3: trimmedValue }, { emitEvent: false });
       this.couponCode3 = trimmedValue;
     }
+    
+    // Sync to full coupon code input
+    const fullCode = `${this.couponCode1}${this.couponCode2}${this.couponCode3}`;
+    this.couponVerificationForm.patchValue({ fullCouponCode: fullCode }, { emitEvent: false });
+    
+    // Trigger validation
+    this.couponVerificationForm.updateValueAndValidity();
   }
 
   // Handle paste event for coupon code inputs
@@ -161,54 +254,82 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
     // Remove dashes, spaces, and convert to uppercase
     const cleanedData = pastedData.replace(/[^A-Z0-9]/gi, '').toUpperCase();
     
-    // If the pasted data is 13 characters (full coupon code), split it
-    if (cleanedData.length === 13) {
-      const part1 = cleanedData.substring(0, 4);
-      const part2 = cleanedData.substring(4, 8);
-      const part3 = cleanedData.substring(8, 13);
+    // Check if pasting into full coupon code input or three-part inputs
+    const target = event.target as HTMLInputElement;
+    const isFullInput = target.getAttribute('formControlName') === 'fullCouponCode';
+    
+    if (isFullInput) {
+      // Paste into full input (4-5-4 format, 13 characters total)
+      const trimmedData = cleanedData.substring(0, 13);
+      this.couponVerificationForm.patchValue({ fullCouponCode: trimmedData }, { emitEvent: false });
       
-      // Update form controls
-      this.couponVerificationForm.patchValue({
-        couponCode1: part1,
-        couponCode2: part2,
-        couponCode3: part3
-      }, { emitEvent: false });
+      // Also sync to three-part inputs (4-5-4 format)
+      if (trimmedData.length >= 4) {
+        this.couponCode1 = trimmedData.substring(0, 4);
+        this.couponVerificationForm.patchValue({ couponCode1: this.couponCode1 }, { emitEvent: false });
+      }
+      if (trimmedData.length >= 9) {
+        this.couponCode2 = trimmedData.substring(4, 9);
+        this.couponVerificationForm.patchValue({ couponCode2: this.couponCode2 }, { emitEvent: false });
+      }
+      if (trimmedData.length >= 13) {
+        this.couponCode3 = trimmedData.substring(9, 13);
+        this.couponVerificationForm.patchValue({ couponCode3: this.couponCode3 }, { emitEvent: false });
+      }
       
-      // Update component properties
-      this.couponCode1 = part1;
-      this.couponCode2 = part2;
-      this.couponCode3 = part3;
-      
-      // Focus on the last input
-      setTimeout(() => {
-        const lastInput = document.querySelector(`input[data-part="3"]`) as HTMLInputElement;
-        lastInput?.focus();
-        lastInput?.select();
-      }, 0);
-    } else if (cleanedData.length > 0) {
-      // If it's not exactly 13 characters, try to fill what we can
-      const part1 = cleanedData.substring(0, 4);
-      const part2 = cleanedData.substring(4, 8);
-      const part3 = cleanedData.substring(8, 13);
-      
-      this.couponVerificationForm.patchValue({
-        couponCode1: part1 || '',
-        couponCode2: part2 || '',
-        couponCode3: part3 || ''
-      }, { emitEvent: false });
-      
-      this.couponCode1 = part1 || '';
-      this.couponCode2 = part2 || '';
-      this.couponCode3 = part3 || '';
-      
-      // Focus on the appropriate input
-      setTimeout(() => {
-        let focusPart = 1;
-        if (cleanedData.length > 4) focusPart = 2;
-        if (cleanedData.length > 8) focusPart = 3;
-        const focusInput = document.querySelector(`input[data-part="${focusPart}"]`) as HTMLInputElement;
-        focusInput?.focus();
-      }, 0);
+      this.couponVerificationForm.updateValueAndValidity();
+    } else {
+      // Paste into three-part inputs (4-5-4 format)
+      if (cleanedData.length === 13) {
+        const part1 = cleanedData.substring(0, 4);
+        const part2 = cleanedData.substring(4, 9);
+        const part3 = cleanedData.substring(9, 13);
+        
+        // Update form controls
+        this.couponVerificationForm.patchValue({
+          couponCode1: part1,
+          couponCode2: part2,
+          couponCode3: part3,
+          fullCouponCode: cleanedData
+        }, { emitEvent: false });
+        
+        // Update component properties
+        this.couponCode1 = part1;
+        this.couponCode2 = part2;
+        this.couponCode3 = part3;
+        
+        // Focus on the last input
+        setTimeout(() => {
+          const lastInput = document.querySelector(`input[data-part="3"]`) as HTMLInputElement;
+          lastInput?.focus();
+          lastInput?.select();
+        }, 0);
+      } else if (cleanedData.length > 0) {
+        // If it's not exactly 13 characters, try to fill what we can (4-5-4 format)
+        const part1 = cleanedData.substring(0, 4);
+        const part2 = cleanedData.substring(4, 9);
+        const part3 = cleanedData.substring(9, 13);
+        
+        this.couponVerificationForm.patchValue({
+          couponCode1: part1 || '',
+          couponCode2: part2 || '',
+          couponCode3: part3 || '',
+          fullCouponCode: cleanedData.substring(0, 13)
+        }, { emitEvent: false });
+        
+        this.couponCode1 = part1 || '';
+        this.couponCode2 = part2 || '';
+        this.couponCode3 = part3 || '';
+        
+        // Focus on the appropriate input
+        setTimeout(() => {
+          let focusPart = 1;
+          if (cleanedData.length > 4) focusPart = 2;
+          if (cleanedData.length > 9) focusPart = 3;
+          const focusInput = document.querySelector(`input[data-part="${focusPart}"]`) as HTMLInputElement;
+          focusInput?.focus();
+        }, 0);
+      }
     }
   }
 
@@ -235,8 +356,18 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
     if (this.couponVerificationForm.valid) {
       this.isSubmitting = true;
       
-      // Combine the three parts
-      const fullCouponCode = `${this.couponCode1}${this.couponCode2}${this.couponCode3}`;
+      // Get coupon code from either full input or three parts
+      let fullCouponCode = '';
+      const fullCodeControl = this.couponVerificationForm.get('fullCouponCode');
+      const fullCodeValue = fullCodeControl?.value || '';
+      
+      if (fullCodeValue) {
+        // Use full code input (for mobile)
+        fullCouponCode = fullCodeValue.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+      } else {
+        // Combine the three parts (for desktop)
+        fullCouponCode = `${this.couponCode1}${this.couponCode2}${this.couponCode3}`;
+      }
       
       // Call new verify coupon API
       this.registerCustomerService.verifyCoupon(fullCouponCode).subscribe({
@@ -652,6 +783,10 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
 
   get couponCode3Control() {
     return this.couponVerificationForm.get('couponCode3');
+  }
+
+  get fullCouponCodeControl() {
+    return this.couponVerificationForm.get('fullCouponCode');
   }
 
 

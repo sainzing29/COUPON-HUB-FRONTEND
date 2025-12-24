@@ -7,7 +7,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { CouponService } from '../service/coupon.service';
-import { Coupon } from '../model/coupon.model';
+import { Coupon, CouponsResponse } from '../model/coupon.model';
+
+interface StatusOption {
+  value: string;
+  label: string;
+  statusNumber: number | null;
+}
 
 @Component({
   selector: 'app-coupons',
@@ -25,25 +31,48 @@ import { Coupon } from '../model/coupon.model';
 })
 export class CouponsComponent implements OnInit {
   coupons: Coupon[] = [];
-  filteredCoupons: Coupon[] = [];
   paginatedCoupons: Coupon[] = [];
   isLoading = false;
   searchTerm: string = '';
   selectedStatus: string = 'all';
+  periodFilter: string = '';
+  selectedMonth: string = '';
+  selectedYear: string = '';
+  private searchTimeout: any;
 
   // Pagination properties
   currentPage = 1;
-  pageSize = 10;
+  pageSize = 50;
   totalItems = 0;
   totalPages = 0;
+  hasPreviousPage = false;
+  hasNextPage = false;
 
-  statusOptions = [
-    { value: 'all', label: 'All Statuses' },
-    { value: 'Unassigned', label: 'Unassigned' },
-    { value: 'Active', label: 'Active' },
-    { value: 'Completed', label: 'Completed' },
-    { value: 'Expired', label: 'Expired' }
+  statusOptions: StatusOption[] = [
+    { value: 'all', label: 'All Statuses', statusNumber: null },
+    { value: 'Unassigned', label: 'Unassigned', statusNumber: 0 },
+    { value: 'Active', label: 'Active', statusNumber: 1 },
+    { value: 'Completed', label: 'Completed', statusNumber: 2 },
+    { value: 'Expired', label: 'Expired', statusNumber: 3 }
   ];
+
+  monthOptions: { value: string; label: string; number: string }[] = [
+    { value: '', label: 'Month', number: '' },
+    { value: 'Jan', label: 'January', number: '01' },
+    { value: 'Feb', label: 'February', number: '02' },
+    { value: 'Mar', label: 'March', number: '03' },
+    { value: 'Apr', label: 'April', number: '04' },
+    { value: 'May', label: 'May', number: '05' },
+    { value: 'Jun', label: 'June', number: '06' },
+    { value: 'Jul', label: 'July', number: '07' },
+    { value: 'Aug', label: 'August', number: '08' },
+    { value: 'Sep', label: 'September', number: '09' },
+    { value: 'Oct', label: 'October', number: '10' },
+    { value: 'Nov', label: 'November', number: '11' },
+    { value: 'Dec', label: 'December', number: '12' }
+  ];
+
+  yearOptions: number[] = [];
 
   constructor(
     private couponService: CouponService,
@@ -51,58 +80,127 @@ export class CouponsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.initializeYearOptions();
     this.loadCoupons();
+    this.setupSearch();
+  }
+
+  private initializeYearOptions(): void {
+    for (let year = 2025; year <= 2100; year++) {
+      this.yearOptions.push(year);
+    }
+  }
+
+  private setupSearch(): void {
+    // Search debouncing is handled in onSearchChange method
   }
 
   loadCoupons(): void {
     this.isLoading = true;
-    this.couponService.getCoupons().subscribe({
-      next: (response) => {
-        this.coupons = response;
-        this.applyFilters();
+    const searchText = this.searchTerm?.trim() || '';
+    
+    const params: any = {
+      pageNumber: this.currentPage,
+      pageSize: this.pageSize
+    };
+    
+    if (searchText) {
+      params.searchText = searchText;
+    }
+    
+    // Map status string to status number
+    if (this.selectedStatus !== 'all') {
+      const statusOption = this.statusOptions.find(opt => opt.value === this.selectedStatus);
+      if (statusOption && statusOption.statusNumber !== null) {
+        params.status = statusOption.statusNumber;
+      }
+    }
+    
+    // Build period from month and year selectors
+    const periodValue = this.buildPeriodValue();
+    if (periodValue) {
+      params.period = periodValue;
+    }
+    
+    this.couponService.getCouponsWithPagination(params).subscribe({
+      next: (response: CouponsResponse) => {
+        this.coupons = response.items;
+        this.paginatedCoupons = response.items;
+        this.totalItems = response.totalCount;
+        this.totalPages = response.totalPages;
+        this.currentPage = response.pageNumber;
+        this.hasPreviousPage = response.hasPreviousPage;
+        this.hasNextPage = response.hasNextPage;
         this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading coupons:', error);
         this.toastr.error('Error loading coupons', 'Error');
         this.coupons = [];
-        this.filteredCoupons = [];
-        this.updatePagination();
+        this.paginatedCoupons = [];
+        this.totalItems = 0;
+        this.totalPages = 0;
         this.isLoading = false;
       }
     });
   }
 
   applyFilters(): void {
-    let filtered = [...this.coupons];
-
-    // Filter by status
-    if (this.selectedStatus !== 'all') {
-      filtered = filtered.filter(coupon => coupon.status === this.selectedStatus);
-    }
-
-    // Filter by search term
-    if (this.searchTerm.trim()) {
-      const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(coupon =>
-        coupon.couponCode.toLowerCase().includes(term) ||
-        coupon.prefix.toLowerCase().includes(term) ||
-        coupon.period.toLowerCase().includes(term) ||
-        coupon.id.toString().includes(term)
-      );
-    }
-
-    this.filteredCoupons = filtered;
     this.currentPage = 1;
-    this.updatePagination();
+    this.loadCoupons();
   }
 
   onStatusFilterChange(): void {
     this.applyFilters();
   }
 
-  onSearchChange(): void {
+  onPeriodFilterChange(): void {
     this.applyFilters();
+  }
+
+  onMonthChange(): void {
+    this.applyFilters();
+  }
+
+  onYearChange(): void {
+    this.applyFilters();
+  }
+
+  buildPeriodValue(): string {
+    const monthOption = this.monthOptions.find(m => m.value === this.selectedMonth);
+    const monthNumber = monthOption?.number || '';
+    const yearLastTwo = this.selectedYear ? this.selectedYear.slice(-2) : '';
+
+    if (monthNumber && yearLastTwo) {
+      // Both month and year: "1225"
+      return monthNumber + yearLastTwo;
+    } else if (yearLastTwo) {
+      // Only year: "25"
+      return yearLastTwo;
+    } else if (monthNumber) {
+      // Only month: "12"
+      return monthNumber;
+    }
+    return '';
+  }
+
+  onSearchChange(): void {
+    // Debounce search to avoid too many API calls
+    clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(() => {
+      this.currentPage = 1;
+      this.loadCoupons();
+    }, 500);
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.selectedStatus = 'all';
+    this.periodFilter = '';
+    this.selectedMonth = '';
+    this.selectedYear = '';
+    this.currentPage = 1;
+    this.loadCoupons();
   }
 
   getStatusColorClass(status: string): string {
@@ -135,33 +233,24 @@ export class CouponsComponent implements OnInit {
   }
 
   // Pagination methods
-  updatePagination(): void {
-    this.totalItems = this.filteredCoupons.length;
-    this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-    
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    this.paginatedCoupons = this.filteredCoupons.slice(startIndex, endIndex);
-  }
-
   goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
+    if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
       this.currentPage = page;
-      this.updatePagination();
+      this.loadCoupons();
     }
   }
 
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
-      this.updatePagination();
+      this.loadCoupons();
     }
   }
 
   previousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
-      this.updatePagination();
+      this.loadCoupons();
     }
   }
 

@@ -12,3 +12,21 @@ export interface Coupon {
   printBatchId: number | null;
 }
 
+export interface CouponsResponse {
+  items: Coupon[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
+
+export interface CouponsQueryParams {
+  pageNumber?: number;
+  pageSize?: number;
+  searchText?: string;
+  status?: number;
+  period?: string;
+}
+

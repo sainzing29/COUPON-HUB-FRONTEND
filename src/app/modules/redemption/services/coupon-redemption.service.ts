@@ -9,7 +9,8 @@ import {
   Product,
   CreateRedemptionRequest,
   RedemptionResponse,
-  RedemptionHistory
+  RedemptionHistory,
+  RedemptionHistoryResponse
 } from '../models/coupon-redemption.model';
 
 @Injectable({
@@ -47,10 +48,16 @@ export class CouponRedemptionService {
   }
 
   /**
-   * Get redemption history list
+   * Get redemption history list with pagination and filters
    */
-  getRedemptionHistory(): Observable<RedemptionHistory[]> {
-    return this.apiService.get<RedemptionHistory[]>('/serviceredemptions');
+  getRedemptionHistory(params?: {
+    pageNumber?: number;
+    pageSize?: number;
+    searchText?: string;
+    redemptionDateFrom?: string;
+    redemptionDateTo?: string;
+  }): Observable<RedemptionHistoryResponse> {
+    return this.apiService.getWithParams<RedemptionHistoryResponse>('/serviceredemptions', params || {});
   }
 
   /**

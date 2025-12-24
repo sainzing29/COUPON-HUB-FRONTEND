@@ -34,9 +34,13 @@
             <label class="block text-sm font-medium text-gray-500 mb-1">Customer Name</label>
             <p class="text-sm text-gray-900">{{ redemption.customerName }}</p>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-500 mb-1">Customer ID</label>
-            <p class="text-sm text-gray-900">{{ redemption.customerId }}</p>
+          <div *ngIf="redemption.customerEmail">
+            <label class="block text-sm font-medium text-gray-500 mb-1">Email</label>
+            <p class="text-sm text-gray-900">{{ redemption.customerEmail }}</p>
+          </div>
+          <div *ngIf="redemption.customerPhone">
+            <label class="block text-sm font-medium text-gray-500 mb-1">Phone</label>
+            <p class="text-sm text-gray-900">{{ redemption.customerPhone }}</p>
           </div>
         </div>
 
@@ -64,10 +68,6 @@
             <label class="block text-sm font-medium text-gray-500 mb-1">Coupon Code</label>
             <p class="text-sm font-mono text-gray-900">{{ redemption.couponCode }}</p>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-500 mb-1">Coupon ID</label>
-            <p class="text-sm text-gray-900">{{ redemption.couponId }}</p>
-          </div>
         </div>
 
         <!-- Product Information -->
@@ -89,10 +89,6 @@
           <div>
             <label class="block text-sm font-medium text-gray-500 mb-1">Service Center Name</label>
             <p class="text-sm text-gray-900">{{ redemption.serviceCenterName }}</p>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-500 mb-1">Service Center ID</label>
-            <p class="text-sm text-gray-900">{{ redemption.serviceCenterId }}</p>
           </div>
         </div>
 

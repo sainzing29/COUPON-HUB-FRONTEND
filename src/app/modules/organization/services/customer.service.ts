@@ -100,15 +100,31 @@ export interface CustomerDetailResponse {
   invoices: CustomerInvoice[];
 }
 
+export interface CustomersResponse {
+  items: Customer[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
+
+export interface CustomersQueryParams {
+  pageNumber?: number;
+  pageSize?: number;
+  searchText?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class CustomerService {
   constructor(private apiService: ApiService) { }
 
-  // Get all customers
-  getCustomers(): Observable<Customer[]> {
-    return this.apiService.get<Customer[]>('/customers');
+  // Get all customers with pagination and search
+  getCustomers(params?: CustomersQueryParams): Observable<CustomersResponse> {
+    return this.apiService.getWithParams<CustomersResponse>('/customers', params || {});
   }
 
   // Get customer by ID

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
 import { environment } from '../../../../environments/environment';
-import { Coupon } from '../model/coupon.model';
+import { Coupon, CouponsResponse, CouponsQueryParams } from '../model/coupon.model';
 import { CouponValidationRequest, CouponValidationResponse } from '../model/coupon-sale.model';
 
 export interface NextSequenceResponse {
@@ -74,8 +74,18 @@ export class CouponService {
     return this.apiService.post<GenerateResponse>('/coupons/generate', request);
   }
 
+  /**
+   * Get all coupons (legacy - kept for backward compatibility)
+   */
   getCoupons(): Observable<Coupon[]> {
     return this.apiService.get<Coupon[]>('/coupons');
+  }
+
+  /**
+   * Get coupons with pagination and filters
+   */
+  getCouponsWithPagination(params?: CouponsQueryParams): Observable<CouponsResponse> {
+    return this.apiService.getWithParams<CouponsResponse>('/coupons', params || {});
   }
 
   /**

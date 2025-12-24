@@ -12,7 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CustomerService, Customer, CustomerDeleteRequest } from '../../services/customer.service';
+import { CustomerService, Customer, CustomerDeleteRequest, CustomersResponse } from '../../services/customer.service';
 import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
@@ -51,12 +51,11 @@ import { trigger, transition, style, animate } from '@angular/animations';
 })
 export class CustomersComponent implements OnInit {
   customers: Customer[] = [];
-  filteredCustomers: Customer[] = [];
   paginatedCustomers: Customer[] = [];
   
   // Pagination properties
   currentPage = 1;
-  pageSize = 10;
+  pageSize = 50;
   totalItems = 0;
   totalPages = 0;
   
@@ -65,6 +64,7 @@ export class CustomersComponent implements OnInit {
   customerForm: FormGroup;
   isEditMode = false;
   editingCustomer: Customer | null = null;
+  isLoading = false;
 
 
 
@@ -93,247 +93,50 @@ export class CustomersComponent implements OnInit {
   }
 
   private loadCustomers(): void {
-    this.customerService.getCustomers().subscribe({
-      next: (customers) => {
-        this.customers = customers;
-        this.filteredCustomers = [...customers];
-        this.updatePagination();
+    this.isLoading = true;
+    const searchText = this.searchForm.get('search')?.value?.trim() || '';
+    
+    const params: any = {
+      pageNumber: this.currentPage,
+      pageSize: this.pageSize
+    };
+    
+    if (searchText) {
+      params.searchText = searchText;
+    }
+    
+    this.customerService.getCustomers(params).subscribe({
+      next: (response: CustomersResponse) => {
+        this.customers = response.items;
+        this.paginatedCustomers = response.items;
+        this.totalItems = response.totalCount;
+        this.totalPages = response.totalPages;
+        this.currentPage = response.pageNumber;
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading customers:', error);
         this.toastr.error('Error loading customers', 'Error');
-        // Handle error without fallback data
         this.customers = [];
-        this.filteredCustomers = [];
-        this.updatePagination();
+        this.paginatedCustomers = [];
+        this.totalItems = 0;
+        this.totalPages = 0;
+        this.isLoading = false;
       }
     });
   }
 
-  private loadDummyCustomers(): void {
-    // Simulate API delay
-    setTimeout(() => {
-      this.customers = [
-        {
-          id: 1,
-          firstName: 'Ahmed',
-          lastName: 'Al-Rashid',
-          fullName: 'Ahmed Al-Rashid',
-          email: 'ahmed.rashid@email.com',
-          mobileNumber: '0501234567',
-          isActive: true,
-          createdAt: '2024-01-15T10:30:00Z',
-          couponCount: 5,
-          invoiceCount: 3,
-          googleId: null
-        },
-        {
-          id: 2,
-          firstName: 'Fatima',
-          lastName: 'Hassan',
-          fullName: 'Fatima Hassan',
-          email: 'fatima.hassan@email.com',
-          mobileNumber: '0502345678',
-          isActive: true,
-          createdAt: '2024-01-20T14:15:00Z',
-          couponCount: 8,
-          invoiceCount: 6,
-          googleId: null
-        },
-        {
-          id: 3,
-          firstName: 'Mohammed',
-          lastName: 'Al-Zahra',
-          fullName: 'Mohammed Al-Zahra',
-          email: 'mohammed.zahra@email.com',
-          mobileNumber: '0503456789',
-          isActive: false,
-          createdAt: '2024-02-01T09:45:00Z',
-          couponCount: 2,
-          invoiceCount: 1,
-          googleId: null
-        },
-        {
-          id: 4,
-          firstName: 'Aisha',
-          lastName: 'Al-Mansouri',
-          fullName: 'Aisha Al-Mansouri',
-          email: 'aisha.mansouri@email.com',
-          mobileNumber: '0504567890',
-          isActive: true,
-          createdAt: '2024-02-10T16:20:00Z',
-          couponCount: 12,
-          invoiceCount: 9,
-          googleId: null
-        },
-        {
-          id: 5,
-          firstName: 'Omar',
-          lastName: 'Al-Sabah',
-          fullName: 'Omar Al-Sabah',
-          email: 'omar.sabah@email.com',
-          mobileNumber: '0505678901',
-          isActive: true,
-          createdAt: '2024-02-15T11:30:00Z',
-          couponCount: 3,
-          invoiceCount: 2,
-          googleId: null
-        },
-        {
-          id: 6,
-          firstName: 'Layla',
-          lastName: 'Al-Kuwaiti',
-          fullName: 'Layla Al-Kuwaiti',
-          email: 'layla.kuwaiti@email.com',
-          mobileNumber: '0506789012',
-          isActive: true,
-          createdAt: '2024-02-20T13:45:00Z',
-          couponCount: 7,
-          invoiceCount: 4,
-          googleId: null
-        },
-        {
-          id: 7,
-          firstName: 'Khalid',
-          lastName: 'Al-Dubai',
-          fullName: 'Khalid Al-Dubai',
-          email: 'khalid.dubai@email.com',
-          mobileNumber: '0507890123',
-          isActive: false,
-          createdAt: '2024-03-01T08:15:00Z',
-          couponCount: 1,
-          invoiceCount: 0,
-          googleId: null
-        },
-        {
-          id: 8,
-          firstName: 'Nour',
-          lastName: 'Al-Sharjah',
-          fullName: 'Nour Al-Sharjah',
-          email: 'nour.sharjah@email.com',
-          mobileNumber: '0508901234',
-          isActive: true,
-          createdAt: '2024-03-05T15:30:00Z',
-          couponCount: 9,
-          invoiceCount: 7,
-          googleId: null
-        },
-        {
-          id: 9,
-          firstName: 'Yousef',
-          lastName: 'Al-Ajman',
-          fullName: 'Yousef Al-Ajman',
-          email: 'yousef.ajman@email.com',
-          mobileNumber: '0509012345',
-          isActive: true,
-          createdAt: '2024-03-10T12:00:00Z',
-          couponCount: 4,
-          invoiceCount: 3,
-          googleId: null
-        },
-        {
-          id: 10,
-          firstName: 'Mariam',
-          lastName: 'Al-Fujairah',
-          fullName: 'Mariam Al-Fujairah',
-          email: 'mariam.fujairah@email.com',
-          mobileNumber: '0500123456',
-          isActive: true,
-          createdAt: '2024-03-15T17:45:00Z',
-          couponCount: 6,
-          invoiceCount: 5,
-          googleId: null
-        },
-        {
-          id: 11,
-          firstName: 'Hassan',
-          lastName: 'Al-Ras Al-Khaimah',
-          fullName: 'Hassan Al-Ras Al-Khaimah',
-          email: 'hassan.rak@email.com',
-          mobileNumber: '0501234568',
-          isActive: false,
-          createdAt: '2024-03-20T10:20:00Z',
-          couponCount: 2,
-          invoiceCount: 1,
-          googleId: null
-        },
-        {
-          id: 12,
-          firstName: 'Zainab',
-          lastName: 'Al-Umm Al-Quwain',
-          fullName: 'Zainab Al-Umm Al-Quwain',
-          email: 'zainab.uq@email.com',
-          mobileNumber: '0502345679',
-          isActive: true,
-          createdAt: '2024-03-25T14:10:00Z',
-          couponCount: 11,
-          invoiceCount: 8,
-          googleId: null
-        },
-        {
-          id: 13,
-          firstName: 'Abdullah',
-          lastName: 'Al-Abu Dhabi',
-          fullName: 'Abdullah Al-Abu Dhabi',
-          email: 'abdullah.ad@email.com',
-          mobileNumber: '0503456780',
-          isActive: true,
-          createdAt: '2024-04-01T09:30:00Z',
-          couponCount: 15,
-          invoiceCount: 12,
-          googleId: null
-        },
-        {
-          id: 14,
-          firstName: 'Sara',
-          lastName: 'Al-Dubai Marina',
-          fullName: 'Sara Al-Dubai Marina',
-          email: 'sara.marina@email.com',
-          mobileNumber: '0504567891',
-          isActive: true,
-          createdAt: '2024-04-05T16:45:00Z',
-          couponCount: 8,
-          invoiceCount: 6,
-          googleId: null
-        },
-        {
-          id: 15,
-          firstName: 'Tariq',
-          lastName: 'Al-Jumeirah',
-          fullName: 'Tariq Al-Jumeirah',
-          email: 'tariq.jumeirah@email.com',
-          mobileNumber: '0505678902',
-          isActive: false,
-          createdAt: '2024-04-10T11:15:00Z',
-          couponCount: 3,
-          invoiceCount: 2,
-          googleId: null
-        }
-      ];
-      
-      this.filteredCustomers = [...this.customers];
-      this.updatePagination();
-      
-      console.log('Loaded dummy customers:', this.customers.length);
-    }, 500); // Simulate API delay
-  }
 
 
   private setupSearch(): void {
+    // Debounce search to avoid too many API calls
+    let searchTimeout: any;
     this.searchForm.get('search')?.valueChanges.subscribe(value => {
-      const searchTerm = value.trim().toLowerCase();
-      if (searchTerm) {
-        this.filteredCustomers = this.customers.filter(customer => 
-          customer.firstName.toLowerCase().includes(searchTerm) ||
-          customer.lastName.toLowerCase().includes(searchTerm) ||
-          customer.fullName.toLowerCase().includes(searchTerm) ||
-          customer.email.toLowerCase().includes(searchTerm)
-        );
-      } else {
-        this.filteredCustomers = [...this.customers];
-      }
-      this.currentPage = 1;
-      this.updatePagination();
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        this.currentPage = 1;
+        this.loadCustomers();
+      }, 500); // Wait 500ms after user stops typing
     });
   }
 
@@ -361,24 +164,21 @@ export class CustomersComponent implements OnInit {
     const message = `Are you sure you want to ${action} ${customer.firstName} ${customer.lastName}?`;
     
     if (confirm(message)) {
-      // For now, update locally. Replace with API call when backend is ready
-      customer.isActive = !customer.isActive;
-      
-      // Update the customers array
-      const index = this.customers.findIndex(c => c.id === customer.id);
-      if (index > -1) {
-        this.customers[index] = customer;
-      }
-      
-      // Update filtered customers
-      const filteredIndex = this.filteredCustomers.findIndex(c => c.id === customer.id);
-      if (filteredIndex > -1) {
-        this.filteredCustomers[filteredIndex] = customer;
-      }
-      
-      this.updatePagination();
-      
-      this.toastr.success(`Customer ${action}d successfully`, 'Success');
+      this.customerService.toggleCustomerStatus(customer.id, !customer.isActive).subscribe({
+        next: (updatedCustomer) => {
+          // Update the customer in the list
+          const index = this.customers.findIndex(c => c.id === customer.id);
+          if (index > -1) {
+            this.customers[index] = updatedCustomer;
+            this.paginatedCustomers[index] = updatedCustomer;
+          }
+          this.toastr.success(`Customer ${action}d successfully`, 'Success');
+        },
+        error: (error) => {
+          console.error('Error toggling customer status:', error);
+          this.toastr.error(error.error?.message || `Error ${action}ing customer`, 'Error');
+        }
+      });
     }
   }
 
@@ -413,10 +213,12 @@ export class CustomersComponent implements OnInit {
 
       this.customerService.deleteCustomer(customer.id, deleteRequest).subscribe({
         next: () => {
-      this.customers = this.customers.filter(c => c.id !== customer.id);
-      this.filteredCustomers = this.filteredCustomers.filter(c => c.id !== customer.id);
-      this.updatePagination();
-      this.toastr.success('Customer deleted successfully', 'Success');
+          this.customers = this.customers.filter((c: Customer) => c.id !== customer.id);
+          this.paginatedCustomers = this.paginatedCustomers.filter((c: Customer) => c.id !== customer.id);
+          this.totalItems--;
+          this.toastr.success('Customer deleted successfully', 'Success');
+          // Reload customers to refresh pagination
+          this.loadCustomers();
         },
         error: (error) => {
           console.error('Error deleting customer:', error);
@@ -432,47 +234,33 @@ export class CustomersComponent implements OnInit {
       
       if (this.isEditMode && this.editingCustomer) {
         // Update existing customer
-        const updatedCustomer = {
-          ...this.editingCustomer,
-          ...formValue,
-          fullName: `${formValue.firstName} ${formValue.lastName}`
-        };
-        
-        const index = this.customers.findIndex(c => c.id === this.editingCustomer!.id);
-        if (index > -1) {
-          this.customers[index] = updatedCustomer;
-        }
-        
-        const filteredIndex = this.filteredCustomers.findIndex(c => c.id === this.editingCustomer!.id);
-        if (filteredIndex > -1) {
-          this.filteredCustomers[filteredIndex] = updatedCustomer;
-        }
-        
-        this.updatePagination();
-        
-        this.toastr.success('Customer updated successfully', 'Success');
+        this.customerService.updateCustomer(this.editingCustomer.id, formValue).subscribe({
+          next: (updatedCustomer) => {
+            this.toastr.success('Customer updated successfully', 'Success');
+            this.showAddCustomerForm = false;
+            this.customerForm.reset();
+            this.loadCustomers(); // Reload to get updated data
+          },
+          error: (error) => {
+            console.error('Error updating customer:', error);
+            this.toastr.error(error.error?.message || 'Error updating customer', 'Error');
+          }
+        });
       } else {
         // Add new customer
-        const newCustomer: Customer = {
-          id: Date.now(), // Simple ID generation
-          ...formValue,
-          fullName: `${formValue.firstName} ${formValue.lastName}`,
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          couponCount: 0,
-          invoiceCount: 0,
-          googleId: null
-        };
-        
-        this.customers.unshift(newCustomer);
-        this.filteredCustomers.unshift(newCustomer);
-        this.updatePagination();
-        
-        this.toastr.success('Customer added successfully', 'Success');
+        this.customerService.createCustomer(formValue).subscribe({
+          next: (newCustomer) => {
+            this.toastr.success('Customer added successfully', 'Success');
+            this.showAddCustomerForm = false;
+            this.customerForm.reset();
+            this.loadCustomers(); // Reload to get new data
+          },
+          error: (error) => {
+            console.error('Error creating customer:', error);
+            this.toastr.error(error.error?.message || 'Error creating customer', 'Error');
+          }
+        });
       }
-      
-      this.showAddCustomerForm = false;
-      this.customerForm.reset();
     } else {
       this.markFormGroupTouched();
     }
@@ -537,33 +325,24 @@ export class CustomersComponent implements OnInit {
 
 
   // Pagination methods
-  updatePagination(): void {
-    this.totalItems = this.filteredCustomers.length;
-    this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-    
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    this.paginatedCustomers = this.filteredCustomers.slice(startIndex, endIndex);
-  }
-
   goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
+    if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
       this.currentPage = page;
-      this.updatePagination();
+      this.loadCustomers();
     }
   }
 
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
-      this.updatePagination();
+      this.loadCustomers();
     }
   }
 
   previousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
-      this.updatePagination();
+      this.loadCustomers();
     }
   }
 

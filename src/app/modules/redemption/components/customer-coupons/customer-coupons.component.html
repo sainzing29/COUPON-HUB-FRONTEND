@@ -52,30 +52,31 @@
     <div *ngIf="!loadingProducts && products.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <div
         *ngFor="let product of products"
-        class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col">
         <div class="flex justify-between items-start mb-2">
           <h4 class="font-semibold text-gray-900">{{ product.productName }}</h4>
           <span *ngIf="product.isRedeemed" class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
             Redeemed
           </span>
         </div>
-        <p class="text-sm text-gray-600 mb-4">{{ product.description }}</p>
+        <p class="text-sm text-gray-600 mb-4 flex-grow">{{ product.description }}</p>
         <div *ngIf="product.isRedeemed && product.redemptionDate" class="text-xs text-gray-500 mb-4">
           Redeemed on: {{ product.redemptionDate | date:'short' }}
         </div>
         <button
-          *ngIf="!product.isRedeemed"
-          (click)="onConfirmRedeem(product)"
-          [disabled]="isRedeeming"
-          class="w-full px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          style="background-color: var(--button-primary-bg);"
-          onmouseover="this.style.backgroundColor='var(--button-primary-hover)'"
-          onmouseout="this.style.backgroundColor='var(--button-primary-bg)'">
-          Confirm Redeem
+          (click)="!product.isRedeemed && onConfirmRedeem(product)"
+          [disabled]="isRedeeming || product.isRedeemed"
+          class="w-full px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed mt-auto"
+          [ngClass]="{
+            'text-white': !product.isRedeemed,
+            'text-gray-500 bg-gray-100': product.isRedeemed
+          }"
+          [style.background-color]="!product.isRedeemed ? 'var(--button-primary-bg)' : 'transparent'"
+          [style.cursor]="product.isRedeemed ? 'default' : 'pointer'"
+          (mouseover)="onButtonHover($event, product.isRedeemed)"
+          (mouseout)="onButtonHoverOut($event, product.isRedeemed)">
+          {{ product.isRedeemed ? 'Redeemed' : 'Confirm Redeem' }}
         </button>
-        <div *ngIf="product.isRedeemed" class="w-full px-4 py-2 text-sm font-medium text-center text-gray-500 bg-gray-100 rounded-lg">
-          Already Redeemed
-        </div>
       </div>
     </div>
   </div>

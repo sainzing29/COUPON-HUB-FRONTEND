@@ -157,5 +157,19 @@ export class CustomerCouponsComponent implements OnInit {
         return 'bg-gray-100 text-gray-800';
     }
   }
+
+  onButtonHover(event: MouseEvent, isRedeemed: boolean): void {
+    if (!isRedeemed) {
+      const target = event.target as HTMLElement;
+      target.style.backgroundColor = 'var(--button-primary-hover)';
+    }
+  }
+
+  onButtonHoverOut(event: MouseEvent, isRedeemed: boolean): void {
+    if (!isRedeemed) {
+      const target = event.target as HTMLElement;
+      target.style.backgroundColor = 'var(--button-primary-bg)';
+    }
+  }
 }
 

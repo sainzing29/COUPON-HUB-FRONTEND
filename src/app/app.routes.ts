@@ -180,6 +180,7 @@ export const routes: Routes = [
       {
         path: 'redemption/redemptions',
         loadComponent: () => import('./modules/redemption/pages/redemption-history/redemption-history.component').then(m => m.RedemptionHistoryComponent),
+        providers: [provideDaterangepickerLocale()],
         canActivate: [permissionGuard],
         data: { permission: 'RadeemCoupon' }
       },

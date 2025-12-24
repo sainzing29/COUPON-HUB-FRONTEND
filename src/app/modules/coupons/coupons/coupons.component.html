@@ -1,7 +1,7 @@
 <div class="coupons-container">
   <!-- Filters Section -->
   <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
       <!-- Search Input -->
       <div>
         <label for="search" class="block text-sm font-medium text-gray-700 mb-1">
@@ -12,7 +12,7 @@
           id="search"
           [(ngModel)]="searchTerm"
           (ngModelChange)="onSearchChange()"
-          placeholder="Search by code, prefix, period, ID..."
+          placeholder="Search by code, prefix.."
           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
         />
       </div>
@@ -33,6 +33,48 @@
           </option>
         </select>
       </div>
+
+      <!-- Period Filter -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Period
+        </label>
+        <div class="grid grid-cols-2 gap-2">
+          <select
+            id="month-filter"
+            [(ngModel)]="selectedMonth"
+            (ngModelChange)="onMonthChange()"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+          >
+            <option *ngFor="let month of monthOptions" [value]="month.value">
+              {{ month.label }}
+            </option>
+          </select>
+          <select
+            id="year-filter"
+            [(ngModel)]="selectedYear"
+            (ngModelChange)="onYearChange()"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+          >
+            <option value="">Year</option>
+            <option *ngFor="let year of yearOptions" [value]="year.toString()">
+              {{ year }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Clear Filters Button -->
+      <div class="flex items-end">
+        <button
+          (click)="clearFilters()"
+          class="w-full inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+          title="Clear all filters"
+        >
+          <i class="bi bi-x-lg mr-2"></i>
+          Clear Filters
+        </button>
+      </div>
     </div>
   </div>
 
@@ -42,15 +84,15 @@
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!isLoading && filteredCoupons.length === 0" class="bg-white rounded-lg shadow-sm p-12 text-center">
+  <div *ngIf="!isLoading && paginatedCoupons.length === 0" class="bg-white rounded-lg shadow-sm p-12 text-center">
     <i class="bi bi-inbox text-6xl text-gray-400 mb-4"></i>
     <h3 class="text-lg font-semibold text-gray-900 mb-2">No coupons found</h3>
     <p class="text-gray-600 mb-4">
-      {{ coupons.length === 0 ? 'No coupons have been generated yet.' : 'No coupons match your filters.' }}
+      {{ totalItems === 0 ? 'No coupons have been generated yet.' : 'No coupons match your filters.' }}
     </p>
     <button
-      *ngIf="coupons.length > 0"
-      (click)="selectedStatus = 'all'; searchTerm = ''; applyFilters()"
+      *ngIf="totalItems > 0"
+      (click)="clearFilters()"
       class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
     >
       Clear Filters
@@ -58,7 +100,7 @@
   </div>
 
   <!-- Coupons Table -->
-  <div *ngIf="!isLoading && filteredCoupons.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+  <div *ngIf="!isLoading && paginatedCoupons.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">

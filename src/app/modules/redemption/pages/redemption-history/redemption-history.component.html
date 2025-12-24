@@ -1,9 +1,9 @@
 <div class="redemption-history-container">
   <!-- Filters Section -->
   <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="flex flex-wrap gap-4">
       <!-- Search Input -->
-      <div>
+      <div class="flex-1 min-w-[200px]">
         <label for="search" class="block text-sm font-medium text-gray-700 mb-1">
           Search
         </label>
@@ -12,9 +12,39 @@
           id="search"
           [(ngModel)]="searchTerm"
           (ngModelChange)="onSearchChange()"
-          placeholder="Search by customer name, coupon code, product, date..."
+          placeholder="Search by customer name, coupon code, email or phone..."
           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
         />
+      </div>
+
+      <!-- Redemption Date Range Filter -->
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Redemption Date Range
+        </label>
+        <input
+          #redemptionDateRangeInput
+          type="text"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+          placeholder="Select date range"
+          ngxDaterangepickerBootstrap
+          [(ngModel)]="selectedRedemptionDateRange"
+          (datesUpdated)="onRedemptionDateRangeChange($event)"
+          [locale]="{ format: 'YYYY-MM-DD' }"
+          [autoApply]="true"
+          [showDropdowns]="true"
+          [singleDatePicker]="false"
+        />
+      </div>
+
+      <!-- Clear Filters Button -->
+      <div class="flex items-end">
+        <button
+          (click)="clearFilters()"
+          class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-sm font-medium"
+        >
+          Clear Filters
+        </button>
       </div>
     </div>
   </div>
@@ -25,23 +55,23 @@
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!isLoading && filteredRedemptions.length === 0" class="bg-white rounded-lg shadow-sm p-12 text-center">
+  <div *ngIf="!isLoading && paginatedRedemptions.length === 0" class="bg-white rounded-lg shadow-sm p-12 text-center">
     <i class="bi bi-inbox text-6xl text-gray-400 mb-4"></i>
     <h3 class="text-lg font-semibold text-gray-900 mb-2">No redemptions found</h3>
     <p class="text-gray-600 mb-4">
-      {{ redemptions.length === 0 ? 'No redemptions have been recorded yet.' : 'No redemptions match your search criteria.' }}
+      {{ totalItems === 0 ? 'No redemptions have been recorded yet.' : 'No redemptions match your search criteria.' }}
     </p>
     <button
-      *ngIf="redemptions.length > 0"
-      (click)="searchTerm = ''; applyFilters()"
+      *ngIf="totalItems > 0"
+      (click)="clearFilters()"
       class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
     >
-      Clear Search
+      Clear Filters
     </button>
   </div>
 
   <!-- Redemptions Table -->
-  <div *ngIf="!isLoading && filteredRedemptions.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+  <div *ngIf="!isLoading && paginatedRedemptions.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">

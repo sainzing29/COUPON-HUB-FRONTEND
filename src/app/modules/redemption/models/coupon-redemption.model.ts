@@ -93,6 +93,8 @@ export interface RedemptionHistory {
   serviceCenterName: string;
   customerId: number;
   customerName: string;
+  customerEmail?: string;
+  customerPhone?: string;
   productId: number;
   productName: string;
   redemptionDate: string;
@@ -101,5 +103,15 @@ export interface RedemptionHistory {
   cancelledAt: string | null;
   cancellationReason: string | null;
   cancelledByUserId: number | null;
+}
+
+export interface RedemptionHistoryResponse {
+  items: RedemptionHistory[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
 }
 
