@@ -1,26 +1,26 @@
 <div class="customer-invoice-container">
   <!-- Header Section -->
   <div class="header-section">
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6">
       <div class="flex items-center">
-        <h1 class="text-2xl font-bold text-white">Customer Invoice</h1>
+        <h1 class="text-xl sm:text-2xl font-bold text-white">Customer Invoice</h1>
       </div>
-      <div class="flex items-center space-x-3">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
         <button 
           (click)="goBack()"
-          class="px-4 py-2 bg-white bg-opacity-20 text-white hover:bg-opacity-30 rounded-lg transition-colors duration-200 flex items-center space-x-2">
+          class="w-full sm:w-auto px-4 py-2 bg-white bg-opacity-20 text-white hover:bg-opacity-30 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2">
           <i class="fas fa-arrow-left"></i>
           <span>Back</span>
         </button>
         <button 
           (click)="printInvoice()"
-          class="px-4 py-2 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 transition-colors duration-200 flex items-center space-x-2">
+          class="w-full sm:w-auto px-4 py-2 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 transition-colors duration-200 flex items-center justify-center space-x-2">
           <i class="fas fa-print"></i>
           <span>Print</span>
         </button>
         <button 
           (click)="downloadInvoice()"
-          class="px-4 py-2 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 transition-colors duration-200 flex items-center space-x-2">
+          class="w-full sm:w-auto px-4 py-2 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 transition-colors duration-200 flex items-center justify-center space-x-2">
           <i class="fas fa-download"></i>
           <span>Download</span>
         </button>
@@ -40,8 +40,8 @@
   <div *ngIf="invoiceData && !isLoading" class="invoice-content">
     <div class="invoice-card">
       <!-- Invoice Header -->
-      <div class="invoice-header">
-        <div class="header-left">
+      <div class="invoice-header flex flex-col lg:flex-row gap-6">
+        <div class="header-left flex-1">
           <div class="company-info">
             <div class="company-details">
               <h2 class="company-name">{{ companyDetails?.companyName || 'Coupon Hub Services' }}</h2>
@@ -76,7 +76,7 @@
             </div>
           </div>
         </div>
-        <div class="invoice-details">
+        <div class="invoice-details flex-shrink-0">
           <h3 class="invoice-title">INVOICE</h3>
           <div class="invoice-meta">
             <div class="meta-row">

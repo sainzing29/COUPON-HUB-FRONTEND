@@ -4,15 +4,15 @@
     <form [formGroup]="phoneForm" class="space-y-4">
       <!-- Phone Input Section - Hidden when OTP is sent -->
       <div *ngIf="!phoneOtpSent" class="space-y-4">
-        <div class="flex items-center gap-3 flex-wrap">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <!-- Phone Input with Country Code -->
-          <div class="flex gap-2 items-center flex-[2] min-w-[300px]">
+          <div class="flex gap-2 items-center flex-1 sm:flex-[2] min-w-0 sm:min-w-[300px]">
             <app-country-code-selector
               id="phoneCountryCode"
               [value]="phoneForm.get('countryCode')?.value || '+971'"
               (valueChange)="phoneForm.get('countryCode')?.setValue($event); selectedCountryCode = $event">
             </app-country-code-selector>
-            <div class="flex-1">
+            <div class="flex-1 min-w-0">
               <input
                 type="tel"
                 formControlName="phone"
@@ -29,7 +29,7 @@
           type="button"
           (click)="sendPhoneOtp()"
           [disabled]="phoneForm.invalid || isSendingPhoneOtp"
-          class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
+          class="w-full sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2">
           <span class="material-icons text-sm" *ngIf="!isSendingPhoneOtp">send</span>
           <span class="material-icons text-sm animate-spin" *ngIf="isSendingPhoneOtp">refresh</span>
           <span>{{ isSendingPhoneOtp ? 'Sending...' : 'Send OTP' }}</span>
@@ -48,9 +48,9 @@
         <div class="text-sm text-gray-600 mb-2">
           <span class="font-medium">Phone:</span> {{ verifiedPhoneNumber }}
         </div>
-        <div class="flex items-center gap-3 flex-wrap">
-          <form [formGroup]="phoneOtpForm" class="flex items-center gap-3 flex-wrap">
-            <div class="flex space-x-2">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <form [formGroup]="phoneOtpForm" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+            <div class="flex justify-center sm:justify-start space-x-2">
               <input
                 *ngFor="let digit of phoneDigits; let i = index"
                 #phoneOtpInput
@@ -69,14 +69,14 @@
               type="button"
               (click)="verifyPhoneOtp()"
               [disabled]="phoneOtpForm.invalid || isVerifyingPhoneOtp"
-              class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
+              class="w-full sm:w-auto px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2">
               <span class="material-icons text-sm" *ngIf="!isVerifyingPhoneOtp">check</span>
               <span class="material-icons text-sm animate-spin" *ngIf="isVerifyingPhoneOtp">refresh</span>
               <span>{{ isVerifyingPhoneOtp ? 'Verifying...' : 'Verify' }}</span>
             </button>
 
             <!-- Resend Timer/Button -->
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center justify-center sm:justify-start space-x-2">
               <button
                 *ngIf="canResendPhone"
                 type="button"
@@ -92,7 +92,7 @@
         </div>
         
         <!-- Change Phone Number Button -->
-        <div class="flex justify-start">
+        <div class="flex justify-center sm:justify-start">
           <button
             type="button"
             (click)="changePhoneNumber()"
@@ -110,9 +110,9 @@
     <form [formGroup]="emailForm" class="space-y-4">
       <!-- Email Input Section - Hidden when OTP is sent -->
       <div *ngIf="!emailOtpSent" class="space-y-4">
-        <div class="flex items-center gap-3 flex-wrap">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <!-- Email Input -->
-          <div class="flex-1 min-w-[200px]">
+          <div class="flex-1 min-w-0 sm:min-w-[200px]">
             <input
               type="email"
               formControlName="email"
@@ -127,7 +127,7 @@
           type="button"
           (click)="sendEmailOtp()"
           [disabled]="emailForm.invalid || isSendingEmailOtp"
-          class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
+          class="w-full sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2">
           <span class="material-icons text-sm" *ngIf="!isSendingEmailOtp">send</span>
           <span class="material-icons text-sm animate-spin" *ngIf="isSendingEmailOtp">refresh</span>
           <span>{{ isSendingEmailOtp ? 'Sending...' : 'Send OTP' }}</span>
@@ -146,9 +146,9 @@
         <div class="text-sm text-gray-600 mb-2">
           <span class="font-medium">Email:</span> {{ verifiedEmail }}
         </div>
-        <div class="flex items-center gap-3 flex-wrap">
-          <form [formGroup]="emailOtpForm" class="flex items-center gap-3 flex-wrap">
-            <div class="flex space-x-2">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <form [formGroup]="emailOtpForm" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+            <div class="flex justify-center sm:justify-start space-x-2">
               <input
                 *ngFor="let digit of emailDigits; let i = index"
                 #emailOtpInput
@@ -167,14 +167,14 @@
               type="button"
               (click)="verifyEmailOtp()"
               [disabled]="emailOtpForm.invalid || isVerifyingEmailOtp"
-              class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
+              class="w-full sm:w-auto px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2">
               <span class="material-icons text-sm" *ngIf="!isVerifyingEmailOtp">check</span>
               <span class="material-icons text-sm animate-spin" *ngIf="isVerifyingEmailOtp">refresh</span>
               <span>{{ isVerifyingEmailOtp ? 'Verifying...' : 'Verify' }}</span>
             </button>
 
             <!-- Resend Timer/Button -->
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center justify-center sm:justify-start space-x-2">
               <button
                 *ngIf="canResendEmail"
                 type="button"
@@ -190,7 +190,7 @@
         </div>
         
         <!-- Change Email Button -->
-        <div class="flex justify-start">
+        <div class="flex justify-center sm:justify-start">
           <button
             type="button"
             (click)="changeEmailAddress()"
@@ -205,8 +205,8 @@
 
   <!-- Customer Found Section -->
   <div *ngIf="currentStep === 'customer-found' && customerData" class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-    <div class="flex items-start justify-between">
-      <div class="flex-1">
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-start justify-between gap-4">
+      <div class="flex-1 min-w-0">
         <h3 class="text-lg font-semibold text-blue-900 mb-2">Customer Found</h3>
         <div class="space-y-1 text-sm text-blue-800">
           <p><strong>Name:</strong> {{ customerData.fullName }}</p>
@@ -219,7 +219,7 @@
       <button
         type="button"
         (click)="addCouponToExistingCustomer()"
-        class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 flex items-center space-x-2">
+        class="w-full sm:w-auto px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2">
         <span class="material-icons text-sm">add</span>
         <span>Add Coupon</span>
       </button>
@@ -275,14 +275,14 @@
         <label class="block text-sm font-medium text-gray-700 mb-1">
           Mobile Number <span class="text-red-500">*</span>
         </label>
-        <div class="flex gap-2 items-center">
+        <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
           <app-country-code-selector
             id="customerCountryCode"
             [value]="customerForm.get('countryCode')?.value || '+971'"
             [disabled]="true"
             (valueChange)="customerForm.get('countryCode')?.setValue($event); selectedCountryCode = $event">
           </app-country-code-selector>
-          <div class="flex-1">
+          <div class="flex-1 min-w-0">
             <input
               type="tel"
               formControlName="phone"

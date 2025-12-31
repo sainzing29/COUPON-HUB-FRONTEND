@@ -25,7 +25,8 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
   @ViewChildren('confirmPinInput') confirmPinInputs!: QueryList<ElementRef>;
   @ViewChild(ContactVerificationComponent) contactVerificationComponent!: ContactVerificationComponent;
   
-  currentStep: 'coupon-verification' | 'phone-verification' | 'email-verification' | 'customer-details-add' | 'pin-creation' = 'coupon-verification';
+  currentStep: 'coupon-verification' | 'terms-acceptance' | 'phone-verification' | 'email-verification' | 'customer-details-add' | 'pin-creation' = 'coupon-verification';
+  termsAccepted: boolean = false;
   verificationType: 'phone' | 'email' = 'phone'; // Track verification type for header display
   verifiedEmailForForm: string = ''; // Store verified email for customer form
   verifiedPhoneForForm: string = ''; // Store verified phone for customer form
@@ -400,9 +401,8 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
               }, 100);
             }
           } else {
-            // Customer is null, proceed to phone verification
-            this.currentStep = 'phone-verification';
-            this.verificationType = 'phone'; // Default to phone verification
+            // Customer is null, proceed to terms acceptance
+            this.currentStep = 'terms-acceptance';
           }
         },
         error: (error) => {
@@ -419,6 +419,13 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
     } else {
       this.markCouponFormTouched();
     }
+  }
+
+  // Accept Terms and proceed to phone verification
+  acceptTerms(): void {
+    this.termsAccepted = true;
+    this.currentStep = 'phone-verification';
+    this.verificationType = 'phone'; // Default to phone verification
   }
 
   // Contact Verification Handlers

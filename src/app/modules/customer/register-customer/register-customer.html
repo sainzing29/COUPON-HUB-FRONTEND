@@ -1,8 +1,10 @@
-<div class="min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative" style="background-image: url('assets/images/background1.png')">
-  <!-- Gradient Overlay with Lower Opacity -->
-  <div class="absolute inset-0" style="background: linear-gradient(-45deg, rgba(91, 207, 242, 0.6) 20%, rgba(65, 125, 210, 0.6) 50%, rgba(0, 169, 224, 0.6) 100%);"></div>
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
+  <!-- Background Image Container - Hidden below sm screens -->
+  <div class="hidden sm:block absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('assets/images/background1.png');"></div>
+  <!-- Gradient Overlay with Lower Opacity - Hidden below sm screens -->
+  <div class="hidden sm:block absolute inset-0" style="background: linear-gradient(-45deg, rgba(91, 207, 242, 0.6) 20%, rgba(65, 125, 210, 0.6) 50%, rgba(0, 169, 224, 0.6) 100%);"></div>
   
-  <div class="w-full bg-white rounded-2xl shadow-2xl p-8 space-y-8 relative z-10" 
+  <div class="w-full bg-white rounded-2xl border border-gray-300 sm:border-0 sm:shadow-2xl p-8 space-y-8 relative z-10 md:relative" 
        [class.max-w-lg]="currentStep !== 'pin-creation'"
        [class.max-w-md]="currentStep === 'pin-creation'"
        style="overflow: visible;">
@@ -16,6 +18,7 @@
       </div>
       <h2 class="text-xl font-semibold text-gray-700 mb-2">
         {{ currentStep === 'coupon-verification' ? 'Coupon Verification' : 
+           currentStep === 'terms-acceptance' ? 'Terms and Conditions' : 
            currentStep === 'phone-verification' ? 'Phone Verification' : 
            currentStep === 'email-verification' ? 'Email Verification' : 
            currentStep === 'customer-details-add' ? 'Customer Details' : 
@@ -24,6 +27,9 @@
       </h2>
       <p class="text-sm text-gray-500" *ngIf="currentStep === 'coupon-verification'">
         Enter your coupon number to continue
+      </p>
+      <p class="text-sm text-gray-500" *ngIf="currentStep === 'terms-acceptance'">
+        Please read and accept the terms and conditions to continue
       </p>
       <p class="text-sm text-gray-500" *ngIf="currentStep === 'phone-verification'">
         Verify your phone number to continue
@@ -56,7 +62,7 @@
               (input)="onFullCouponCodeInput($event)"
               (paste)="onCouponCodePaste($event)"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-center text-lg font-semibold tracking-widest uppercase"
-              placeholder="AAAAAAAAAAAAAAA"
+              placeholder="AAAAAAAAAAAAA"
               maxlength="13"
               style="text-transform: uppercase;"
               [class.border-red-500]="fullCouponCodeControl?.invalid && fullCouponCodeControl?.touched">
@@ -148,6 +154,102 @@
           </p>
         </div>
       </form>
+    </div>
+
+    <!-- Terms Acceptance Step -->
+    <div *ngIf="currentStep === 'terms-acceptance'" class="space-y-6">
+      <div class="bg-white rounded-lg border border-gray-200 p-4 sm:p-8 max-h-[500px] overflow-y-auto">
+        <div class="prose max-w-none">
+          <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Terms and Conditions for CES Warranty Gift Coupon</h3>
+          
+          <div class="space-y-6">
+            <!-- Section 1 -->
+            <div>
+              <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">1. Purchase and Price</h4>
+              <p class="text-sm sm:text-base text-gray-700">The CES Warranty gift coupon is available for purchase at a price of AED 99.</p>
+            </div>
+
+            <!-- Section 2 -->
+            <div>
+              <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">2. Eligibility</h4>
+              <p class="text-sm sm:text-base text-gray-700">The coupon is valid only for customers who have completed the registration process with www.ceswarranty.com</p>
+            </div>
+
+            <!-- Section 3 -->
+            <div>
+              <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">3. Redemption of Services</h4>
+              <ul class="list-disc list-inside space-y-2 text-sm sm:text-base text-gray-700 ml-4">
+                <li>The coupon entitles the registered holder to five (5) free services (list of services)</li>
+                <li>Services can be redeemed only at CES Warranty counters located across the country.</li>
+                <li>Services are redeemable only upon presentation of the valid coupon or verify the coupon via mobile or email address registered with CES Warranty.</li>
+              </ul>
+            </div>
+
+            <!-- Section 4 -->
+            <div>
+              <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">4. Validity Period</h4>
+              <p class="text-sm sm:text-base text-gray-700 mb-2">The coupon is valid for a period of twelve (12) months from the date of purchase.</p>
+              <ul class="list-disc list-inside space-y-2 text-sm sm:text-base text-gray-700 ml-4">
+                <li>After the expiration date, the coupon and any remaining redeemable services will become invalid and cannot be extended or refunded.</li>
+              </ul>
+            </div>
+
+            <!-- Section 5 -->
+            <div>
+              <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">5. Service Redemption and Reduction</h4>
+              <ul class="list-disc list-inside space-y-2 text-sm sm:text-base text-gray-700 ml-4">
+                <li>Each redemption of a service will reduce the remaining count of free services.</li>
+                <li>The number of free services remaining will be indicated upon each redemption.</li>
+                <li>Once all free services are redeemed, no further services can be claimed under the same coupon.</li>
+              </ul>
+            </div>
+
+            <!-- Section 6 -->
+            <div>
+              <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">6. Redemption Procedure</h4>
+              <ul class="list-disc list-inside space-y-2 text-sm sm:text-base text-gray-700 ml-4">
+                <li>The coupon must be presented at the time of service.</li>
+                <li>The coupon cannot be exchanged for cash, transferred, resold, or used in combination with other offers.</li>
+                <li>Redeemable services are subject to availability and the terms of CES Warranty.</li>
+              </ul>
+            </div>
+
+            <!-- Section 7 -->
+            <div>
+              <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">7. General Terms</h4>
+              <ul class="list-disc list-inside space-y-2 text-sm sm:text-base text-gray-700 ml-4">
+                <li>The coupon is non-refundable and non-transferable.</li>
+                <li>CES Warranty reserves the right to modify, suspend, or terminate this promotion, including these terms and conditions, at any time without prior notice.</li>
+                <li>Any misuse, fraud, or attempted abuse of the coupon will result in disqualification and possible legal action.</li>
+              </ul>
+            </div>
+
+            <!-- Section 8 -->
+            <div>
+              <h4 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">8. Liability</h4>
+              <p class="text-sm sm:text-base text-gray-700">CES Warranty shall not be liable for any loss, damage, or injury resulting from the use or inability to use the coupon.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accept Button -->
+      <div>
+        <button
+          type="button"
+          (click)="acceptTerms()"
+          class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white transition-colors duration-200"
+          style="background-color: var(--button-primary-bg);"
+          onmouseover="this.style.backgroundColor='var(--button-primary-hover)'"
+          onmouseout="this.style.backgroundColor='var(--button-primary-bg)'"
+          onfocus="this.style.backgroundColor='var(--button-primary-focus)'"
+          onblur="this.style.backgroundColor='var(--button-primary-bg)'">
+          <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+            <span class="material-icons text-white text-sm">check_circle</span>
+          </span>
+          Accept & Continue
+        </button>
+      </div>
     </div>
 
     <!-- Contact Verification Step -->

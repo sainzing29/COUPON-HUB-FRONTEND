@@ -9,22 +9,22 @@
       <p class="text-sm text-gray-100 mb-4">Welcome {{ customerName }}! View your service redemption status</p>
       
       <!-- Navigation Menu -->
-      <nav class="flex justify-center space-x-6 mb-6">
+      <nav class="flex flex-col sm:flex-row justify-center items-stretch sm:items-center gap-3 sm:gap-6 mb-6">
         <a 
           routerLink="/customer/service-selection"
-          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2 bg-white text-purple-600">
+          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 bg-white text-purple-600">
           <span class="material-icons text-sm">home</span>
           <span>Purchased Coupons</span>
         </a>
         <a 
           routerLink="/customer/locations"
-          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2 bg-white/20 text-white hover:bg-white/30">
+          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 bg-white/20 text-white hover:bg-white/30">
           <span class="material-icons text-sm">location_on</span>
           <span>Our Locations</span>
         </a>
         <a 
           routerLink="/customer/about-us"
-          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2 bg-white/20 text-white hover:bg-white/30">
+          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 bg-white/20 text-white hover:bg-white/30">
           <span class="material-icons text-sm">info</span>
           <span>About Us</span>
         </a>
@@ -51,26 +51,26 @@
         <div 
           *ngFor="let coupon of coupons" 
           class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <span class="material-icons text-purple-600">confirmation_number</span>
-              <div>
-                <h4 class="font-semibold text-gray-900">Coupon #{{ coupon.couponNumber }}</h4>
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <div class="flex items-center space-x-3 flex-1 min-w-0">
+              <span class="material-icons text-purple-600 flex-shrink-0">confirmation_number</span>
+              <div class="min-w-0 flex-1">
+                <h4 class="font-semibold text-gray-900 truncate">Coupon #{{ coupon.couponNumber }}</h4>
                 <p class="text-sm text-gray-600">{{ getRemainingServices(coupon) }} of {{ coupon.products?.length || 0 }} services available</p>
                 <p class="text-xs text-orange-600 font-medium">{{getRemainingDays(coupon.expirationDate)}} days remaining</p>
               </div>
             </div>
-            <div class="flex items-center space-x-3">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 sm:flex-shrink-0">
               <button 
                 (click)="viewInvoice(coupon)"
-                class="px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white">
+                class="w-full sm:w-auto px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-700 text-white">
                 <span class="material-icons text-sm">receipt</span>
                 <span>Invoice</span>
               </button>
               <button 
                 (click)="toggleCoupon(coupon.id)"
                 [disabled]="!coupon.products || coupon.products.length === 0"
-                class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="w-full sm:w-auto px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 [class]="selectedCouponId === coupon.id && showServices ? 'bg-purple-600 text-white' : 'bg-purple-100 text-purple-600 hover:bg-purple-200'">
                 <span class="material-icons text-sm">{{ selectedCouponId === coupon.id && showServices ? 'expand_less' : 'expand_more' }}</span>
                 <span>{{ selectedCouponId === coupon.id && showServices ? 'Hide Services' : 'View Services' }}</span>

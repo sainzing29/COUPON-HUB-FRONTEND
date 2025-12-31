@@ -3,13 +3,16 @@
   width: 80px; // Compact width to show only country code
   min-width: 80px;
   position: relative;
+  
+
 }
 
 .country-code-wrapper {
   position: relative;
 }
 
-.w-35 select.form-select.country-code-select {
+// Select styling - works for both responsive and fixed width
+select.form-select.country-code-select {
   width: 100%;
   padding-right: 2rem; // Make room for dropdown arrow
   color: transparent !important; // Hide the actual text completely
@@ -20,6 +23,11 @@
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+  
+  // Responsive adjustments
+  @media (min-width: 640px) {
+    width: 100%;
+  }
   
   option {
     color: #111827 !important; // Show text in dropdown options
@@ -47,11 +55,16 @@
   pointer-events: none;
   z-index: 3; // Higher than select to ensure it's visible
   color: #111827;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.5;
   white-space: nowrap;
   font-weight: 400;
   background-color: transparent;
+  
+  // Responsive font size
+  @media (min-width: 640px) {
+    font-size: 16px;
+  }
   
   &.disabled {
     color: #6b7280;
@@ -65,13 +78,5 @@
   color: #6b7280;
   cursor: not-allowed;
   opacity: 0.6;
-}
-
-// Responsive adjustments
-@media (max-width: 768px) {
-  .w-35 {
-    width: 100%;
-    min-width: 100%;
-  }
 }
 

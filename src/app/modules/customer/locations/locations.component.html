@@ -9,22 +9,22 @@
       <p class="text-sm text-gray-100 mb-6">Visit us at any of our locations across the UAE</p>
       
       <!-- Navigation Menu -->
-      <nav class="flex justify-center space-x-6 mb-8">
+      <nav class="flex flex-col sm:flex-row justify-center items-stretch sm:items-center gap-3 sm:gap-6 mb-8">
         <a 
           routerLink="/customer/service-selection"
-          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2 bg-white/20 text-white hover:bg-white/30">
+          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 bg-white/20 text-white hover:bg-white/30">
           <span class="material-icons text-sm">home</span>
           <span>Purchased Coupons</span>
         </a>
         <a 
           routerLink="/customer/locations"
-          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2 bg-white text-purple-600">
+          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 bg-white text-purple-600">
           <span class="material-icons text-sm">location_on</span>
           <span>Our Locations</span>
         </a>
         <a 
           routerLink="/customer/about-us"
-          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2 bg-white/20 text-white hover:bg-white/30">
+          class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 bg-white/20 text-white hover:bg-white/30">
           <span class="material-icons text-sm">info</span>
           <span>About Us</span>
         </a>
@@ -110,7 +110,7 @@
     <div class="flex justify-center">
       <button 
         (click)="goBack()"
-        class="px-6 py-3 text-purple-600 hover:text-purple-500 hover:bg-purple-50 rounded-lg transition-colors duration-200 flex items-center space-x-2">
+        class="w-full sm:w-auto px-6 py-3 text-purple-600 hover:text-purple-500 hover:bg-purple-50 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2">
         <span class="material-icons">arrow_back</span>
         <span>Back to Coupons</span>
       </button>

@@ -104,6 +104,15 @@ export class CustomerLoginComponent implements OnInit {
     }
   }
 
+  onPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input.value.replace(/\D/g, ''); // Remove all non-digit characters
+    if (input.value !== value) {
+      input.value = value;
+      this.loginForm.get('phone')?.setValue(value, { emitEvent: false });
+    }
+  }
+
   private updateValidators(): void {
     const emailControl = this.loginForm.get('email');
     const phoneControl = this.loginForm.get('phone');
