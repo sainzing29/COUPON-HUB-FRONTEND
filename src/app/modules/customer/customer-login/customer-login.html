@@ -150,6 +150,8 @@
               [readonly]="pinInputsReadonly[i]"
               class="w-12 h-12 text-center text-lg font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
               [class.border-red-500]="loginForm.get('pin' + i)?.invalid && loginForm.get('pin' + i)?.touched"
+              (touchstart)="onPinTouchStart(i)"
+              (mousedown)="onPinTouchStart(i)"
               (input)="onPinDigitInput($event, i)"
               (keydown)="onPinKeyDown($event, i)"
               (paste)="onPinPaste($event)"

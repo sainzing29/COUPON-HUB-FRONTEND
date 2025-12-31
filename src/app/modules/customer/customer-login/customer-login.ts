@@ -248,8 +248,15 @@ export class CustomerLoginComponent implements OnInit {
     });
   }
 
+  onPinTouchStart(index: number): void {
+    // Remove readonly on touch/click before focus to allow keyboard to open on first tap
+    if (this.pinInputsReadonly[index]) {
+      this.pinInputsReadonly[index] = false;
+    }
+  }
+
   onPinFocus(index: number): void {
-    // Remove readonly on focus
+    // Remove readonly on focus (backup in case touchstart didn't fire)
     if (this.pinInputsReadonly[index]) {
       this.pinInputsReadonly[index] = false;
     }
