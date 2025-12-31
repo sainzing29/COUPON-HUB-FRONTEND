@@ -805,6 +805,13 @@ export class ContactVerificationComponent implements OnInit, OnDestroy, OnChange
     this.isSubmittingCustomerForm = false;
   }
 
+  // Get combined phone number for display (countryCode + phone)
+  getDisplayPhoneNumber(): string {
+    const countryCode = this.customerForm.get('countryCode')?.value || '+971';
+    const phone = this.customerForm.get('phone')?.value || '';
+    return phone ? `${countryCode} ${phone}` : '';
+  }
+
   addCouponToExistingCustomer(): void {
     if (this.customerData) {
       // Extract countryCode and mobileNumber if mobileNumber includes country code
