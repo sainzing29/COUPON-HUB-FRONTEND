@@ -18,6 +18,8 @@
                 formControlName="phone"
                 placeholder="Enter phone number"
                 maxlength="12"
+                pattern="[0-9]*"
+                inputmode="numeric"
                 class="w-full h-[42px] px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
                 [class.border-red-500]="phoneControl?.invalid && phoneControl?.touched">
             </div>
@@ -56,6 +58,8 @@
                 #phoneOtpInput
                 type="text"
                 maxlength="1"
+                pattern="[0-9]*"
+                inputmode="numeric"
                 [formControlName]="'digit' + i"
                 class="w-10 h-10 text-center text-sm font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
                 [class.border-red-500]="phoneOtpForm.get('digit' + i)?.invalid && phoneOtpForm.get('digit' + i)?.touched"
@@ -154,6 +158,8 @@
                 #emailOtpInput
                 type="text"
                 maxlength="1"
+                pattern="[0-9]*"
+                inputmode="numeric"
                 [formControlName]="'digit' + i"
                 class="w-10 h-10 text-center text-sm font-semibold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
                 [class.border-red-500]="emailOtpForm.get('digit' + i)?.invalid && emailOtpForm.get('digit' + i)?.touched"
