@@ -154,22 +154,24 @@ export class CustomerLoginComponent implements OnInit {
     
     // Move to next input if current is filled
     if (value && index < 3) {
-      setTimeout(() => {
-        if (this.pinInputs && this.pinInputs.length > index + 1) {
-          const nextInput = this.pinInputs.toArray()[index + 1];
-          if (nextInput) {
-            nextInput.nativeElement.focus();
-            nextInput.nativeElement.select();
-            return;
+      // Use requestAnimationFrame for better mobile keyboard compatibility
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (this.pinInputs && this.pinInputs.length > index + 1) {
+            const nextInput = this.pinInputs.toArray()[index + 1];
+            if (nextInput) {
+              nextInput.nativeElement.focus();
+              // Don't select on mobile as it can close the keyboard
+              return;
+            }
           }
-        }
-        
-        const nextInput = document.querySelector(`input[formControlName="pin${index + 1}"]`) as HTMLInputElement;
-        if (nextInput) {
-          nextInput.focus();
-          nextInput.select();
-        }
-      }, 10);
+          
+          const nextInput = document.querySelector(`input[formControlName="pin${index + 1}"]`) as HTMLInputElement;
+          if (nextInput) {
+            nextInput.focus();
+          }
+        });
+      });
     }
   }
 
@@ -237,11 +239,13 @@ export class CustomerLoginComponent implements OnInit {
     
     // Focus on the next empty input or last input
     const nextEmptyIndex = digits.length < 4 ? digits.length : 3;
-    setTimeout(() => {
-      if (this.pinInputs && this.pinInputs.length > nextEmptyIndex) {
-        this.pinInputs.toArray()[nextEmptyIndex].nativeElement.focus();
-      }
-    }, 0);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (this.pinInputs && this.pinInputs.length > nextEmptyIndex) {
+          this.pinInputs.toArray()[nextEmptyIndex].nativeElement.focus();
+        }
+      });
+    });
   }
 
   onPinFocus(index: number): void {
