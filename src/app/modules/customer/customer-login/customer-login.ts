@@ -248,17 +248,48 @@ export class CustomerLoginComponent implements OnInit {
     });
   }
 
-  onPinTouchStart(index: number): void {
-    // Remove readonly on touch/click before focus to allow keyboard to open on first tap
+  onPinPointerDown(index: number, event: PointerEvent): void {
+    // Remove readonly immediately on pointerdown (fires before touchstart/focus) to allow keyboard to open on first tap
     if (this.pinInputsReadonly[index]) {
+      // Remove readonly from DOM immediately for instant effect
+      if (this.pinInputs && this.pinInputs.length > index) {
+        const input = this.pinInputs.toArray()[index];
+        if (input && input.nativeElement) {
+          input.nativeElement.removeAttribute('readonly');
+        }
+      }
+      // Update the array to keep state in sync
       this.pinInputsReadonly[index] = false;
     }
   }
 
+  enablePinInputs(): void {
+    // Remove readonly from all PIN inputs when user starts interacting with phone/email field
+    // This ensures PIN inputs are ready when user reaches them
+    for (let i = 0; i < this.pinInputsReadonly.length; i++) {
+      if (this.pinInputsReadonly[i]) {
+        this.pinInputsReadonly[i] = false;
+        // Also remove from DOM immediately
+        if (this.pinInputs && this.pinInputs.length > i) {
+          const input = this.pinInputs.toArray()[i];
+          if (input && input.nativeElement) {
+            input.nativeElement.removeAttribute('readonly');
+          }
+        }
+      }
+    }
+  }
+
   onPinFocus(index: number): void {
-    // Remove readonly on focus (backup in case touchstart didn't fire)
+    // Remove readonly on focus (backup in case pointerdown didn't fire)
     if (this.pinInputsReadonly[index]) {
       this.pinInputsReadonly[index] = false;
+      if (this.pinInputs && this.pinInputs.length > index) {
+        const input = this.pinInputs.toArray()[index];
+        if (input && input.nativeElement) {
+          input.nativeElement.removeAttribute('readonly');
+        }
+      }
     }
   }
 
