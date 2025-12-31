@@ -386,11 +386,7 @@ export class RegisterCustomerComponent implements OnInit, OnDestroy {
             if (response.hasPin) {
               // Customer has PIN, redirect to login
               this.toastr.info('Customer already registered. Please login.', 'Info');
-              this.router.navigate(['/customer/login'], {
-                queryParams: {
-                  email: response.customer.email
-                }
-              });
+              this.router.navigate(['/customer/login']);
             } else {
               // Customer exists but no PIN, show PIN creation
               this.currentStep = 'pin-creation';
