@@ -1,5 +1,7 @@
 /* Global Theme Variables */
-:root {
+:root { 
+  /* Background Colors */
+  --primary-bg: #00a7e1;
   /* Primary Purple Theme Colors */
   --header-bg-primary: #28243D;
   --header-bg-secondary: #3D3551;
@@ -29,8 +31,9 @@
   /* Sidebar Colors */
   --sidebar-bg-primary: #FFFFFF;
   --sidebar-bg-secondary: #F8F9FA;
-  --sidebar-bg-hover: #F8F9FA;
-  --sidebar-bg-active: #28243D;
+  --sidebar-bg-hover: rgba(0, 167, 225, 0.1);
+  --sidebar-bg-active: #00a7e1;
+  --sidebar-active-border: #00a7e1;
   --sidebar-text-primary: #28243D;
   --sidebar-text-secondary: #6B7280;
   --sidebar-text-tertiary: #9CA3AF;
@@ -52,23 +55,13 @@
   --dashboard-quaternary: #5B21B6;
   --dashboard-accent: #A78BFA;
   --dashboard-text-accent: #7C3AED;
-  --dashboard-card-icon-bg: #d41367;
+  --dashboard-card-icon-bg: #E6F7FD;
   
   /* Button Colors */
   --button-primary-bg: #00a7e1;
   --button-primary-text: #FFFFFF;
   --button-primary-hover: #0088c4;
   --button-primary-focus: #0066a0;
-  
-  /* Alternative Theme Colors (for future use) */
-  --theme-blue-primary: #1E40AF;
-  --theme-blue-secondary: #3B82F6;
-  --theme-green-primary: #059669;
-  --theme-green-secondary: #10B981;
-  --theme-red-primary: #DC2626;
-  --theme-red-secondary: #EF4444;
-  --theme-orange-primary: #EA580C;
-  --theme-orange-secondary: #F97316;
 }
 
 /* SCSS Variables for easier usage */
@@ -212,14 +205,15 @@ header {
     transition: all 0.2s ease-in-out;
     min-width: 0; /* Allow flex items to shrink */
 
-    &:hover {
-      background-color: $sidebar-bg-hover !important;
-      color: $sidebar-text-primary !important;
+    &:hover:not(.active) {
+      background-color: rgba(0, 167, 225, 0.1) !important;
+      // Keep default text color on hover
     }
 
     &.active {
       background-color: $sidebar-bg-active !important;
       color: #FFFFFF !important;
+      border-left: 3px solid var(--sidebar-active-border);
     }
 
     /* Prevent text wrapping in sidebar menu items */
@@ -236,14 +230,15 @@ header {
     transition: all 0.2s ease-in-out;
     min-width: 0; /* Allow flex items to shrink */
 
-    &:hover {
-      background-color: $sidebar-bg-hover !important;
-      color: $sidebar-text-secondary !important;
+    &:hover:not(.active) {
+      background-color: rgba(0, 167, 225, 0.1) !important;
+      // Keep default text color on hover
     }
 
     &.active {
-      background-color: $sidebar-bg-secondary !important;
-      color: $sidebar-text-primary !important;
+      background-color: $sidebar-bg-active !important;
+      color: #FFFFFF !important;
+      border-left: 3px solid var(--sidebar-active-border);
     }
 
     /* Prevent text wrapping in sidebar submenu items */
@@ -390,104 +385,6 @@ thead {
       font-weight: 600;
     }
   }
-}
-
-/* Theme Switching Classes */
-.theme-purple {
-  --header-bg-primary: #28243D;
-  --header-bg-secondary: #3D3551;
-  --header-bg-hover: #3D3551;
-  --header-bg-focus: #4C1D95;
-  --header-text-primary: #E0D6FF;
-  --header-text-secondary: #C4B5FD;
-  --header-text-tertiary: #A78BFA;
-  --header-text-placeholder: #A78BFA;
-  --header-border-primary: #3D3551;
-  --header-border-secondary: #7C3AED;
-  --header-focus-ring: #A78BFA;
-  --avatar-gradient-start: #8B5CF6;
-  --avatar-gradient-end: #7C3AED;
-  
-  /* Sidebar Colors */
-  --sidebar-bg-primary: #FFFFFF;
-  --sidebar-bg-secondary: #F8F9FA;
-  --sidebar-bg-hover: #F8F9FA;
-  --sidebar-bg-active: #28243D;
-  --sidebar-text-primary: #28243D;
-  --sidebar-text-secondary: #6B7280;
-  --sidebar-text-tertiary: #9CA3AF;
-  --sidebar-border-primary: #E5E7EB;
-  --sidebar-brand-bg: #FFFFFF;
-  --sidebar-brand-text: #FFFFFF;
-  
-  /* Table Colors */
-  --table-header-bg: #F8F8F8;
-  --table-header-text: #374151;
-  --table-header-border: #E5E7EB;
-  --table-row-hover: #F8F9FA;
-  --table-border: #E5E7EB;
-  
-  /* Button Colors */
-  --button-primary-bg: #00a7e1;
-  --button-primary-text: #FFFFFF;
-  --button-primary-hover: #0088c4;
-  --button-primary-focus: #0066a0;
-}
-
-.theme-blue {
-  --header-bg-primary: #1E40AF;
-  --header-bg-secondary: #3B82F6;
-  --header-bg-hover: #3B82F6;
-  --header-bg-focus: #2563EB;
-  --header-text-primary: #DBEAFE;
-  --header-text-secondary: #BFDBFE;
-  --header-text-tertiary: #93C5FD;
-  --header-text-placeholder: #93C5FD;
-  --header-border-primary: #3B82F6;
-  --header-border-secondary: #60A5FA;
-  --header-focus-ring: #93C5FD;
-  --avatar-gradient-start: #3B82F6;
-  --avatar-gradient-end: #2563EB;
-  
-  /* Sidebar Colors */
-  --sidebar-bg-primary: #1E40AF;
-  --sidebar-bg-secondary: #3B82F6;
-  --sidebar-bg-hover: #3B82F6;
-  --sidebar-bg-active: #2563EB;
-  --sidebar-text-primary: #DBEAFE;
-  --sidebar-text-secondary: #BFDBFE;
-  --sidebar-text-tertiary: #93C5FD;
-  --sidebar-border-primary: #3B82F6;
-  --sidebar-brand-bg: linear-gradient(to right, #3B82F6, #2563EB);
-  --sidebar-brand-text: #FFFFFF;
-}
-
-.theme-green {
-  --header-bg-primary: #059669;
-  --header-bg-secondary: #10B981;
-  --header-bg-hover: #10B981;
-  --header-bg-focus: #047857;
-  --header-text-primary: #D1FAE5;
-  --header-text-secondary: #A7F3D0;
-  --header-text-tertiary: #6EE7B7;
-  --header-text-placeholder: #6EE7B7;
-  --header-border-primary: #10B981;
-  --header-border-secondary: #34D399;
-  --header-focus-ring: #6EE7B7;
-  --avatar-gradient-start: #10B981;
-  --avatar-gradient-end: #059669;
-  
-  /* Sidebar Colors */
-  --sidebar-bg-primary: #059669;
-  --sidebar-bg-secondary: #10B981;
-  --sidebar-bg-hover: #10B981;
-  --sidebar-bg-active: #047857;
-  --sidebar-text-primary: #D1FAE5;
-  --sidebar-text-secondary: #A7F3D0;
-  --sidebar-text-tertiary: #6EE7B7;
-  --sidebar-border-primary: #10B981;
-  --sidebar-brand-bg: linear-gradient(to right, #10B981, #059669);
-  --sidebar-brand-text: #FFFFFF;
 }
 
 /* SCSS Mixins for common patterns */

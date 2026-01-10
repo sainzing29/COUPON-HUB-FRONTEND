@@ -64,10 +64,11 @@ header.header-container {
 // Header positioning based on sidebar state
 .header-container {
   transition: left 0.3s ease-in-out;
+  right: 0; // Stretch to right edge
 }
 
 .header-sidebar-open {
-  left: 260px; // Match sidebar-open width
+  left: 256px; // Match sidebar-open width
 }
 
 .header-sidebar-closed {

@@ -1,6 +1,6 @@
 <!-- Sidebar -->
 <div 
-  class="sidebar shadow-lg transition-all duration-300 ease-in-out h-screen flex flex-col relative fixed left-0 top-0 z-40"
+  class="sidebar shadow-md transition-all duration-300 ease-in-out h-screen flex flex-col relative fixed left-0 top-0 z-40"
   [class.sidebar-open]="sidebarOpen"
   [class.sidebar-closed]="!sidebarOpen"
   [@slideInOut]="sidebarOpen ? 'in' : 'out'"
@@ -16,19 +16,19 @@
 
   <!-- Navigation Menu -->
   <nav class="flex-1 mt-8 px-2 overflow-y-auto">
-    <ul class="space-y-2">
+    <ul class="space-y-1">
       <li *ngFor="let item of menuItems" class="relative">
         <!-- Main Menu Item -->
         <div 
           (click)="onMenuItemClick($event, item.id)"
-          class="sidebar-menu-item cursor-pointer rounded-lg p-3 flex items-center"
+          class="sidebar-menu-item cursor-pointer rounded-[] px-3 py-3 flex items-center"
           [class.active]="item.active && !item.hasSubmenu"
           [class.has-active-submenu]="hasActiveSubmenu(item)"
           [class.space-x-3]="sidebarOpen"
           [class.justify-between]="item.hasSubmenu && sidebarOpen">
           <div class="flex items-center space-x-3">
             <span class="material-icons text-xl">{{ item.icon }}</span>
-            <span *ngIf="sidebarOpen" class="font-medium text-base whitespace-nowrap">{{ item.label }}</span>
+            <span *ngIf="sidebarOpen" class="font-medium text-[15px] whitespace-nowrap">{{ item.label }}</span>
           </div>
           <!-- Submenu Toggle Arrow -->
           <span *ngIf="item.hasSubmenu && sidebarOpen" 

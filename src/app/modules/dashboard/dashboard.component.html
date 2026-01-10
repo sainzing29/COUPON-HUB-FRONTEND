@@ -2,12 +2,12 @@
   <!-- Statistics Cards -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
     <!-- Card 1: Total Coupon Activations -->
-    <div class="stat-card bg-white rounded-lg shadow-card p-6" [@fadeInUp]>
+    <div class="stat-card bg-white shadow-card p-6" [@fadeInUp]>
       <div class="flex items-center justify-between">
         <div class="flex-1">
           <div class="flex items-center space-x-3 mb-2">
             <div class="w-12 h-12 dashboard-card-icon-bg rounded-lg flex items-center justify-center">
-              <span class="material-icons text-white text-xl">local_offer</span>
+              <span class="material-icons text-xl">local_offer</span>
             </div>
             <div>
               <h3 class="text-sm font-medium text-gray-600">Total Coupon Activated</h3>
@@ -24,12 +24,12 @@
     </div>
 
     <!-- Card 2: Active Coupons -->
-    <div class="stat-card bg-white rounded-lg shadow-card p-6" [@fadeInUp]>
+    <div class="stat-card bg-white shadow-card p-6" [@fadeInUp]>
       <div class="flex items-center justify-between">
         <div class="flex-1">
           <div class="flex items-center space-x-3 mb-2">
             <div class="w-12 h-12 dashboard-card-icon-bg rounded-lg flex items-center justify-center">
-              <span class="material-icons text-white text-xl">check_circle</span>
+              <span class="material-icons text-xl">check_circle</span>
             </div>
             <div>
               <h3 class="text-sm font-medium text-gray-600">Active Coupons</h3>
@@ -45,12 +45,12 @@
     </div>
 
     <!-- Card 3: Services Completed (This Month) -->
-    <div class="stat-card bg-white rounded-lg shadow-card p-6" [@fadeInUp]>
+    <div class="stat-card bg-white shadow-card p-6" [@fadeInUp]>
       <div class="flex items-center justify-between">
         <div class="flex-1">
           <div class="flex items-center space-x-3 mb-2">
             <div class="w-12 h-12 dashboard-card-icon-bg rounded-lg flex items-center justify-center">
-              <span class="material-icons text-white text-xl">build</span>
+              <span class="material-icons  text-xl">build</span>
             </div>
             <div>
               <h3 class="text-sm font-medium text-gray-600">Services Completed</h3>
@@ -67,12 +67,12 @@
     </div>
 
     <!-- Card 4: Total Customers -->
-    <div class="stat-card bg-white rounded-lg shadow-card p-6" [@fadeInUp]>
+    <div class="stat-card bg-white shadow-card p-6" [@fadeInUp]>
       <div class="flex items-center justify-between">
         <div class="flex-1">
           <div class="flex items-center space-x-3 mb-2">
             <div class="w-12 h-12 dashboard-card-icon-bg rounded-lg flex items-center justify-center">
-              <span class="material-icons text-white text-xl">people</span>
+              <span class="material-icons  text-xl">people</span>
             </div>
             <div>
               <h3 class="text-sm font-medium text-gray-600">Total Customers</h3>
@@ -92,7 +92,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
     <!-- Line Chart: Active Coupon Count by Month -->
     <div class="bg-white rounded-lg shadow-card p-6" [@fadeInUp]>
-      <div class="h-80">
+      <div class="h-64">
         <canvas baseChart
           [data]="activeCouponChartData"
           [type]="lineChartType"
@@ -103,7 +103,7 @@
 
     <!-- Donut Chart: Coupon Status Distribution -->
     <div class="bg-white rounded-lg shadow-card p-6" [@fadeInUp]>
-      <div class="h-80">
+      <div class="h-64">
         <canvas baseChart
           [data]="couponStatusChartData"
           [type]="donutChartType"
@@ -117,7 +117,7 @@
   <div class="flex justify-center mt-6">
     <!-- Line Chart: Service Redemptions by Month -->
     <div class="bg-white rounded-lg shadow-card p-6 w-full lg:w-1/2" [@fadeInUp]>
-      <div class="h-80">
+      <div class="h-64">
         <canvas baseChart
           [data]="serviceRedemptionsChartData"
           [type]="lineChartType"
