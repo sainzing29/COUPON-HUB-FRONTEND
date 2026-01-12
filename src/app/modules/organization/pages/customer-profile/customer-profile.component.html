@@ -49,19 +49,7 @@
       <div>
         <label class="text-sm font-medium text-gray-500">Member Since</label>
         <p class="text-sm text-gray-900">{{ formatDate(customer.createdAt) }}</p>
-      </div>
-      <div>
-        <label class="text-sm font-medium text-gray-500">Coupon Count</label>
-        <p class="text-sm text-gray-900">{{ customer.couponCount || 0 }}</p>
-      </div>
-      <div>
-        <label class="text-sm font-medium text-gray-500">Invoice Count</label>
-        <p class="text-sm text-gray-900">{{ customer.invoiceCount || 0 }}</p>
-      </div>
-      <div>
-        <label class="text-sm font-medium text-gray-500">Total Amount</label>
-        <p class="text-sm text-gray-900">{{ getTotalAmount() }} AED</p>
-      </div>
+      </div> 
     </div>
 
     <!-- Edit Form -->
