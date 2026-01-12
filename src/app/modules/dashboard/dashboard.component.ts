@@ -194,7 +194,7 @@ export class DashboardComponent implements OnInit {
         borderColor: 'rgba(0, 167, 225, 1)',
         borderWidth: 2,
         fill: true,
-        tension: 0.4,
+        tension: 0, // Straight line segments, no curve/smoothing
         pointRadius: 4,
         pointHoverRadius: 6
       }
@@ -211,7 +211,7 @@ export class DashboardComponent implements OnInit {
         borderColor: 'rgba(34, 197, 94, 1)',
         borderWidth: 2,
         fill: true,
-        tension: 0.4,
+        tension: 0, // Straight line segments, no curve/smoothing
         pointRadius: 4,
         pointHoverRadius: 6
       }
@@ -273,7 +273,7 @@ export class DashboardComponent implements OnInit {
             borderColor: 'rgba(0, 167, 225, 1)',
             borderWidth: 2,
             fill: true,
-            tension: 0.4,
+            tension: 0, // Straight line segments, no curve/smoothing
             pointRadius: 4,
             pointHoverRadius: 6
           }
@@ -296,7 +296,7 @@ export class DashboardComponent implements OnInit {
             borderColor: 'rgba(34, 197, 94, 1)',
             borderWidth: 2,
             fill: true,
-            tension: 0.4,
+            tension: 0, // Straight line segments, no curve/smoothing
             pointRadius: 4,
             pointHoverRadius: 6
           }
