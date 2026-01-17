@@ -79,20 +79,11 @@ export class RedeemServiceComponent implements OnInit {
   }
 
   confirmRedeem(service: Service, index: number): void {
-    console.log('confirmRedeem called with:', { service: service.name, index });
-    
     // Only allow redemption for available services
     if (service.status === 'available') {
       this.selectedService = service;
       this.selectedServiceIndex = index;
       this.showConfirmationDialog = true;
-      
-      console.log('Confirmation dialog opened for:', {
-        selectedService: this.selectedService.name,
-        selectedServiceIndex: this.selectedServiceIndex
-      });
-    } else {
-      console.log('Service not available for redemption:', service.name, 'status:', service.status);
     }
   }
 
@@ -103,18 +94,9 @@ export class RedeemServiceComponent implements OnInit {
   }
 
   processRedemption(): void {
-    console.log('processRedemption called');
-    console.log('selectedService:', this.selectedService);
-    console.log('selectedServiceIndex:', this.selectedServiceIndex);
-    console.log('services array:', this.services);
-    
     if (this.selectedService && this.selectedServiceIndex !== -1) {
-      console.log('Starting redemption for service:', this.selectedService.name, 'at index:', this.selectedServiceIndex);
-      
       // Validate that the service exists at the index
       if (this.services[this.selectedServiceIndex]) {
-        console.log('Service found at index:', this.services[this.selectedServiceIndex]);
-        
         // Store the index before closing dialog
         const serviceIndex = this.selectedServiceIndex;
         
@@ -125,8 +107,6 @@ export class RedeemServiceComponent implements OnInit {
         this.services[serviceIndex].isRedeeming = true;
         this.services[serviceIndex].status = 'processing';
         
-        console.log('Service status set to processing:', this.services[serviceIndex]);
-        
         // Force change detection
         this.cdr.detectChanges();
         
@@ -136,23 +116,13 @@ export class RedeemServiceComponent implements OnInit {
           this.services[serviceIndex].isRedeeming = false;
           this.services[serviceIndex].status = 'redeemed';
           
-          console.log('Service status set to redeemed:', this.services[serviceIndex]);
-          
           // Force change detection
           this.cdr.detectChanges();
           
           // Show success toast
           this.showSuccessToast();
         }, 2000);
-      } else {
-        console.error('Service not found at index:', this.selectedServiceIndex);
-        console.error('Available services:', this.services);
       }
-    } else {
-      console.error('Invalid redemption state:', {
-        selectedService: this.selectedService,
-        selectedServiceIndex: this.selectedServiceIndex
-      });
     }
   }
 
@@ -183,6 +153,6 @@ export class RedeemServiceComponent implements OnInit {
 
   // Debug method to check service statuses
   checkServiceStatuses(): void {
-    console.log('Current service statuses:', this.services.map(s => ({ name: s.name, status: s.status, isRedeeming: s.isRedeeming })));
+    // Service statuses check method
   }
 }

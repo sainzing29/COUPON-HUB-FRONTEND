@@ -137,7 +137,6 @@ export class CouponSaleComponent implements OnInit, OnDestroy {
       next: (schemes) => {
         // Show all schemes (remove filter to show all, or filter only active: schemes.filter(s => s.isActive))
         this.couponSchemes = schemes;
-        console.log('Loaded coupon schemes:', this.couponSchemes);
       },
       error: (error) => {
         console.error('Error loading coupon schemes:', error);

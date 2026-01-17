@@ -361,7 +361,6 @@ export class DashboardComponent implements OnInit {
         this.updateChartsWithStats();
 
         this.isLoading = false;
-        console.log('Dashboard stats loaded:', stats);
       },
       error: (error) => {
         console.error('Error fetching dashboard stats:', error);
@@ -376,11 +375,11 @@ export class DashboardComponent implements OnInit {
    * Chart event handlers (from ng2-charts documentation)
    */
   chartHovered(event: any): void {
-    console.log('Chart hovered:', event);
+    // Chart hovered event handler
   }
 
   chartClicked(event: any): void {
-    console.log('Chart clicked:', event);
+    // Chart clicked event handler
   }
 
   /**

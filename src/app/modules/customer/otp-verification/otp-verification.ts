@@ -101,8 +101,6 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
   onDigitInput(event: any, index: number): void {
     const value = event.target.value;
     
-    console.log(`Input ${index}: "${value}"`); // Debug log
-    
     // Only allow single digit
     if (value.length > 1) {
       event.target.value = value.slice(-1);
@@ -119,13 +117,11 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
     
     // Move to next input if current is filled
     if (value && index < 5) {
-      console.log(`Moving to next input: ${index + 1}`); // Debug log
       setTimeout(() => {
         // Try ViewChildren first
         if (this.otpInputs && this.otpInputs.length > index + 1) {
           const nextInput = this.otpInputs.toArray()[index + 1];
           if (nextInput) {
-            console.log('Using ViewChildren to focus'); // Debug log
             nextInput.nativeElement.focus();
             nextInput.nativeElement.select();
             return;
@@ -135,11 +131,8 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
         // Fallback to DOM query
         const nextInput = document.querySelector(`input[formControlName="digit${index + 1}"]`) as HTMLInputElement;
         if (nextInput) {
-          console.log('Using DOM query to focus'); // Debug log
           nextInput.focus();
           nextInput.select();
-        } else {
-          console.log('Next input not found'); // Debug log
         }
       }, 10);
     }

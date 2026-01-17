@@ -23,25 +23,9 @@ export function apiInterceptor(req: HttpRequest<any>, next: HttpHandlerFn): Obse
   // Add common headers and authentication token
   apiReq = addCommonHeaders(apiReq, tokenService);
 
-  // Log request in development mode
-  if (environmentService.isDebugMode()) {
-    console.log('API Request:', {
-      method: apiReq.method,
-      url: apiReq.url,
-      headers: apiReq.headers,
-      body: apiReq.body
-    });
-  }
-
   return next(apiReq).pipe(
     tap(event => {
-      if (event instanceof HttpResponse && environmentService.isDebugMode()) {
-        console.log('API Response:', {
-          status: event.status,
-          url: event.url,
-          body: event.body
-        });
-      }
+      // Response handling
     }),
     catchError((error: HttpErrorResponse) => {
       return handleError(error, environmentService, tokenService);

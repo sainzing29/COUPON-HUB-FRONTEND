@@ -72,7 +72,6 @@ export class CustomerNavbarComponent implements OnInit {
 
   viewProfile(): void {
     // Navigate to profile page
-    console.log('View Profile');
     this.closeUserDropdown();
   }
 

@@ -67,7 +67,6 @@ export class BatchesComponent implements OnInit {
     this.isLoading = true;
     this.batchService.getBatches().subscribe({
       next: (response) => {
-        console.log('Batches loaded:', response);
         this.batches = response;
         this.applyFilters();
         this.isLoading = false;

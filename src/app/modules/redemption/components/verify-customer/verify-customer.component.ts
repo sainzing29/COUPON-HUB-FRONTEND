@@ -138,7 +138,6 @@ export class VerifyCustomerComponent implements OnInit, OnDestroy {
           errorMessage = error.message;
         }
         
-        console.log('Displaying error message:', errorMessage);
         this.toastr.error(errorMessage, 'Error');
       }
     });

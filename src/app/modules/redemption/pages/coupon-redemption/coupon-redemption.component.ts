@@ -36,7 +36,6 @@ export class CouponRedemptionComponent implements OnInit {
 
   onRedemptionComplete(response: RedemptionResponse): void {
     // Handle redemption completion if needed
-    console.log('Redemption completed:', response);
   }
 }
 

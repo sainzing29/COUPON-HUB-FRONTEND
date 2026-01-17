@@ -73,7 +73,6 @@ export class SignUpComponent implements OnInit {
       
       // Simulate API call
       setTimeout(() => {
-        console.log('Sign up data:', this.signUpForm.value);
         this.isLoading = false;
         // Navigate to dashboard or login page
         this.router.navigate(['/dashboard']);

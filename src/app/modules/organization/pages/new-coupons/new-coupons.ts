@@ -96,7 +96,6 @@ export class NewCouponsComponent implements OnInit {
         this.closeGenerateCouponModal();
         
         // Show success message (you can implement a toast notification here)
-        console.log(`Successfully generated ${count} new coupons`);
       }, 2000);
     }
   }

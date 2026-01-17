@@ -96,8 +96,6 @@ export class CustomerProfileComponent implements OnInit {
         this.coupons = response.coupons || [];
         this.services = response.services || [];
         this.invoices = response.invoices || [];
-        console.log('Loaded coupons:', this.coupons);
-        console.log('First coupon scheme:', this.coupons[0]?.scheme);
         this.populateEditForm();
       },
       error: (error) => {

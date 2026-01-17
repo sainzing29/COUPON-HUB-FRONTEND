@@ -77,11 +77,6 @@ export class PermissionService {
   hasAnyPermission(permissions: string[]): boolean {
     const userPermissions = this.getPermissions();
     const hasAccess = permissions.some(permission => userPermissions.includes(permission));
-    console.log('PermissionService: hasAnyPermission check', { 
-      requiredPermissions: permissions, 
-      userPermissions, 
-      hasAccess 
-    });
     return hasAccess;
   }
 

@@ -64,7 +64,6 @@ export class SignInComponent implements OnInit {
 
       this.authService.login(loginData).subscribe({
         next: (response) => {
-          console.log('Login successful:', response);
           this.isLoading = false;
           
           // Get user role from the current user (decoded from token)

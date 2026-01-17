@@ -125,8 +125,6 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
 
     // Subscribe to user changes to update menu items when user logs in/out
     this.userSubscription = this.authService.currentUser$.subscribe(user => {
-      console.log('Sidebar: User changed, filtering menu items', user);
-      console.log('Sidebar: User permissions', user?.permission);
       this.filterMenuItemsByPermission();
       this.updateActiveStateFromRoute();
       this.ensureSubmenuExpanded();
@@ -146,14 +144,12 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
   private filterMenuItemsByPermission(): void {
     // Filter menu items based on permissions
     const userPermissions = this.permissionService.getPermissions();
-    console.log('Sidebar: Filtering menu items. User permissions:', userPermissions);
     
     this.menuItems = this.allMenuItems
       .map(item => {
         // Check if main menu item is accessible
         if (item.permission && item.permission.length > 0) {
           const hasAccess = this.permissionService.hasAnyPermission(item.permission);
-          console.log(`Sidebar: Menu item "${item.id}" requires permissions:`, item.permission, 'Has access:', hasAccess);
           if (!hasAccess) {
             return null; // Filter out this item
           }
@@ -164,7 +160,6 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
           const filteredSubmenu = item.submenu.filter(subItem => {
             if (subItem.permission && subItem.permission.length > 0) {
               const hasAccess = this.permissionService.hasAnyPermission(subItem.permission);
-              console.log(`Sidebar: Submenu item "${subItem.id}" requires permissions:`, subItem.permission, 'Has access:', hasAccess);
               return hasAccess;
             }
             return true; // If no permission required, show it
@@ -172,7 +167,6 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
 
           // If parent has permission but no submenu items are accessible, hide parent
           if (filteredSubmenu.length === 0) {
-            console.log(`Sidebar: Hiding parent menu "${item.id}" because no submenu items are accessible`);
             return null;
           }
 
@@ -186,8 +180,6 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
         return item;
       })
       .filter(item => item !== null) as MenuItem[];
-    
-    console.log('Sidebar: Filtered menu items:', this.menuItems.map(m => ({ id: m.id, label: m.label, submenuCount: m.submenu?.length || 0 })));
 
     // Always include dashboard if user is logged in
     if (this.authService.isLoggedIn()) {

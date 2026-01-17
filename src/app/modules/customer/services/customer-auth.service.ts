@@ -170,7 +170,6 @@ export class CustomerAuthService {
     return new Observable(observer => {
       // Simulate API call
       setTimeout(() => {
-        console.log(`OTP sent to ${phone}`);
         observer.next(true);
         observer.complete();
       }, 1000);

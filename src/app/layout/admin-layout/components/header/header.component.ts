@@ -59,13 +59,11 @@ export class HeaderComponent implements OnInit {
   onProfileClick(): void {
     this.showUserMenu = false;
     // Navigate to profile page when implemented
-    console.log('Navigate to profile');
   }
 
   onSettingsClick(): void {
     this.showUserMenu = false;
     // Navigate to settings page when implemented
-    console.log('Navigate to settings');
   }
 
   getUserDisplayName(): string {

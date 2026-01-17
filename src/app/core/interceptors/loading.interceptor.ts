@@ -44,13 +44,6 @@ function shouldSkipLoading(req: HttpRequest<any>): boolean {
  */
 function setLoading(loading: boolean): void {
   // You can emit this to a loading service or use a global state
-  // For now, we'll just log it
-  if (loading) {
-    console.log('Loading started...');
-  } else {
-    console.log('Loading completed...');
-  }
-
   // Example: You could integrate with a loading service like this:
   // this.loadingService.setLoading(loading);
 }

@@ -145,7 +145,6 @@ export class CouponSchemeAddComponent implements OnInit {
   }
 
   openProductModal(index?: number): void {
-    console.log('openProductModal called with index:', index);
     this.editingProductIndex = index !== undefined ? index : null;
     if (index !== undefined) {
       // Edit mode - populate form with existing product data
@@ -215,7 +214,6 @@ export class CouponSchemeAddComponent implements OnInit {
   }
 
   removeProduct(index: number): void {
-    console.log('removeProduct called with index:', index);
     if (confirm('Are you sure you want to remove this product?')) {
       this.productsFormArray.removeAt(index);
       this.updateDisplayOrders();
@@ -231,7 +229,6 @@ export class CouponSchemeAddComponent implements OnInit {
   }
 
   moveProductUp(index: number): void {
-    console.log('moveProductUp called with index:', index);
     if (index > 0) {
       const products = this.productsFormArray;
       const temp = products.at(index);
@@ -244,7 +241,6 @@ export class CouponSchemeAddComponent implements OnInit {
   }
 
   moveProductDown(index: number): void {
-    console.log('moveProductDown called with index:', index);
     if (index < this.productsFormArray.length - 1) {
       const products = this.productsFormArray;
       const temp = products.at(index);

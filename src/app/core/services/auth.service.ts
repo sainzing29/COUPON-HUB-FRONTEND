@@ -189,7 +189,6 @@ export class AuthService {
   getFullUserData(): User | null {
     const user = this.getCurrentUser();
     if (user) {
-      console.log('Full user data:', user);
       return user;
     }
     return null;
@@ -241,7 +240,6 @@ export class AuthService {
           // Decode token to get fresh user information
           // NOTE: This works with both real JWT tokens and dummy tokens from sign-in component
           const payload = this.decodeToken(token);
-          console.log('JWT Payload:', payload);
           
           const user: User = {
             id: payload.sub || '',
@@ -254,9 +252,6 @@ export class AuthService {
             authProvider: payload.authProvider || undefined,
             isActive: payload.isActive !== undefined ? payload.isActive : true
           };
-          
-          console.log('Final User Object:', user);
-          console.log('User Permissions:', user.permission);
           
           // Update stored user data with fresh token data
           this.tokenService.setUser(user);

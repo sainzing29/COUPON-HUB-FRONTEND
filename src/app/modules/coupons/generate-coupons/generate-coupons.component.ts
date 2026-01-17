@@ -183,7 +183,6 @@ export class GenerateCouponsComponent implements OnInit {
 
     this.couponService.generateCoupons(request).subscribe({
       next: (response) => {
-        console.log('Generate coupons response:', response);
         this.generatedBatch = response;
         this.isGenerating = false;
         this.showPreview = false;
@@ -202,25 +201,17 @@ export class GenerateCouponsComponent implements OnInit {
   }
 
   onDownloadCSV(): void {
-    console.log('onDownloadCSV called');
-    console.log('generatedBatch:', this.generatedBatch);
-    
     if (!this.generatedBatch) {
-      console.log('No generated batch available');
       return;
     }
 
     const csvContent = this.generateCSVContent();
-    console.log('CSV Content generated, length:', csvContent.length);
-    console.log('CSV Content:', csvContent);
     
     if (!csvContent) {
-      console.log('CSV content is empty');
       this.toastr.warning('No coupon codes available to download', 'Warning');
       return;
     }
 
-    console.log('Creating blob and downloading file...');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
@@ -231,34 +222,25 @@ export class GenerateCouponsComponent implements OnInit {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    console.log('Download initiated successfully');
 
     // Update batch status to 1 (Exported)
     this.updateBatchStatus(1);
   }
 
   onDownloadExcel(): void {
-    console.log('onDownloadExcel called');
-    console.log('generatedBatch:', this.generatedBatch);
-    
     if (!this.generatedBatch) {
-      console.log('No generated batch available');
       return;
     }
 
     // Excel can open CSV files directly
     // For true .xlsx format, consider using a library like xlsx or exceljs
     const csvContent = this.generateCSVContent();
-    console.log('CSV Content generated, length:', csvContent.length);
-    console.log('CSV Content:', csvContent);
     
     if (!csvContent) {
-      console.log('CSV content is empty');
       this.toastr.warning('No coupon codes available to download', 'Warning');
       return;
     }
 
-    console.log('Creating blob and downloading file...');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
@@ -269,38 +251,24 @@ export class GenerateCouponsComponent implements OnInit {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    console.log('Download initiated successfully');
 
     // Update batch status to 1 (Exported)
     this.updateBatchStatus(1);
   }
 
   private generateCSVContent(): string {
-    console.log('generateCSVContent called');
-    console.log('generatedBatch in generateCSVContent:', this.generatedBatch);
-    
     if (!this.generatedBatch) {
-      console.log('No generatedBatch, returning empty string');
       return '';
     }
     
-    console.log('generatedBatch.coupons:', this.generatedBatch.coupons);
-    console.log('Is coupons an array?', Array.isArray(this.generatedBatch.coupons));
-    
     // Check if coupons array exists
     if (!this.generatedBatch.coupons || !Array.isArray(this.generatedBatch.coupons)) {
-      console.error('Generated batch does not contain coupons array:', this.generatedBatch);
-      console.error('coupons value:', this.generatedBatch.coupons);
-      console.error('typeof coupons:', typeof this.generatedBatch.coupons);
       return '';
     }
 
     if (this.generatedBatch.coupons.length === 0) {
-      console.warn('Coupons array is empty');
       return '';
     }
-
-    console.log('Number of coupons:', this.generatedBatch.coupons.length);
     
     // Calculate range from first and last coupon
     const firstCoupon = this.generatedBatch.coupons[0].couponCode;
@@ -313,10 +281,8 @@ export class GenerateCouponsComponent implements OnInit {
     
     let csv = 'Batch ID,Coupon Code,Quantity,Created At\n';
     this.generatedBatch.coupons.forEach((coupon, index) => {
-      console.log(`Processing coupon ${index + 1}:`, coupon);
       csv += `${this.generatedBatch!.printBatchId},${coupon.couponCode},${this.generatedBatch!.quantity},${coupon.createdAt}\n`;
     });
-    console.log('CSV generation complete');
     return csv;
   }
 

@@ -322,7 +322,7 @@ export class UsersComponent implements OnInit {
           this.toastr.error(errorMessage, 'Error');
         },
         complete: () => {
-          console.log('Resend password email request completed');
+          // Resend password email request completed
         }
       });
     }
