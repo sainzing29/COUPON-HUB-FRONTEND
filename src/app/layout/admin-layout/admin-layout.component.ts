@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd, RouterOutlet } from '@angular/router';
-import { HeaderComponent } from './components/header/header.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { trigger, state, style, transition, animate, query, group } from '@angular/animations';
 import { filter } from 'rxjs/operators';
@@ -9,7 +8,7 @@ import { filter } from 'rxjs/operators';
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, HeaderComponent, SidebarComponent, RouterOutlet],
+  imports: [CommonModule, RouterModule, SidebarComponent, RouterOutlet],
   templateUrl: './admin-layout.component.html',
   styleUrls: ['./admin-layout.component.scss'],
   animations: [

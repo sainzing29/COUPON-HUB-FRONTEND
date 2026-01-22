@@ -2,10 +2,11 @@ import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitte
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
-import { AuthService } from '../../../../core/services/auth.service';
+import { AuthService, User } from '../../../../core/services/auth.service';
 import { PermissionService } from '../../../../core/services/permission.service';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 interface MenuItem {
   id: string;
@@ -22,7 +23,7 @@ interface MenuItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatTooltipModule],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
   animations: [
@@ -44,7 +45,10 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
   @Input() sidebarOpen = true;
   @Input() activeMenuItem = 'dashboard';
   @Output() menuItemClick = new EventEmitter<string>();
+  @Output() toggleSidebar = new EventEmitter<void>();
 
+  currentUser: User | null = null;
+  hoveredMenuItemId: string | null = null; // Track which menu item is being hovered (for dropdown)
   private userSubscription: Subscription = new Subscription();
   private routerSubscription: Subscription = new Subscription();
 
@@ -116,6 +120,9 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    // Get current user from auth service
+    this.currentUser = this.authService.getCurrentUser();
+    
     // Initial filter - wait a bit to ensure auth service has loaded user from token
     setTimeout(() => {
       this.filterMenuItemsByPermission();
@@ -125,6 +132,7 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
 
     // Subscribe to user changes to update menu items when user logs in/out
     this.userSubscription = this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
       this.filterMenuItemsByPermission();
       this.updateActiveStateFromRoute();
       this.ensureSubmenuExpanded();
@@ -301,10 +309,20 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
     
     if (selectedItem) {
       if (selectedItem.hasSubmenu) {
-        // Toggle submenu expansion
-        selectedItem.expanded = !selectedItem.expanded;
+        if (this.sidebarOpen) {
+          // Toggle submenu expansion when sidebar is open
+          selectedItem.expanded = !selectedItem.expanded;
+        } else {
+          // When sidebar is closed, show dropdown on click as well
+          if (this.hoveredMenuItemId === itemId) {
+            this.hoveredMenuItemId = null;
+          } else {
+            this.hoveredMenuItemId = itemId;
+          }
+        }
       } else {
         // Regular menu item - navigate to route
+        // Don't expand sidebar when navigating
         this.activeMenuItem = itemId;
         this.updateActiveState();
         this.router.navigate([selectedItem.route]);
@@ -313,10 +331,30 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
+  onMenuItemHover(itemId: string): void {
+    // Show dropdown when sidebar is closed and item has submenu
+    if (!this.sidebarOpen) {
+      const item = this.menuItems.find(i => i.id === itemId);
+      if (item && item.hasSubmenu) {
+        this.hoveredMenuItemId = itemId;
+      }
+    }
+  }
+
+  onMenuItemLeave(): void {
+    // Hide dropdown when mouse leaves
+    if (!this.sidebarOpen) {
+      this.hoveredMenuItemId = null;
+    }
+  }
+
   onSubmenuItemClick(event: Event, subItemId: string, parentId: string): void {
     // Prevent event propagation to avoid triggering parent click handlers
     event.stopPropagation();
     event.preventDefault();
+    
+    // Hide dropdown after selection
+    this.hoveredMenuItemId = null;
     
     // Find the parent item and ensure it stays expanded
     const parentItem = this.menuItems.find(item => item.id === parentId);
@@ -328,8 +366,8 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
         // Set active menu item immediately for better UX
         this.activeMenuItem = subItemId;
         
-        // Ensure parent is expanded
-        if (parentItem) {
+        // Ensure parent is expanded (only if sidebar is open)
+        if (this.sidebarOpen && parentItem) {
           parentItem.expanded = true;
         }
         
@@ -337,6 +375,7 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
         this.updateActiveState();
         
         // Navigate to route - the router subscription will handle route-based updates
+        // Don't expand sidebar when navigating
         this.router.navigate([subItem.route]).then(() => {
           // Ensure active state is updated after navigation completes
           this.updateActiveStateFromRoute();
@@ -352,5 +391,43 @@ export class SidebarComponent implements OnInit, OnChanges, OnDestroy {
    */
   hasActiveSubmenu(item: MenuItem): boolean {
     return !!(item.hasSubmenu && item.submenu && item.submenu.some(sub => sub.active));
+  }
+
+  /**
+   * User profile methods
+   */
+  getUserDisplayName(): string {
+    if (this.currentUser) {
+      return this.currentUser.name;
+    }
+    return 'User';
+  }
+
+  getUserInitials(): string {
+    if (this.currentUser) {
+      const nameParts = this.currentUser.name.split(' ');
+      if (nameParts.length >= 2) {
+        return `${nameParts[0].charAt(0)}${nameParts[1].charAt(0)}`.toUpperCase();
+      } else {
+        return this.currentUser.name.charAt(0).toUpperCase();
+      }
+    }
+    return 'U';
+  }
+
+  getUserRole(): string {
+    if (this.currentUser) {
+      return this.currentUser.role || 'User';
+    }
+    return 'User';
+  }
+
+  onLogout(): void {
+    this.authService.logout();
+    this.router.navigate(['/admin-login']);
+  }
+
+  onToggleSidebar(): void {
+    this.toggleSidebar.emit();
   }
 }

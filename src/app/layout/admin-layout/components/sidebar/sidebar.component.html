@@ -1,9 +1,8 @@
 <!-- Sidebar -->
 <div 
-  class="sidebar shadow-md transition-all duration-300 ease-in-out h-screen flex flex-col relative fixed left-0 top-0 z-40"
+  class="sidebar h-screen bg-white border-r border-gray-200 flex flex-col transition-all duration-200 relative"
   [class.sidebar-open]="sidebarOpen"
   [class.sidebar-closed]="!sidebarOpen"
-  [@slideInOut]="sidebarOpen ? 'in' : 'out'"
 >
   <!-- Brand Section -->
   <div class="sidebar-brand" tabindex="-1">
@@ -12,6 +11,15 @@
       alt="CES Warranty Logo" 
       [class]="sidebarOpen ? 'logo-expanded' : 'logo-collapsed'"
       tabindex="-1">
+    <!-- Toggle Button -->
+    <button 
+      (click)="onToggleSidebar()"
+      class="sidebar-toggle-btn"
+      [class.sidebar-toggle-open]="sidebarOpen"
+      [class.sidebar-toggle-closed]="!sidebarOpen"
+      aria-label="Toggle sidebar">
+      <span class="material-icons">{{ sidebarOpen ? 'chevron_left' : 'chevron_right' }}</span>
+    </button>
   </div>
 
   <!-- Navigation Menu -->
@@ -21,13 +29,15 @@
         <!-- Main Menu Item -->
         <div 
           (click)="onMenuItemClick($event, item.id)"
-          class="sidebar-menu-item cursor-pointer rounded-[] px-3 py-3 flex items-center"
+          (mouseenter)="onMenuItemHover(item.id)"
+          (mouseleave)="onMenuItemLeave()"
+          class="sidebar-menu-item cursor-pointer rounded-lg flex items-center"
           [class.active]="item.active && !item.hasSubmenu"
           [class.has-active-submenu]="hasActiveSubmenu(item)"
-          [class.space-x-3]="sidebarOpen"
+          [class.justify-center]="!sidebarOpen"
           [class.justify-between]="item.hasSubmenu && sidebarOpen">
-          <div class="flex items-center space-x-3">
-            <span class="material-icons text-xl">{{ item.icon }}</span>
+          <div class="flex items-center" [class.space-x-3]="sidebarOpen" [class.justify-center]="!sidebarOpen">
+            <span class="material-icons text-xl flex-shrink-0">{{ item.icon }}</span>
             <span *ngIf="sidebarOpen" class="font-medium text-[15px] whitespace-nowrap">{{ item.label }}</span>
           </div>
           <!-- Submenu Toggle Arrow -->
@@ -38,7 +48,7 @@
           </span>
         </div>
         
-        <!-- Submenu Items -->
+        <!-- Submenu Items - Expanded in sidebar -->
         <ul *ngIf="item.hasSubmenu && item.submenu && item.expanded && sidebarOpen" 
             class="ml-6 mt-2 space-y-1">
           <li *ngFor="let subItem of item.submenu">
@@ -51,8 +61,52 @@
             </div>
           </li>
         </ul>
+        
+        <!-- Submenu Dropdown - When sidebar is closed -->
+        <div *ngIf="item.hasSubmenu && item.submenu && !sidebarOpen && hoveredMenuItemId === item.id"
+             class="submenu-dropdown absolute left-full top-0 ml-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 min-w-[200px]"
+             (mouseenter)="onMenuItemHover(item.id)"
+             (mouseleave)="onMenuItemLeave()">
+          <div *ngFor="let subItem of item.submenu" 
+               (click)="onSubmenuItemClick($event, subItem.id, item.id)"
+               class="sidebar-submenu-item cursor-pointer rounded-lg px-4 py-2 flex items-center space-x-3 hover:bg-gray-50"
+               [class.active]="subItem.active">
+            <span class="material-icons text-sm">{{ subItem.icon }}</span>
+            <span class="font-medium text-sm whitespace-nowrap">{{ subItem.label }}</span>
+          </div>
+        </div>
       </li>
     </ul>
   </nav>
+
+  <!-- User Profile Section at Bottom -->
+  <div class="sidebar-user-profile border-t border-gray-200 px-4 py-4">
+    <div *ngIf="sidebarOpen" class="flex items-center space-x-3">
+      <!-- User Avatar -->
+      <div class="w-12 h-12 bg-gradient-to-r bg-[#ffcd00] text-white rounded-full flex items-center justify-center text-sm font-semibold shadow-sm flex-shrink-0">
+        {{ getUserInitials() }}
+      </div>
+      <!-- User Info -->
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-semibold text-gray-900 truncate" style="color: #1e293b;">{{ getUserDisplayName() }}</p>
+        <p class="text-xs text-gray-500 truncate">{{ getUserRole() }}</p>
+      </div>
+      <!-- Logout Icon -->
+      <button 
+        (click)="onLogout()"
+        class="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center flex-shrink-0"
+        matTooltip="Logout">
+        <span class="material-icons text-gray-500 text-lg">logout</span>
+      </button>
+    </div>
+    <!-- Collapsed State - Just Avatar -->
+    <div *ngIf="!sidebarOpen" class="flex justify-center">
+      <button 
+        (click)="onLogout()"
+        class="w-10 h-10 bg-gradient-to-r bg-[#ffcd00] text-white rounded-full flex items-center justify-center text-sm font-semibold shadow-sm hover:opacity-80 transition-opacity">
+        {{ getUserInitials() }}
+      </button>
+    </div>
+  </div>
 
 </div>
